@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table";
 
-import { yoys, categories } from "../data/data"
-import { Task } from "../data/schema"
-import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
+import { categories } from "../data/data";
+import { Asset } from "../data/schema";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTableRowDetails } from "./column-details/data-table-row-details";
+import { BarChart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export const columns: ColumnDef<Task>[] = [
+export const columns: ColumnDef<Asset>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -30,6 +31,17 @@ export const columns: ColumnDef<Task>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "id",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Task"
+        className="hidden p-0 m-0"
+      />
+    ),
+    cell: ({ row }) => <div className="hidden p-0 m-0" />,
   },
   // {
   //   accessorKey: "id",
@@ -55,7 +67,7 @@ export const columns: ColumnDef<Task>[] = [
             {row.getValue("name")}
           </span>
         </div>
-      )
+      );
     },
   },
   {
@@ -64,7 +76,7 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Value (USD)" />
     ),
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -75,10 +87,10 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const category = categories.find(
         (category) => category.value === row.getValue("category")
-      )
+      );
 
       if (!category) {
-        return null
+        return null;
       }
 
       return (
@@ -88,10 +100,10 @@ export const columns: ColumnDef<Task>[] = [
           )}
           <span>{category.label}</span>
         </div>
-      )
+      );
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -100,25 +112,15 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="YOY Change" />
     ),
     cell: ({ row }) => {
-      const yoy = yoys.find(
-        (yoy) => yoy.value === row.getValue("yoy")
-      )
-
-      if (!yoy) {
-        return null
-      }
-
       return (
         <div className="flex items-center">
-          {yoy.icon && (
-            <yoy.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{yoy.label}</span>
+          <span>{row.getValue("yoy")}%</span>
+          <BarChart className="ml-2 h-4 w-4 text-muted-foreground" />
         </div>
-      )
+      );
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -127,7 +129,7 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Profit (USD)" />
     ),
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -135,12 +137,33 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ROI (%)" />
     ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center">
+          <span>{row.getValue("roi")}%</span>
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    id: "details",
+    cell: ({ row }) => {
+      const router = useRouter();
+      return (
+        <div
+          onClick={() => router.replace(`?edit-asset=${row.getValue("id")}`)}
+        >
+          <DataTableRowDetails row={row} />
+        </div>
+      );
+    },
   },
-]
+
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => <DataTableRowActions row={row} />,
+  // },
+];

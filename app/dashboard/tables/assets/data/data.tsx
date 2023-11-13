@@ -1,71 +1,42 @@
 import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  CheckCircledIcon,
   CircleIcon,
-  CrossCircledIcon,
   QuestionMarkCircledIcon,
   StopwatchIcon,
-} from "@radix-ui/react-icons"
-
-export const labels = [
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "feature",
-    label: "Feature",
-  },
-  {
-    value: "documentation",
-    label: "Documentation",
-  },
-]
+} from "@radix-ui/react-icons";
+import { Banknote, Building, LineChart } from "lucide-react";
 
 export const categories = [
   {
-    value: "backlog",
-    label: "Backlog",
+    value: "real estate",
+    label: "Real Estate",
+    icon: Building,
+  },
+  {
+    value: "stocks",
+    label: "Stocks",
+    icon: LineChart,
+  },
+  {
+    value: "bonds",
+    label: "Bonds",
+    icon: Banknote,
+  },
+];
+
+export const types = [
+  {
+    value: "passive",
+    label: "Passive",
     icon: QuestionMarkCircledIcon,
   },
   {
-    value: "todo",
-    label: "Todo",
+    value: "active",
+    label: "Active",
     icon: CircleIcon,
   },
   {
-    value: "in progress",
-    label: "In Progress",
+    value: "sustain",
+    label: "Sustain",
     icon: StopwatchIcon,
   },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircledIcon,
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-    icon: CrossCircledIcon,
-  },
-]
-
-export const yoys = [
-  {
-    label: "Low",
-    value: "low",
-    icon: ArrowDownIcon,
-  },
-  {
-    label: "Medium",
-    value: "medium",
-    icon: ArrowRightIcon,
-  },
-  {
-    label: "High",
-    value: "high",
-    icon: ArrowUpIcon,
-  },
-]
+];

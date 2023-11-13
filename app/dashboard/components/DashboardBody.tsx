@@ -1,29 +1,30 @@
-"use client"
+"use client";
 
-import React from 'react'
-import Plans from "@/app/dashboard/components/Plans"
-import Review from "@/app/dashboard/components/Review"
-import Assets from "@/app/dashboard/components/Assets"
-import { useNavState } from "@/store/store"
+import React, { useEffect } from "react";
+import Plans from "@/app/dashboard/components/Plans";
+import Review from "@/app/dashboard/components/Review";
+import Assets from "@/app/dashboard/components/Assets";
+import { useNavState } from "@/store/store";
+import { Asset } from "../tables/assets/data/schema";
+import { useAssetStore } from "@/store/assetStore";
 
+function DashboardBody({ data }: { data: Asset[] }) {
+  const { nav } = useNavState();
+  const { setAssets } = useAssetStore();
 
-function DashboardBody() {
-    const { nav } = useNavState()
-    return (
-        <div className="mx-auto">
-            {nav == "assets" && (
-                <Assets />
-            )}
+  useEffect(() => {
+    setAssets(data);
+  }, [setAssets]);
 
-            {nav == "plans" && (
-                <Plans />
-            )}
+  return (
+    <div className="mx-auto">
+      {nav == "assets" && <Assets />}
 
-            {nav == "review" && (
-                <Review />
-            )}
-        </div>
-    )
+      {nav == "plans" && <Plans />}
+
+      {nav == "review" && <Review />}
+    </div>
+  );
 }
 
-export default DashboardBody
+export default DashboardBody;

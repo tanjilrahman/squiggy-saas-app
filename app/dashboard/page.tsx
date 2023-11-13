@@ -1,18 +1,33 @@
-import DashboardBody from "@/app/dashboard/components/DashboardBody"
-import MenuBar from "@/app/dashboard/components/MenuBar"
+import DashboardBody from "@/app/dashboard/components/DashboardBody";
+import MenuBar from "@/app/dashboard/components/MenuBar";
+import { promises as fs } from "fs";
+import path from "path";
 
-function Dashboard() {
-    return (
-        <div>
-            <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-                <div className="mx-auto max-w-screen-md text-center mb-8 lg:mb-12">
-                    <MenuBar />
-                </div>
+// Simulate a database read for tasks.
+async function getAssets() {
+  const data = await fs.readFile(
+    path.join(process.cwd(), "/app/dashboard/tables/assets/data/assets.json")
+  );
 
-                <DashboardBody />
-            </div>
-        </div>
-    )
+  const assets = JSON.parse(data.toString());
+
+  return assets;
 }
 
-export default Dashboard
+async function Dashboard() {
+  const assets = await getAssets();
+
+  return (
+    <div>
+      <div className="py-6 mx-auto max-w-screen-xl lg:py-14">
+        <div className="mx-auto max-w-screen-md text-center mb-6 lg:mb-8">
+          <MenuBar />
+        </div>
+
+        <DashboardBody data={assets} />
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;
