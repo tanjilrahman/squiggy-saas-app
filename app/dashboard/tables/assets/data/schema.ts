@@ -24,10 +24,10 @@ export type IncomeCost = {
 };
 
 export type Asset = {
-  id?: string;
+  id: string;
   name?: string;
-  value?: number;
-  category?: string;
+  value: number;
+  category: string;
   yoy?: number;
   profit?: number;
   roi?: number;

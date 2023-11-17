@@ -19,7 +19,7 @@ async function Dashboard() {
 
   return (
     <div>
-      <div className="py-6 mx-auto max-w-screen-xl lg:py-14">
+      <div className="mx-auto max-w-screen-xl">
         <div className="mx-auto max-w-screen-md text-center mb-6 lg:mb-8">
           <MenuBar />
         </div>

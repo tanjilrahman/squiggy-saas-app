@@ -1,17 +1,16 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-import { Input } from "@/components/ui/input";
 import { Asset } from "../../data/schema";
 import { DataTableColumnHeader } from "../data-table-column-header";
-import { DataTableCombobox } from "../tableUis/data-table-combobox";
+import { DataTableCombobox } from "../data-table-combobox";
 import { types } from "../../data/data";
-import { Button } from "@/components/ui/button";
-import { Trash2, PlusCircle } from "lucide-react";
-import { useState } from "react";
-import { useAssetStore } from "@/store/assetStore";
-import { useSearchParams } from "next/navigation";
+import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
+import ColumnDetailsName from "./column-details-name";
+import ColumnDetailsValue from "./column-details-value";
+import ColumnDetailsYoy from "./column-details-yoy";
+import ColumnDetailsAdd from "./column-details-add";
+import ColumnDetailsDelete from "./column-details-delete";
 
 export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
   {
@@ -20,46 +19,20 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
       <DataTableColumnHeader sort={false} column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const [value, setValue] = useState<string>(row.getValue("name"));
       const { updateCostName } = useAssetStore();
-      const searchParams = useSearchParams();
-      const assetId = searchParams.get("edit-asset");
-      return (
-        <Input
-          id="name"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            if (assetId)
-              updateCostName(assetId, row.getValue("id"), e.target.value);
-          }}
-          className="font-medium"
-        />
-      );
+
+      return <ColumnDetailsName row={row} updateFunc={updateCostName} />;
     },
   },
   {
     accessorKey: "value",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="Value (USD)" />
+      <DataTableColumnHeader sort={false} column={column} title="Value" />
     ),
     cell: ({ row }) => {
-      const [value, setValue] = useState<number>(row.getValue("value"));
       const { updateCostValue } = useAssetStore();
-      const searchParams = useSearchParams();
-      const assetId = searchParams.get("edit-asset");
-      return (
-        <Input
-          id="value"
-          type="number"
-          value={value}
-          onChange={(e) => {
-            setValue(+e.target.value);
-            if (assetId)
-              updateCostValue(assetId, row.getValue("id"), +e.target.value);
-          }}
-        />
-      );
+
+      return <ColumnDetailsValue row={row} updateFunc={updateCostValue} />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -71,21 +44,8 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
       <DataTableColumnHeader sort={false} column={column} title="YOY Change" />
     ),
     cell: ({ row }) => {
-      const [value, setValue] = useState<number>(row.getValue("yoy"));
       const { updateCostYoy } = useAssetStore();
-      const searchParams = useSearchParams();
-      const assetId = searchParams.get("edit-asset");
-      return (
-        <Input
-          id="yoy"
-          value={value}
-          onChange={(e) => {
-            setValue(+e.target.value);
-            if (assetId)
-              updateCostYoy(assetId, row.getValue("id"), +e.target.value);
-          }}
-        />
-      );
+      return <ColumnDetailsYoy row={row} updateFunc={updateCostYoy} />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -97,11 +57,11 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
       <DataTableColumnHeader sort={false} column={column} title="Type" />
     ),
     cell: ({ row }) => {
-      const searchParams = useSearchParams();
-      const assetId = searchParams.get("edit-asset");
+      const { expanded } = useAssetExpandedState();
+
       return (
         <DataTableCombobox
-          parentId={assetId}
+          parentId={expanded}
           type="cost"
           id={row.getValue("id")}
           categories={types}
@@ -109,30 +69,6 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         />
       );
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "add",
-    header: ({ column }) => (
-      <Button
-        variant="outline"
-        className="flex space-x-1 h-8 px-2 data-[state=open]:bg-muted"
-      >
-        <PlusCircle className="h-4 w-4" />
-        <span>Add</span>
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <Button
-        variant="secondary"
-        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
-      >
-        <Trash2 className="h-4 w-4" />
-        <span className="sr-only">Trash</span>
-      </Button>
-    ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -147,5 +83,20 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
       />
     ),
     cell: ({ row }) => <div className="hidden p-0 m-0" />,
+  },
+  {
+    accessorKey: "add",
+    header: ({ column }) => {
+      const { addCost } = useAssetStore();
+      return <ColumnDetailsAdd type="cost" updateFunc={addCost} />;
+    },
+    cell: ({ row }) => {
+      const { removeCost } = useAssetStore();
+
+      return <ColumnDetailsDelete row={row} updateFunc={removeCost} />;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
 ];

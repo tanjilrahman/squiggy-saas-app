@@ -7,18 +7,28 @@ import Assets from "@/app/dashboard/components/Assets";
 import { useNavState } from "@/store/store";
 import { Asset } from "../tables/assets/data/schema";
 import { useAssetStore } from "@/store/assetStore";
+import BarChart from "./BarChart";
 
 function DashboardBody({ data }: { data: Asset[] }) {
   const { nav } = useNavState();
-  const { setAssets } = useAssetStore();
+  const { setAssets, assets } = useAssetStore();
 
   useEffect(() => {
     setAssets(data);
-  }, [setAssets]);
+  }, []);
 
   return (
-    <div className="mx-auto">
-      {nav == "assets" && <Assets />}
+    <div className="mx-auto pt-4 p-8">
+      {nav == "assets" && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-2 gap-8">
+            <BarChart />
+            <BarChart />
+          </div>
+
+          <Assets />
+        </div>
+      )}
 
       {nav == "plans" && <Plans />}
 

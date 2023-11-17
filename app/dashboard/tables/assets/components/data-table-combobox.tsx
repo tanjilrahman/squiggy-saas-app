@@ -9,7 +9,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
 } from "@/components/ui/command";
 import {
@@ -17,7 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAssetStore } from "@/store/assetStore";
+import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 
 type Categories = {
   value: string;
@@ -42,14 +41,23 @@ export function DataTableCombobox({
 }: PropsType) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(category);
-  const { updateAssetCategory, updateIncomeType, updateCostType } =
+  const { assets, updateAssetCategory, updateIncomeType, updateCostType } =
     useAssetStore();
+  const { isEditable } = useAssetExpandedState();
 
   React.useEffect(() => {
     if (parentId === null && type === "parent") updateAssetCategory(id, value);
     if (type === "income" && parentId) updateIncomeType(parentId, id, value);
     if (type === "cost" && parentId) updateCostType(parentId, id, value);
   }, [value]);
+
+  React.useEffect(() => {
+    setValue(category);
+  }, [assets]);
+
+  const selectedCategory = categories.find(
+    (category) => category.value === value
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -58,17 +66,23 @@ export function DataTableCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[180px] justify-between  disabled:opacity-100 disabled:bg-transparent"
+          disabled={!isEditable}
         >
-          {value
-            ? categories.find((category) => category.value === value)?.label
-            : "Select category..."}
+          <div className="flex items-center">
+            {value && selectedCategory && (
+              <selectedCategory.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+            )}
+            {value && selectedCategory
+              ? categories.find((category) => category.value === value)?.label
+              : "Select category..."}
+          </div>
+
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[180px] p-0">
         <Command>
-          <CommandInput placeholder="Search category..." />
           <CommandEmpty>No category found.</CommandEmpty>
           <CommandGroup>
             {categories?.map((category) => (
@@ -86,6 +100,9 @@ export function DataTableCombobox({
                     value === category.value ? "opacity-100" : "opacity-0"
                   )}
                 />
+                {category.icon && (
+                  <category.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                )}
                 {category.label}
               </CommandItem>
             ))}

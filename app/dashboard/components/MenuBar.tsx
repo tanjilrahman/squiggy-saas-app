@@ -1,23 +1,37 @@
-"use client"
+"use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useNavState } from "@/store/store"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavState } from "@/store/store";
+import { CandlestickChart, KanbanSquare, Route } from "lucide-react";
 
-import React from 'react'
+import React from "react";
 
 function MenuBar() {
-    const { setNav } = useNavState()
-    return (
-        <Tabs defaultValue="assets" className="">
-            <TabsList>
-                <TabsTrigger value="review" onClick={() => setNav('review')}>Review</TabsTrigger>
-                <TabsTrigger value="assets" onClick={() => setNav('assets')}>Assets</TabsTrigger>
-                <TabsTrigger value="plans" onClick={() => setNav('plans')}>Plans</TabsTrigger>
-
-            </TabsList>
-        </Tabs>
-
-    )
+  const { nav, setNav } = useNavState();
+  return (
+    <Tabs defaultValue="assets" className="">
+      <TabsList>
+        <TabsTrigger value="review" onClick={() => setNav("review")}>
+          <KanbanSquare
+            className={`mr-2 h-4 w-4 ${nav === "review" && "text-indigo-500"}`}
+          />
+          Review
+        </TabsTrigger>
+        <TabsTrigger value="assets" onClick={() => setNav("assets")}>
+          <CandlestickChart
+            className={`mr-2 h-4 w-4 ${nav === "assets" && "text-indigo-500"}`}
+          />
+          Assets
+        </TabsTrigger>
+        <TabsTrigger value="plans" onClick={() => setNav("plans")}>
+          <Route
+            className={`mr-2 h-4 w-4 ${nav === "plans" && "text-indigo-500"}`}
+          />
+          Plans
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+  );
 }
 
-export default MenuBar
+export default MenuBar;
