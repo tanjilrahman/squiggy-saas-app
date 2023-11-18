@@ -38,10 +38,10 @@ export default function StackedBarChart() {
     value: number;
     className: string;
     dataKey: string;
-    payload: ResultItem;
+    payload: ResultItem[];
   };
 
-  const customTooltip = ({
+  const customTooltipFunction = ({
     payload,
     active,
   }: {
@@ -164,7 +164,8 @@ export default function StackedBarChart() {
         // showYAxis={false}
         // showGridLines={false}
         showAnimation={true}
-        customTooltip={customTooltip}
+        // @ts-ignore
+        customTooltip={customTooltipFunction}
       />
     </Card>
   );

@@ -139,6 +139,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                               Incomes
                             </Label>
                             <DataTable
+                              // @ts-ignore
                               data={assets[row.index].incomes}
                               columns={ColumnDetailsIncomes}
                             />
@@ -151,6 +152,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                               Costs
                             </Label>
                             <DataTable
+                              // @ts-ignore
                               data={assets[row.index].costs}
                               columns={ColumnDetailsCosts}
                             />

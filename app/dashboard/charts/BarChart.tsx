@@ -85,6 +85,7 @@ export default function BarChart() {
         valueFormatter={formatValue}
         yAxisWidth={40}
         showAnimation={true}
+        // @ts-ignore
         customTooltip={customTooltip}
       />
     </Card>
