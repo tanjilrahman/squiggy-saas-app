@@ -30,7 +30,7 @@ function ColumnDetailsValue<TData>({
         setValue(numericValue);
         if (expanded) updateFunc(expanded, row.getValue("id"), numericValue);
       }}
-      className="disabled:opacity-100 disabled:bg-transparent"
+      className="disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
     />
   );
 }

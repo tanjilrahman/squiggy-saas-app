@@ -25,16 +25,18 @@ type Categories = {
 };
 
 type PropsType = {
-  parentId: string | null;
-  type: "income" | "cost" | "parent";
+  disabled?: boolean;
+  parentId?: string | null;
+  type?: "income" | "cost" | "parent";
   id: string;
   categories: Categories[];
   category: string;
 };
 
 export function DataTableCombobox({
-  parentId,
-  type,
+  disabled = false,
+  parentId = null,
+  type = "parent",
   id,
   categories,
   category,
@@ -43,7 +45,6 @@ export function DataTableCombobox({
   const [value, setValue] = React.useState(category);
   const { assets, updateAssetCategory, updateIncomeType, updateCostType } =
     useAssetStore();
-  const { isEditable } = useAssetExpandedState();
 
   React.useEffect(() => {
     if (parentId === null && type === "parent") updateAssetCategory(id, value);
@@ -66,8 +67,8 @@ export function DataTableCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[180px] justify-between  disabled:opacity-100 disabled:bg-transparent"
-          disabled={!isEditable}
+          className="w-[180px] justify-between  disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+          disabled={disabled}
         >
           <div className="flex items-center">
             {value && selectedCategory && (
@@ -75,10 +76,12 @@ export function DataTableCombobox({
             )}
             {value && selectedCategory
               ? categories.find((category) => category.value === value)?.label
-              : "Select category..."}
+              : "Not Selected"}
           </div>
 
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          {!disabled && (
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[180px] p-0">

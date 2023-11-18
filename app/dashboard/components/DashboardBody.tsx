@@ -7,7 +7,8 @@ import Assets from "@/app/dashboard/components/Assets";
 import { useNavState } from "@/store/store";
 import { Asset } from "../tables/assets/data/schema";
 import { useAssetStore } from "@/store/assetStore";
-import BarChart from "./BarChart";
+import BarChart from "../charts/BarChart";
+import StackedBarChart from "../charts/StackedBarChart";
 
 function DashboardBody({ data }: { data: Asset[] }) {
   const { nav } = useNavState();
@@ -20,10 +21,10 @@ function DashboardBody({ data }: { data: Asset[] }) {
   return (
     <div className="mx-auto pt-4 p-8">
       {nav == "assets" && (
-        <div className="space-y-8">
+        <div className="space-y-8 mt-2">
           <div className="grid grid-cols-2 gap-8">
             <BarChart />
-            <BarChart />
+            <StackedBarChart />
           </div>
 
           <Assets />

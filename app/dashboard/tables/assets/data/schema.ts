@@ -18,14 +18,14 @@
 export type IncomeCost = {
   id?: string;
   name?: string;
-  value?: number;
+  value: number;
   yoy?: number;
-  type?: string;
+  type: string;
 };
 
 export type Asset = {
   id: string;
-  name?: string;
+  name: string;
   value: number;
   category: string;
   yoy?: number;

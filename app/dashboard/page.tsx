@@ -20,10 +20,6 @@ async function Dashboard() {
   return (
     <div>
       <div className="mx-auto max-w-screen-xl">
-        <div className="mx-auto max-w-screen-md text-center mb-6 lg:mb-8">
-          <MenuBar />
-        </div>
-
         <DashboardBody data={assets} />
       </div>
     </div>

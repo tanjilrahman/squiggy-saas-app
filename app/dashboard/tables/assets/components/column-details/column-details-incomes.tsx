@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Asset } from "../../data/schema";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { DataTableCombobox } from "../data-table-combobox";
-import { types } from "../../data/data";
+import { IncomeTypes } from "../../data/data";
 import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 import ColumnDetailsName from "./column-details-name";
 import ColumnDetailsValue from "./column-details-value";
@@ -16,7 +16,12 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="Name" />
+      <DataTableColumnHeader
+        sort={false}
+        column={column}
+        title="Name"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
       const { updateIncomeName } = useAssetStore();
@@ -27,7 +32,12 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   {
     accessorKey: "value",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="Value" />
+      <DataTableColumnHeader
+        sort={false}
+        column={column}
+        title="Value"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
       const { updateIncomeValue } = useAssetStore();
@@ -41,7 +51,12 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   {
     accessorKey: "yoy",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="YOY Change" />
+      <DataTableColumnHeader
+        sort={false}
+        column={column}
+        title="YOY Change"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
       const { updateIncomeYoy } = useAssetStore();
@@ -54,17 +69,23 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   {
     accessorKey: "type",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="Type" />
+      <DataTableColumnHeader
+        sort={false}
+        column={column}
+        title="Type"
+        className="translate-x-4"
+      />
     ),
     cell: ({ row }) => {
-      const { expanded } = useAssetExpandedState();
+      const { expanded, isEditable } = useAssetExpandedState();
 
       return (
         <DataTableCombobox
+          disabled={!isEditable}
           parentId={expanded}
           type="income"
           id={row.getValue("id")}
-          categories={types}
+          categories={IncomeTypes}
           category={row.getValue("type")}
         />
       );

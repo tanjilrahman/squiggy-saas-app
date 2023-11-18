@@ -6,24 +6,25 @@ import { Asset } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  BarChart,
   ChevronDown,
   ChevronUp,
   Pencil,
   PlusCircle,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   useAssetExpandedState,
   useAssetStore,
   useSelectedAssetStore,
 } from "@/store/assetStore";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DataTableCombobox } from "./data-table-combobox";
 import { formatValue2nd } from "@/lib/helperFunctions";
 import { DataTableRemove } from "./data-table-remove";
+import ColumnName from "./column/column-name";
+import ColumnValue from "./column/column-value";
+import ColumnYoy from "./column/column-yoy";
 
 export const columns: ColumnDef<Asset>[] = [
   {
@@ -70,59 +71,35 @@ export const columns: ColumnDef<Asset>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader
+        column={column}
+        title="Name"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
-      const { expanded, isEditable } = useAssetExpandedState();
-      const [value, setValue] = useState<string>(row.getValue("name"));
-      const { assets, updateAssetName } = useAssetStore();
+      const { updateAssetName } = useAssetStore();
 
-      useEffect(() => {
-        setValue(row.getValue("name"));
-      }, [assets]);
-
-      if (row.getValue("id") === expanded)
-        return (
-          <Input
-            id="name"
-            disabled={row.getValue("id") === expanded && !isEditable}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              updateAssetName(row.getValue("id"), e.target.value);
-            }}
-            className="font-medium disabled:opacity-100 disabled:bg-transparent"
-          />
-        );
-
-      return (
-        <div className="flex w-[140px] font-semibold items-center">
-          <span>{row.getValue("name")}</span>
-        </div>
-      );
+      return <ColumnName row={row} updateFunc={updateAssetName} />;
     },
   },
 
   {
     accessorKey: "category",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Category" />
+      <DataTableColumnHeader
+        column={column}
+        title="Category"
+        className="translate-x-4"
+      />
     ),
     cell: ({ row }) => {
       const { expanded, isEditable } = useAssetExpandedState();
-      const category = categories.find(
-        (category) => category.value === row.getValue("category")
-      );
-
-      if (!category) {
-        return null;
-      }
 
       if (row.getValue("id") === expanded)
         return (
           <DataTableCombobox
-            parentId={null}
-            type={"parent"}
+            disabled={!isEditable}
             id={row.getValue("id")}
             categories={categories}
             category={row.getValue("category")}
@@ -130,12 +107,12 @@ export const columns: ColumnDef<Asset>[] = [
         );
 
       return (
-        <div className="flex w-[160px] items-center">
-          {category.icon && (
-            <category.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{category.label}</span>
-        </div>
+        <DataTableCombobox
+          disabled={row.getValue("id") !== expanded}
+          id={row.getValue("id")}
+          categories={categories}
+          category={row.getValue("category")}
+        />
       );
     },
     filterFn: (row, id, value) => {
@@ -145,42 +122,15 @@ export const columns: ColumnDef<Asset>[] = [
   {
     accessorKey: "value",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Value" />
+      <DataTableColumnHeader
+        column={column}
+        title="Value"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
-      const [value, setValue] = useState<number>(row.getValue("value"));
-      const { assets, updateAssetValue } = useAssetStore();
-      const { expanded, isEditable } = useAssetExpandedState();
-
-      useEffect(() => {
-        setValue(row.getValue("value"));
-      }, [assets]);
-
-      if (row.getValue("id") === expanded)
-        return (
-          <Input
-            id="value"
-            type="text"
-            value={
-              row.getValue("id") === expanded && !isEditable
-                ? formatValue2nd(value)
-                : value
-            }
-            disabled={row.getValue("id") === expanded && !isEditable}
-            onChange={(e) => {
-              const numericValue = +e.target.value.replace(/\D/g, "");
-              setValue(numericValue);
-              updateAssetValue(row.getValue("id"), numericValue);
-            }}
-            className=" disabled:opacity-100 disabled:bg-transparent"
-          />
-        );
-
-      return (
-        <div className="flex w-[150px] items-center">
-          <span>{formatValue2nd(row.getValue("value"))}</span>
-        </div>
-      );
+      const { updateAssetValue } = useAssetStore();
+      return <ColumnValue row={row} updateFunc={updateAssetValue} />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -189,37 +139,15 @@ export const columns: ColumnDef<Asset>[] = [
   {
     accessorKey: "yoy",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="YOY Change" />
+      <DataTableColumnHeader
+        column={column}
+        title="YOY Change"
+        className="translate-x-3"
+      />
     ),
     cell: ({ row }) => {
-      const [value, setValue] = useState<number>(row.getValue("yoy"));
-      const { assets, updateAssetYoy } = useAssetStore();
-      const { expanded, isEditable } = useAssetExpandedState();
-
-      useEffect(() => {
-        setValue(row.getValue("yoy"));
-      }, [assets]);
-
-      if (row.getValue("id") === expanded)
-        return (
-          <Input
-            id="yoy"
-            value={value}
-            disabled={row.getValue("id") === expanded && !isEditable}
-            onChange={(e) => {
-              setValue(+e.target.value);
-              updateAssetYoy(row.getValue("id"), +e.target.value);
-            }}
-            className=" disabled:opacity-100 disabled:bg-transparent"
-          />
-        );
-
-      return (
-        <div className="flex  items-center">
-          <span>{row.getValue("yoy")}%</span>
-          <BarChart className="ml-2 h-4 w-4 text-muted-foreground" />
-        </div>
-      );
+      const { updateAssetYoy } = useAssetStore();
+      return <ColumnYoy row={row} updateFunc={updateAssetYoy} />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -270,7 +198,7 @@ export const columns: ColumnDef<Asset>[] = [
         id: newAssetId,
         name: "",
         value: 0,
-        category: "real estate",
+        category: "",
         note: "",
         yoy: 0,
         profit: 0,
@@ -307,27 +235,31 @@ export const columns: ColumnDef<Asset>[] = [
       };
       return (
         <div className="flex space-x-2 justify-end ml-auto items-center">
-          {expanded === row.getValue("id") && (
-            <div className="flex space-x-2">
+          <div
+            className={`${
+              expanded !== row.getValue("id") && "opacity-0"
+            } flex space-x-2`}
+          >
+            <Button
+              disabled={expanded !== row.getValue("id")}
+              variant={isEditable ? "ghost" : "outline"}
+              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
+              onClick={() => setIsEditable(!isEditable)}
+            >
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">Pencil</span>
+            </Button>
+            <DataTableRemove handleRemove={handleRemove}>
               <Button
-                variant={isEditable ? "ghost" : "outline"}
+                disabled={expanded !== row.getValue("id")}
+                variant="outline"
                 className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
-                onClick={() => setIsEditable(!isEditable)}
               >
-                <Pencil className="h-4 w-4" />
-                <span className="sr-only">Pencil</span>
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Trash</span>
               </Button>
-              <DataTableRemove handleRemove={handleRemove}>
-                <Button
-                  variant="outline"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Trash</span>
-                </Button>
-              </DataTableRemove>
-            </div>
-          )}
+            </DataTableRemove>
+          </div>
           <Button
             variant="ghost"
             className="flex h-8 w-8 p-0 data-[state=open]:bg-muted ml-auto"
@@ -353,9 +285,4 @@ export const columns: ColumnDef<Asset>[] = [
       );
     },
   },
-
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <DataTableRowActions row={row} />,
-  // },
 ];

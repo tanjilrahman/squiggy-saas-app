@@ -18,6 +18,7 @@ function ColumnDetailsName<TData>({
 
   useEffect(() => {
     setValue(row.getValue("name"));
+    console.log(assets.find((asset) => asset.id === "5")?.incomes);
   }, [assets]);
 
   return (

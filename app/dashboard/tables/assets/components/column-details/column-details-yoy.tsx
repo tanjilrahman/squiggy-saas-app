@@ -27,7 +27,7 @@ function ColumnDetailsYoy<TData>({
         setValue(+e.target.value);
         if (expanded) updateFunc(expanded, row.getValue("id"), +e.target.value);
       }}
-      className="disabled:opacity-100 disabled:bg-transparent"
+      className="disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
     />
   );
 }

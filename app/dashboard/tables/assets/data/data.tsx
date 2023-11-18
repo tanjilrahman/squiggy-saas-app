@@ -3,7 +3,15 @@ import {
   QuestionMarkCircledIcon,
   StopwatchIcon,
 } from "@radix-ui/react-icons";
-import { Banknote, Building, LineChart } from "lucide-react";
+import {
+  Banknote,
+  Briefcase,
+  Building,
+  CarFront,
+  LandPlot,
+  ShieldPlus,
+  Shirt,
+} from "lucide-react";
 
 export const categories = [
   {
@@ -12,31 +20,69 @@ export const categories = [
     icon: Building,
   },
   {
-    value: "stocks",
-    label: "Stocks",
-    icon: LineChart,
+    value: "securities",
+    label: "Securities",
+    icon: ShieldPlus,
   },
   {
-    value: "bonds",
-    label: "Bonds",
+    value: "currency",
+    label: "Currency",
     icon: Banknote,
+  },
+  {
+    value: "job",
+    label: "Job",
+    icon: Briefcase,
+  },
+  {
+    value: "movables",
+    label: "Movables",
+    icon: CarFront,
+  },
+  {
+    value: "lifestyle",
+    label: "Lifestyle",
+    icon: Shirt,
+  },
+  {
+    value: "others",
+    label: "Others",
+    icon: LandPlot,
   },
 ];
 
-export const types = [
+export const IncomeTypes = [
   {
     value: "passive",
     label: "Passive",
     icon: QuestionMarkCircledIcon,
   },
   {
-    value: "active",
-    label: "Active",
+    value: "mixed",
+    label: "Mixed",
     icon: CircleIcon,
   },
   {
+    value: "active",
+    label: "Active",
+    icon: StopwatchIcon,
+  },
+];
+
+export const CostTypes = [
+  {
     value: "sustain",
     label: "Sustain",
+    icon: QuestionMarkCircledIcon,
+  },
+  {
+    value: "invest",
+    label: "Invest",
+    icon: CircleIcon,
+  },
+  {
+    value: "seed",
+    label: "Seed",
     icon: StopwatchIcon,
   },
 ];

@@ -6,13 +6,7 @@ import {
 } from "@/lib/helperFunctions";
 import { useAssetStore } from "@/store/assetStore";
 import { useSelectedAssetStore } from "@/store/assetStore";
-import {
-  BarChart as BC,
-  Card,
-  Subtitle,
-  Title,
-  ValueFormatter,
-} from "@tremor/react";
+import { BarChart as BC, Card, Subtitle, Title } from "@tremor/react";
 import { useEffect, useState } from "react";
 
 type PayloadDataType = {
@@ -58,7 +52,7 @@ export default function BarChart() {
               <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
                 {formatValue(item.value)}
               </p>
-              <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
+              <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-2">
                 ({Math.floor((item.value / totalValue) * 100)}%)
               </p>
             </div>
@@ -66,7 +60,7 @@ export default function BarChart() {
           </>
         ))}
         <div className="grid grid-cols-4">
-          <p className="text-tremor-content dark:text-dark-tremor-content col-span-2 flex items-center">
+          <p className="text-tremor-content dark:text-dark-tremor-content-emphasis font-semibold col-span-2 flex items-center">
             <div className="w-2 h-2 rounded-full bg-indigo-500 mr-1" />
             Total
           </p>
@@ -79,12 +73,9 @@ export default function BarChart() {
   };
 
   return (
-    <Card>
+    <Card className="z-10">
       <Title>Assets</Title>
-      <Subtitle>
-        The IUCN Red List has assessed only a small share of the total known
-        species in the world.
-      </Subtitle>
+      <Subtitle>Some text to add</Subtitle>
       <BC
         className=""
         data={chartdata}

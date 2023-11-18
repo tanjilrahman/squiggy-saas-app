@@ -3,26 +3,33 @@ import React from "react";
 import { IncomeCost } from "../../data/schema";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ColumnDetailsAddProps = {
+  className?: string;
   type: "income" | "cost";
   updateFunc: (assetId: string, value: IncomeCost) => void;
 };
 
-function ColumnDetailsAdd({ type, updateFunc }: ColumnDetailsAddProps) {
+function ColumnDetailsAdd({
+  className,
+  type,
+  updateFunc,
+}: ColumnDetailsAddProps) {
   const { assets } = useAssetStore();
   const { expanded, isEditable } = useAssetExpandedState();
-  const newIncomeId = (
-    assets.find((asset) => asset.id === expanded)?.incomes.length! + 1
-  ).toString();
 
-  const newCostId = (
-    assets.find((asset) => asset.id === expanded)?.costs.length! + 1
-  ).toString();
+  const newId = (items: "incomes" | "costs") => {
+    const item = assets.find((asset) => asset.id === expanded)?.[items];
+
+    if (item?.length! > 0) {
+      return (+item![0].id! + 1).toString();
+    } else return "1";
+  };
 
   const handleAdd = () => {
     const newItem: IncomeCost = {
-      id: type === "income" ? newIncomeId : newCostId,
+      id: type === "income" ? newId("incomes") : newId("costs"),
       name: "",
       type: "",
       value: 0,
@@ -35,7 +42,10 @@ function ColumnDetailsAdd({ type, updateFunc }: ColumnDetailsAddProps) {
     <Button
       disabled={!isEditable}
       variant="outline"
-      className="flex space-x-1 h-8 px-2 data-[state=open]:bg-muted ml-auto"
+      className={cn(
+        "flex space-x-1 w-32 h-8 px-2 data-[state=open]:bg-muted ml-auto",
+        className
+      )}
       onClick={handleAdd}
     >
       <PlusCircle className="h-4 w-4" />

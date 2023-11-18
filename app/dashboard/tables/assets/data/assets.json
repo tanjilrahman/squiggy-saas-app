@@ -10,27 +10,27 @@
     "roi": 5,
     "incomes": [
       {
-        "id": "1",
+        "id": "2",
         "name": "Rent",
         "value": 60000,
         "yoy": 8,
         "type": "passive"
       },
       {
-        "id": "2",
+        "id": "1",
         "name": "Dividends",
         "value": 10000,
         "yoy": 15,
-        "type": "sustain"
+        "type": "mixed"
       }
     ],
     "costs": [
       {
         "id": "1",
         "name": "Maintenance",
-        "value": 5000,
+        "value": 10000,
         "yoy": 10,
-        "type": "passive"
+        "type": "sustain"
       }
     ]
   },
@@ -38,7 +38,7 @@
     "id": "4",
     "name": "Asset 4",
     "value": 800000,
-    "category": "stocks",
+    "category": "job",
     "yoy": 15,
     "profit": 60000,
     "roi": 7,
@@ -55,9 +55,9 @@
       {
         "id": "1",
         "name": "Transaction Fees",
-        "value": 1000,
+        "value": 30000,
         "yoy": 5,
-        "type": "active"
+        "type": "seed"
       }
     ]
   },
@@ -65,20 +65,20 @@
     "id": "3",
     "name": "Asset 3",
     "value": 1200000,
-    "category": "stocks",
+    "category": "lifestyle",
     "yoy": 12,
     "profit": 75000,
     "roi": 6,
     "incomes": [
       {
-        "id": "1",
+        "id": "2",
         "name": "Rent",
         "value": 70000,
         "yoy": 10,
         "type": "passive"
       },
       {
-        "id": "2",
+        "id": "1",
         "name": "Dividends",
         "value": 12000,
         "yoy": 18,
@@ -89,9 +89,9 @@
       {
         "id": "1",
         "name": "Maintenance",
-        "value": 6000,
+        "value": 30000,
         "yoy": 12,
-        "type": "passive"
+        "type": "invest"
       }
     ]
   },
@@ -99,7 +99,7 @@
     "id": "2",
     "name": "Asset 2",
     "value": 500000,
-    "category": "bonds",
+    "category": "securities",
     "yoy": 8,
     "profit": 30000,
     "roi": 6,
@@ -116,9 +116,9 @@
       {
         "id": "1",
         "name": "Management Fees",
-        "value": 2000,
+        "value": 8000,
         "yoy": 10,
-        "type": "sustain"
+        "type": "invest"
       }
     ]
   },
@@ -132,27 +132,27 @@
     "roi": 8,
     "incomes": [
       {
-        "id": "1",
+        "id": "2",
         "name": "Rent",
         "value": 80000,
         "yoy": 15,
         "type": "passive"
       },
       {
-        "id": "2",
+        "id": "1",
         "name": "Dividends",
         "value": 15000,
         "yoy": 25,
-        "type": "active"
+        "type": "mixed"
       }
     ],
     "costs": [
       {
         "id": "1",
         "name": "Maintenance",
-        "value": 7000,
+        "value": 30000,
         "yoy": 15,
-        "type": "passive"
+        "type": "sustain"
       }
     ]
   }

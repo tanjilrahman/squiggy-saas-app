@@ -99,7 +99,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         asset.id === assetId
           ? {
               ...asset,
-              incomes: [...asset.incomes, newIncome],
+              incomes: [newIncome, ...asset.incomes],
             }
           : asset
       ),
@@ -112,7 +112,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         asset.id === assetId
           ? {
               ...asset,
-              costs: [...asset.costs, newCost],
+              costs: [newCost, ...asset.costs],
             }
           : asset
       ),
