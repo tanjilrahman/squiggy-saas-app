@@ -55,6 +55,28 @@ function CategoryCell<TData>({ row }: { row: Row<TData> }) {
   );
 }
 
+function SelectHeader<TValue extends Asset>({
+  table,
+}: {
+  table: Table<TValue>;
+}) {
+  const { setSelectedAssets } = useSelectedAssetStore();
+  useEffect(() => {
+    const selectedAssets = table
+      .getFilteredSelectedRowModel()
+      .rows.map((row) => row.original);
+    setSelectedAssets(selectedAssets);
+  }, [table.getFilteredSelectedRowModel().rows.length]);
+  return (
+    <Checkbox
+      checked={table.getIsAllPageRowsSelected()}
+      onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      aria-label="Select all"
+      className="translate-y-[2px]"
+    />
+  );
+}
+
 function ValueCell<TData>({ row }: { row: Row<TData> }) {
   const { updateAssetValue } = useAssetStore();
   return <ColumnValue row={row} updateFunc={updateAssetValue} />;
@@ -164,24 +186,7 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
 export const columns: ColumnDef<Asset>[] = [
   {
     id: "select",
-    header: ({ table }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { setSelectedAssets } = useSelectedAssetStore();
-      useEffect(() => {
-        const selectedAssets = table
-          .getFilteredSelectedRowModel()
-          .rows.map((row) => row.original);
-        setSelectedAssets(selectedAssets);
-      }, [table.getFilteredSelectedRowModel().rows.length]);
-      return (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-[2px]"
-        />
-      );
-    },
+    header: SelectHeader,
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
