@@ -14,8 +14,43 @@ import ColumnDetailsDelete from "./column-details-delete";
 
 function CostsNameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateCostName } = useAssetStore();
-
   return <ColumnDetailsName row={row} updateFunc={updateCostName} />;
+}
+
+function CostsValueCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateCostValue } = useAssetStore();
+  return <ColumnDetailsValue row={row} updateFunc={updateCostValue} />;
+}
+
+function CostsYoyCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateCostYoy } = useAssetStore();
+  return <ColumnDetailsYoy row={row} updateFunc={updateCostYoy} />;
+}
+
+function CostsTypeCell<TData>({ row }: { row: Row<TData> }) {
+  const { expanded, isEditable } = useAssetExpandedState();
+
+  return (
+    <DataTableCombobox
+      disabled={!isEditable}
+      parentId={expanded}
+      type="cost"
+      id={row.getValue("id")}
+      categories={CostTypes}
+      category={row.getValue("type")}
+    />
+  );
+}
+
+function CostsAddCell<TData>({ row }: { row: Row<TData> }) {
+  const { removeCost } = useAssetStore();
+
+  return <ColumnDetailsDelete row={row} updateFunc={removeCost} />;
+}
+
+function CostsAddHeader() {
+  const { addCost } = useAssetStore();
+  return <ColumnDetailsAdd type="cost" updateFunc={addCost} />;
 }
 
 export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
@@ -41,11 +76,7 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateCostValue } = useAssetStore();
-
-      return <ColumnDetailsValue row={row} updateFunc={updateCostValue} />;
-    },
+    cell: CostsValueCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -60,10 +91,7 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateCostYoy } = useAssetStore();
-      return <ColumnDetailsYoy row={row} updateFunc={updateCostYoy} />;
-    },
+    cell: CostsYoyCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -78,20 +106,7 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         className="translate-x-4"
       />
     ),
-    cell: ({ row }) => {
-      const { expanded, isEditable } = useAssetExpandedState();
-
-      return (
-        <DataTableCombobox
-          disabled={!isEditable}
-          parentId={expanded}
-          type="cost"
-          id={row.getValue("id")}
-          categories={CostTypes}
-          category={row.getValue("type")}
-        />
-      );
-    },
+    cell: CostsTypeCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -109,15 +124,8 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
   },
   {
     accessorKey: "add",
-    header: ({ column }) => {
-      const { addCost } = useAssetStore();
-      return <ColumnDetailsAdd type="cost" updateFunc={addCost} />;
-    },
-    cell: ({ row }) => {
-      const { removeCost } = useAssetStore();
-
-      return <ColumnDetailsDelete row={row} updateFunc={removeCost} />;
-    },
+    header: CostsAddHeader,
+    cell: CostsAddCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },

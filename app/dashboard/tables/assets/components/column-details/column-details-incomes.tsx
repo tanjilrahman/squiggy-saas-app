@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { Asset } from "../../data/schema";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { DataTableCombobox } from "../data-table-combobox";
@@ -11,6 +11,49 @@ import ColumnDetailsValue from "./column-details-value";
 import ColumnDetailsYoy from "./column-details-yoy";
 import ColumnDetailsAdd from "./column-details-add";
 import ColumnDetailsDelete from "./column-details-delete";
+
+function IncomesNameCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateIncomeName } = useAssetStore();
+
+  return <ColumnDetailsName row={row} updateFunc={updateIncomeName} />;
+}
+
+function IncomesValueCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateIncomeValue } = useAssetStore();
+
+  return <ColumnDetailsValue row={row} updateFunc={updateIncomeValue} />;
+}
+
+function IncomesYoyCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateIncomeYoy } = useAssetStore();
+  return <ColumnDetailsYoy row={row} updateFunc={updateIncomeYoy} />;
+}
+
+function IncomesTypeCell<TData>({ row }: { row: Row<TData> }) {
+  const { expanded, isEditable } = useAssetExpandedState();
+
+  return (
+    <DataTableCombobox
+      disabled={!isEditable}
+      parentId={expanded}
+      type="income"
+      id={row.getValue("id")}
+      categories={IncomeTypes}
+      category={row.getValue("type")}
+    />
+  );
+}
+
+function IncomesAddCell<TData>({ row }: { row: Row<TData> }) {
+  const { removeIncome } = useAssetStore();
+
+  return <ColumnDetailsDelete row={row} updateFunc={removeIncome} />;
+}
+
+function IncomesAddHeader() {
+  const { addIncome } = useAssetStore();
+  return <ColumnDetailsAdd type="income" updateFunc={addIncome} />;
+}
 
 export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   {
@@ -23,11 +66,7 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateIncomeName } = useAssetStore();
-
-      return <ColumnDetailsName row={row} updateFunc={updateIncomeName} />;
-    },
+    cell: IncomesNameCell,
   },
   {
     accessorKey: "value",
@@ -39,11 +78,7 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateIncomeValue } = useAssetStore();
-
-      return <ColumnDetailsValue row={row} updateFunc={updateIncomeValue} />;
-    },
+    cell: IncomesValueCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -58,10 +93,7 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateIncomeYoy } = useAssetStore();
-      return <ColumnDetailsYoy row={row} updateFunc={updateIncomeYoy} />;
-    },
+    cell: IncomesYoyCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -76,20 +108,7 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
         className="translate-x-4"
       />
     ),
-    cell: ({ row }) => {
-      const { expanded, isEditable } = useAssetExpandedState();
-
-      return (
-        <DataTableCombobox
-          disabled={!isEditable}
-          parentId={expanded}
-          type="income"
-          id={row.getValue("id")}
-          categories={IncomeTypes}
-          category={row.getValue("type")}
-        />
-      );
-    },
+    cell: IncomesTypeCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -107,15 +126,8 @@ export const ColumnDetailsIncomes: ColumnDef<Asset>[] = [
   },
   {
     accessorKey: "add",
-    header: ({ column }) => {
-      const { addIncome } = useAssetStore();
-      return <ColumnDetailsAdd type="income" updateFunc={addIncome} />;
-    },
-    cell: ({ row }) => {
-      const { removeIncome } = useAssetStore();
-
-      return <ColumnDetailsDelete row={row} updateFunc={removeIncome} />;
-    },
+    header: IncomesAddHeader,
+    cell: IncomesAddCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
