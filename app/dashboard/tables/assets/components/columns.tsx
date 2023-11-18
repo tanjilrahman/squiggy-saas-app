@@ -270,7 +270,6 @@ export const columns: ColumnDef<Asset>[] = [
               } else {
                 setExpanded(row.getValue("id"));
                 setIsEditable(false);
-                console.log(row.getValue("id"));
               }
             }}
           >

@@ -49,7 +49,6 @@ export default function StackedBarChart() {
     active: boolean;
   }) => {
     if (!active || !payload) return null;
-    let totalValue = payload[0].value;
 
     interface TypeValues {
       assetName: string;
@@ -94,8 +93,8 @@ export default function StackedBarChart() {
     return (
       <div className="w-56 rounded-tremor-default text-tremor-default bg-tremor-background dark:bg-dark-tremor-background-muted shadow-tremor-dropdown border border-tremor-border dark:border dark:border-dark-tremor-border">
         {payload.map((item, idx) => (
-          <>
-            <div key={idx}>
+          <div key={idx}>
+            <div>
               <div className="grid grid-cols-4 py-2 px-3">
                 <div className="flex items-center space-x-1 col-span-3">
                   <svg
@@ -135,7 +134,7 @@ export default function StackedBarChart() {
                 ))}
               </div>
             </div>
-          </>
+          </div>
         ))}
       </div>
     );

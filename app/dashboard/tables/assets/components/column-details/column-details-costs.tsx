@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { Asset } from "../../data/schema";
 import { DataTableColumnHeader } from "../data-table-column-header";
 import { DataTableCombobox } from "../data-table-combobox";
@@ -11,6 +11,12 @@ import ColumnDetailsValue from "./column-details-value";
 import ColumnDetailsYoy from "./column-details-yoy";
 import ColumnDetailsAdd from "./column-details-add";
 import ColumnDetailsDelete from "./column-details-delete";
+
+function CostsNameCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateCostName } = useAssetStore();
+
+  return <ColumnDetailsName row={row} updateFunc={updateCostName} />;
+}
 
 export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
   {
@@ -23,11 +29,7 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         className="translate-x-3"
       />
     ),
-    cell: ({ row }) => {
-      const { updateCostName } = useAssetStore();
-
-      return <ColumnDetailsName row={row} updateFunc={updateCostName} />;
-    },
+    cell: CostsNameCell,
   },
   {
     accessorKey: "value",
