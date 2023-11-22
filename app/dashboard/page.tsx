@@ -1,6 +1,8 @@
 import DashboardBody from "@/app/dashboard/components/DashboardBody";
-import MenuBar from "@/app/dashboard/components/MenuBar";
+import { db } from "@/db";
+import { auth } from "@clerk/nextjs";
 import { promises as fs } from "fs";
+import { redirect } from "next/navigation";
 import path from "path";
 
 // Simulate a database read for tasks.
@@ -16,12 +18,21 @@ async function getAssets() {
 
 async function Dashboard() {
   const assets = await getAssets();
+  const { userId } = auth();
+
+  if (!userId) return redirect("/auth-callback?origin=dashboard");
+
+  const dbUser = await db.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!dbUser) return redirect("/auth-callback?origin=dashboard");
 
   return (
-    <div>
-      <div className="mx-auto max-w-screen-xl">
-        <DashboardBody data={assets} />
-      </div>
+    <div className="mx-auto max-w-screen-xl">
+      <DashboardBody data={assets} />
     </div>
   );
 }

@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import ClientProviders from "@/components/ClientProviders";
-import FirebaseAuthProvider from "@/components/FirebaseAuthProvider";
-
+import { ClerkProvider } from "@clerk/nextjs";
+import Header from "@/components/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,23 +17,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClientProviders>
+    <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <FirebaseAuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <Header />
-
-              {children}
-            </ThemeProvider>
-          </FirebaseAuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
-    </ClientProviders>
+    </ClerkProvider>
   );
 }

@@ -10,53 +10,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import UserAvatar from "./UserAvatar";
-import { Session } from "next-auth";
 import { Button } from "./ui/button";
-import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DarkModeToggle from "./DarkModeToggle";
+import { useClerk } from "@clerk/nextjs";
 
-function UserButton({ session }: { session: Session | null }) {
+type UserButtonTypes = {
+  userName: string;
+  userEmail: string | undefined;
+  userImg: string | undefined;
+  userId: string | null;
+};
+
+function UserButton({ userName, userEmail, userImg, userId }: UserButtonTypes) {
   const router = useRouter();
+  const { signOut } = useClerk();
   // Subscription listener...
 
-  if (!session)
-    return (
-      <div className="flex items-center space-x-2">
-        <Button
-          variant={"outline"}
-          onClick={() => {
-            signIn();
-            router.push("/dashboard");
-          }}
-        >
-          Sign In
-        </Button>
-        <Button
-          variant={"outline"}
-          onClick={() => {
-            signIn();
-            router.push("/dashboard");
-          }}
-        >
-          Sign Up
-        </Button>
-      </div>
-    );
   return (
-    session && (
+    userId && (
       <DropdownMenu>
         <DropdownMenuTrigger className="rounded-full">
-          <UserAvatar name={session.user?.name} image={session.user?.image} />
+          <UserAvatar name={userName} image={userImg} />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">
-                {session.user?.name}
-              </p>
+              <p className="text-sm font-medium leading-none">{userName}</p>
               <p className="text-xs leading-none text-muted-foreground mr-3">
-                {session.user?.email}
+                {userEmail}
               </p>
             </div>
           </DropdownMenuLabel>
@@ -66,7 +48,7 @@ function UserButton({ session }: { session: Session | null }) {
             <DropdownMenuItem onClick={() => router.push("/register")}>
               Billing
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => signOut()}>
+            <DropdownMenuItem onClick={() => signOut(() => router.push("/"))}>
               Log out
             </DropdownMenuItem>
           </DropdownMenuGroup>

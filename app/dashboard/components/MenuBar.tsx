@@ -3,11 +3,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavState } from "@/store/store";
 import { CandlestickChart, KanbanSquare, Route } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import React from "react";
 
 function MenuBar() {
   const { nav, setNav } = useNavState();
+  const pathname = usePathname();
+
+  if (pathname !== "/dashboard") return null;
   return (
     <Tabs defaultValue="assets" className="">
       <TabsList>
