@@ -4,6 +4,7 @@ import { IncomeCost } from "../../data/schema";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { v4 as uuid } from "uuid";
 
 type ColumnDetailsAddProps = {
   className?: string;
@@ -16,25 +17,33 @@ function ColumnDetailsAdd({
   type,
   updateFunc,
 }: ColumnDetailsAddProps) {
-  const { assets } = useAssetStore();
   const { expanded, isEditable } = useAssetExpandedState();
 
-  const newId = (items: "incomes" | "costs") => {
-    const item = assets.find((asset) => asset.id === expanded)?.[items];
-
-    if (item?.length! > 0) {
-      return (+item![0].id! + 1).toString();
-    } else return "1";
-  };
-
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const newItem: IncomeCost = {
-      id: type === "income" ? newId("incomes") : newId("costs"),
+      id: uuid(),
       name: "",
       type: "",
       value: 0,
       yoy: 0,
     };
+
+    // try {
+    //   const response = await fetch("/api/create-incomecost", {
+    //     method: "POST",
+    //     body: JSON.stringify({ type, assetId: expanded, newItem }),
+    //   });
+
+    //   const { success } = await response.json();
+    //   if (success) {
+    //     console.log("success");
+
+    //   }
+    // } catch (err: any) {
+    //   if (err.data?.code === "UNAUTHORIZED") {
+    //     console.log("You don't have the access.");
+    //   }
+    // }
     updateFunc(expanded!, newItem);
   };
 

@@ -47,7 +47,9 @@ function IncomesTypeCell<TData>({ row }: { row: Row<TData> }) {
 function IncomesAddCell<TData>({ row }: { row: Row<TData> }) {
   const { removeIncome } = useAssetStore();
 
-  return <ColumnDetailsDelete row={row} updateFunc={removeIncome} />;
+  return (
+    <ColumnDetailsDelete type="income" row={row} updateFunc={removeIncome} />
+  );
 }
 
 function IncomesAddHeader() {

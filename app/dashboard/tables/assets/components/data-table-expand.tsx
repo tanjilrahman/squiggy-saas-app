@@ -33,6 +33,7 @@ import { ColumnDetailsCosts } from "./column-details/column-details-costs";
 import DataTableTextArea from "./data-table-textarea";
 import { Button } from "@/components/ui/button";
 import { Asset } from "../data/schema";
+import { AlertCircle, Check, Loader2 } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,7 +52,43 @@ export function DataTableExpand<TData extends Asset, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const { assets } = useAssetStore();
-  const { expanded, isEditable } = useAssetExpandedState();
+  const { expanded, isEditable, setIsEditable } = useAssetExpandedState();
+  const [status, setStatus] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isEditable === true) setStatus(null);
+  }, [isEditable]);
+
+  React.useEffect(() => {
+    setStatus(null);
+  }, [expanded]);
+
+  const handleSave = async (assetId: string) => {
+    setStatus("LOADING");
+    const updatedAsset = assets.find((asset) => assetId === asset.id);
+    try {
+      const response = await fetch("/api/update-asset", {
+        method: "POST",
+        body: JSON.stringify(updatedAsset),
+      });
+
+      const { success } = await response.json();
+      if (success) {
+        console.log("SUCCESS");
+        setStatus("SUCCESS");
+        setIsEditable(false);
+      } else {
+        setStatus("ERROR");
+      }
+    } catch (err: any) {
+      if (err.data?.code === "UNAUTHORIZED") {
+        console.log("You don't have the access.");
+      } else {
+        console.log("Something went wrong!");
+      }
+      setStatus("ERROR");
+    }
+  };
 
   const table = useReactTable({
     data,
@@ -163,7 +200,17 @@ export function DataTableExpand<TData extends Asset, TValue>({
                             type="submit"
                             disabled={!isEditable}
                             className="ml-auto my-4"
+                            onClick={() => handleSave(row.getValue("id"))}
                           >
+                            {status === "LOADING" && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            {status === "SUCCESS" && (
+                              <Check className="mr-2 h-4 w-4" />
+                            )}
+                            {status === "ERROR" && (
+                              <AlertCircle className="mr-2 h-4 w-4" />
+                            )}
                             Save changes
                           </Button>
                         </div>

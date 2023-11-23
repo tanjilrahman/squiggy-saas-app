@@ -16,7 +16,7 @@
 // export type Task = z.infer<typeof taskSchema>
 
 export type IncomeCost = {
-  id?: string;
+  id: string;
   name?: string;
   value: number;
   yoy?: number;

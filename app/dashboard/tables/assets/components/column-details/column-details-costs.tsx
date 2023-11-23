@@ -45,7 +45,7 @@ function CostsTypeCell<TData>({ row }: { row: Row<TData> }) {
 function CostsAddCell<TData>({ row }: { row: Row<TData> }) {
   const { removeCost } = useAssetStore();
 
-  return <ColumnDetailsDelete row={row} updateFunc={removeCost} />;
+  return <ColumnDetailsDelete type="cost" row={row} updateFunc={removeCost} />;
 }
 
 function CostsAddHeader() {

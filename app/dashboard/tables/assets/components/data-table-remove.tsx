@@ -9,6 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAssetStore } from "@/store/assetStore";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type DataTableRemoveProps = {
   handleRemove: () => void;
@@ -19,8 +22,22 @@ export function DataTableRemove({
   handleRemove,
   children,
 }: DataTableRemoveProps) {
+  const { assets } = useAssetStore();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const deleteButton = () => {
+    setLoading(true);
+    handleRemove();
+  };
+
+  useEffect(() => {
+    setLoading(false);
+    setOpen(false);
+  }, [assets]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -33,13 +50,18 @@ export function DataTableRemove({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="ghost">Cancel</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button onClick={handleRemove} variant="destructive">
-              Delete
+            <Button disabled={loading} variant="ghost">
+              Cancel
             </Button>
           </DialogClose>
+          <Button
+            onClick={deleteButton}
+            disabled={loading}
+            variant="destructive"
+          >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{" "}
+            Delete
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,6 @@
 "use client";
 
+import { v4 as uuid } from "uuid";
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { categories } from "../data/data";
 import { Asset } from "../data/schema";
@@ -88,23 +89,25 @@ function YoyCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function DetailsHeader() {
-  const { assets, addAsset } = useAssetStore();
+  const { addAsset } = useAssetStore();
   const { setIsEditable, setExpanded } = useAssetExpandedState();
-  const newAssetId = (assets[0]?.id ? +assets[0]?.id + 1 : 1).toString();
 
-  const newAsset: Asset = {
-    id: newAssetId,
-    name: "",
-    value: 0,
-    category: "",
-    note: "",
-    yoy: 0,
-    profit: 0,
-    roi: 0,
-    incomes: [],
-    costs: [],
-  };
   const handleAddAsset = () => {
+    const newAssetId = uuid();
+
+    const newAsset: Asset = {
+      id: newAssetId,
+      name: "",
+      value: 0,
+      category: "",
+      note: "",
+      yoy: 0,
+      profit: 0,
+      roi: 0,
+      incomes: [],
+      costs: [],
+    };
+
     addAsset(newAsset);
     setExpanded(newAssetId);
     setIsEditable(true);
@@ -127,11 +130,32 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
     useAssetExpandedState();
   const { removeAsset } = useAssetStore();
 
-  const handleRemove = () => {
-    removeAsset(row.getValue("id"));
-    setExpanded(null);
-    setIsEditable(false);
+  const handleRemove = async () => {
+    try {
+      const response = await fetch("/api/delete-asset", {
+        method: "POST",
+        body: JSON.stringify({ assetId: row.getValue("id") }),
+      });
+
+      const { success, code } = await response.json();
+      if (success) {
+        console.log("success");
+        removeAsset(row.getValue("id"));
+        setExpanded(null);
+        setIsEditable(false);
+      }
+      if (code === "NOT FOUND") {
+        removeAsset(row.getValue("id"));
+        setExpanded(null);
+        setIsEditable(false);
+      }
+    } catch (err: any) {
+      if (err.data?.code === "UNAUTHORIZED") {
+        console.log("You don't have the access.");
+      }
+    }
   };
+
   return (
     <div className="flex space-x-2 justify-end ml-auto items-center">
       <div
