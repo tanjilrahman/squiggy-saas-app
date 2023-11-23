@@ -84,7 +84,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
       if (err.data?.code === "UNAUTHORIZED") {
         console.log("You don't have the access.");
       } else {
-        console.log("Something went wrong!");
+        console.log(err);
       }
       setStatus("ERROR");
     }
