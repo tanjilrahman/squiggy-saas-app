@@ -136,39 +136,43 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    updatedAsset?.incomes.map(async (income: IncomeCost) => {
-      await db.income.create({
-        data: {
-          Asset: {
-            connect: {
-              id: createdAsset.id,
+    await Promise.all(
+      updatedAsset?.incomes.map(async (income: IncomeCost) => {
+        await db.income.create({
+          data: {
+            Asset: {
+              connect: {
+                id: createdAsset.id,
+              },
             },
+            id: income.id,
+            name: income.name!,
+            type: income?.type,
+            value: income?.value,
+            yoy: income.yoy!,
           },
-          id: income.id,
-          name: income.name!,
-          type: income?.type,
-          value: income?.value,
-          yoy: income.yoy!,
-        },
-      });
-    });
+        });
+      })
+    );
 
-    updatedAsset?.costs.map(async (cost: IncomeCost) => {
-      await db.cost.create({
-        data: {
-          Asset: {
-            connect: {
-              id: createdAsset.id,
+    await Promise.all(
+      updatedAsset?.costs.map(async (cost: IncomeCost) => {
+        await db.cost.create({
+          data: {
+            Asset: {
+              connect: {
+                id: createdAsset.id,
+              },
             },
+            id: cost.id,
+            name: cost.name!,
+            type: cost?.type,
+            value: cost?.value,
+            yoy: cost.yoy!,
           },
-          id: cost.id,
-          name: cost.name!,
-          type: cost?.type,
-          value: cost?.value,
-          yoy: cost.yoy!,
-        },
-      });
-    });
+        });
+      })
+    );
   }
 
   return Response.json({ success: true });
