@@ -118,61 +118,58 @@ export async function POST(request: NextRequest) {
   // create a new asset
 
   if (!hasAsset) {
-    const createdAsset = await db.asset.create({
-      data: {
-        User: {
-          connect: {
-            id: userId,
+    await db.asset
+      .create({
+        data: {
+          User: {
+            connect: {
+              id: userId,
+            },
           },
+          id: updatedAsset?.id,
+          name: updatedAsset?.name,
+          value: updatedAsset?.value,
+          category: updatedAsset?.category,
+          yoy: updatedAsset?.yoy,
+          profit: updatedAsset?.profit,
+          roi: updatedAsset?.roi,
+          note: updatedAsset?.note || "",
         },
-        id: updatedAsset?.id,
-        name: updatedAsset?.name,
-        value: updatedAsset?.value,
-        category: updatedAsset?.category,
-        yoy: updatedAsset?.yoy,
-        profit: updatedAsset?.profit,
-        roi: updatedAsset?.roi,
-        note: updatedAsset?.note || "",
-      },
-    });
-
-    await Promise.all(
-      updatedAsset?.incomes.map(async (income: IncomeCost) => {
-        await db.income.create({
-          data: {
-            Asset: {
-              connect: {
-                id: createdAsset.id,
-              },
-            },
-            id: income.id,
-            name: income.name!,
-            type: income?.type,
-            value: income?.value,
-            yoy: income.yoy!,
-          },
-        });
       })
-    );
-
-    await Promise.all(
-      updatedAsset?.costs.map(async (cost: IncomeCost) => {
-        await db.cost.create({
-          data: {
-            Asset: {
-              connect: {
-                id: createdAsset.id,
+      .then((createdAsset) => {
+        updatedAsset?.incomes.map(async (income: IncomeCost) => {
+          await db.income.create({
+            data: {
+              Asset: {
+                connect: {
+                  id: createdAsset.id,
+                },
               },
+              id: income.id,
+              name: income.name!,
+              type: income?.type,
+              value: income?.value,
+              yoy: income.yoy!,
             },
-            id: cost.id,
-            name: cost.name!,
-            type: cost?.type,
-            value: cost?.value,
-            yoy: cost.yoy!,
-          },
+          });
         });
-      })
-    );
+        updatedAsset?.costs.map(async (cost: IncomeCost) => {
+          await db.cost.create({
+            data: {
+              Asset: {
+                connect: {
+                  id: createdAsset.id,
+                },
+              },
+              id: cost.id,
+              name: cost.name!,
+              type: cost?.type,
+              value: cost?.value,
+              yoy: cost.yoy!,
+            },
+          });
+        });
+      });
   }
 
   return Response.json({ success: true });
