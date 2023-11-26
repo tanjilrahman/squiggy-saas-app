@@ -294,7 +294,7 @@ export const columns: ColumnDef<Asset>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex w-[120px] space-x-2">
+        <div className="flex w-[80px] space-x-2">
           <span className="truncate font-medium">
             {formatValue2nd(row.getValue("profit"))}
           </span>
@@ -312,7 +312,7 @@ export const columns: ColumnDef<Asset>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex items-center">
+        <div className="w-[40px] flex items-center">
           <span>{row.getValue("roi")}%</span>
         </div>
       );

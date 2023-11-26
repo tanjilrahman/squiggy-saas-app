@@ -17,27 +17,23 @@ function ColumnName<TData>({ row, updateFunc }: ColumnNameProps<TData>) {
     setValue(row.getValue("name"));
   }, [assets]);
 
-  if (row.getValue("id") === expanded)
+  if (row.getValue("id") === expanded && isEditable)
     return (
       <Input
         id="name"
-        disabled={!isEditable}
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
           updateFunc(row.getValue("id"), e.target.value);
         }}
-        className="font-medium disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+        className="w-[120px] font-medium disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
       />
     );
 
   return (
-    <Input
-      id="name"
-      disabled
-      value={value}
-      className="font-medium disabled:opacity-100 disabled:bg-transparent disabled:border-transparent disabled:cursor-default"
-    />
+    <div className="w-[120px] px-3 py-2 border border-transparent">
+      <p>{value}</p>
+    </div>
   );
 }
 

@@ -18,30 +18,25 @@ function ColumnValue<TData>({ row, updateFunc }: ColumnValueProps<TData>) {
     setValue(row.getValue("value"));
   }, [assets]);
 
-  if (row.getValue("id") === expanded)
+  if (row.getValue("id") === expanded && isEditable)
     return (
       <Input
         id="value"
         type="text"
-        value={!isEditable ? formatValue2nd(value) : value}
-        disabled={row.getValue("id") === expanded && !isEditable}
+        value={value}
         onChange={(e) => {
           const numericValue = +e.target.value.replace(/\D/g, "");
           setValue(numericValue);
           updateFunc(row.getValue("id"), numericValue);
         }}
-        className=" disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+        className="w-[150px] disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
       />
     );
 
   return (
-    <Input
-      id="value"
-      type="text"
-      value={formatValue2nd(value)}
-      disabled
-      className=" disabled:opacity-100 disabled:bg-transparent disabled:border-transparent disabled:cursor-default"
-    />
+    <div className="w-[150px] px-3 py-2 border border-transparent">
+      <p>{formatValue2nd(value)}</p>
+    </div>
   );
 }
 

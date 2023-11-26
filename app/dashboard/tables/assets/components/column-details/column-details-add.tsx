@@ -28,22 +28,6 @@ function ColumnDetailsAdd({
       yoy: 0,
     };
 
-    // try {
-    //   const response = await fetch("/api/create-incomecost", {
-    //     method: "POST",
-    //     body: JSON.stringify({ type, assetId: expanded, newItem }),
-    //   });
-
-    //   const { success } = await response.json();
-    //   if (success) {
-    //     console.log("success");
-
-    //   }
-    // } catch (err: any) {
-    //   if (err.data?.code === "UNAUTHORIZED") {
-    //     console.log("You don't have the access.");
-    //   }
-    // }
     updateFunc(expanded!, newItem);
   };
 

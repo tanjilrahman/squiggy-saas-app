@@ -67,7 +67,7 @@ export function DataTableCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[180px] justify-between  disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+          className="w-[160px] justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
           disabled={disabled}
         >
           <div className="flex items-center">
@@ -79,12 +79,14 @@ export function DataTableCombobox({
               : "Not Selected"}
           </div>
 
-          {!disabled && (
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          )}
+          <ChevronsUpDown
+            className={`${
+              disabled ? "opacity-0" : "opacity-50"
+            } ml-2 h-4 w-4 shrink-0`}
+          />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[180px] p-0">
+      <PopoverContent className="w-[160px] p-0">
         <Command>
           <CommandEmpty>No category found.</CommandEmpty>
           <CommandGroup>

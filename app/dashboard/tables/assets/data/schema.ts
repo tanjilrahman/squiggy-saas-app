@@ -19,7 +19,10 @@ export type IncomeCost = {
   id: string;
   name?: string;
   value: number;
-  yoy?: number;
+  value_mode?: "independent" | "relative";
+  yoy?: number | number[];
+  yoy_type?: "fixed" | "percentage";
+  yoy_mode?: "simple" | "advanced";
   type: string;
 };
 
@@ -28,7 +31,9 @@ export type Asset = {
   name: string;
   value: number;
   category: string;
-  yoy?: number;
+  yoy?: number | number[];
+  yoy_type?: "fixed" | "percentage";
+  yoy_mode?: "simple" | "advanced";
   profit?: number;
   roi?: number;
   note: string | null;
