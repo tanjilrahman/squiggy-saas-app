@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { OAuthStrategy } from "@clerk/types";
-import { useSignIn } from "@clerk/nextjs";
+import { useSignUp } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 
-function GoogleSignInButton() {
-  const { isLoaded, signIn } = useSignIn();
+function GoogleSignUpButton() {
+  const { isLoaded, signUp } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
 
-  const signInWith = (strategy: OAuthStrategy) => {
-    return signIn?.authenticateWithRedirect({
+  const signUpWith = (strategy: OAuthStrategy) => {
+    return signUp?.authenticateWithRedirect({
       strategy,
-      redirectUrl: "/sign-up",
+      redirectUrl: "/sign-in",
       redirectUrlComplete: "/dashboard",
     });
   };
@@ -24,7 +24,7 @@ function GoogleSignInButton() {
       type="button"
       disabled={!isLoaded || isLoading}
       onClick={() => {
-        signInWith("oauth_google");
+        signUpWith("oauth_google");
         setIsLoading(true);
       }}
     >
@@ -43,4 +43,4 @@ function GoogleSignInButton() {
   );
 }
 
-export default GoogleSignInButton;
+export default GoogleSignUpButton;

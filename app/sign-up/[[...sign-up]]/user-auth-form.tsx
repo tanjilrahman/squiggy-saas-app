@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import GoogleSignInButton from "@/components/GoogleSignInButton";
+import GoogleSignUpButton from "@/components/GoogleSignUpButton";
 import { Loader2 } from "lucide-react";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -143,7 +143,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             </div>
           </div>
 
-          <GoogleSignInButton />
+          <GoogleSignUpButton />
         </>
       )}
       {pendingVerification && (
