@@ -19,12 +19,14 @@ function CostsNameCell<TData>({ row }: { row: Row<TData> }) {
 
 function CostsValueCell<TData>({ row }: { row: Row<TData> }) {
   const { updateCostValue } = useAssetStore();
-  return <ColumnDetailsValue row={row} updateFunc={updateCostValue} />;
+  return (
+    <ColumnDetailsValue row={row} type="cost" updateFunc={updateCostValue} />
+  );
 }
 
 function CostsYoyCell<TData>({ row }: { row: Row<TData> }) {
   const { updateCostYoy } = useAssetStore();
-  return <ColumnDetailsYoy row={row} updateFunc={updateCostYoy} />;
+  return <ColumnDetailsYoy row={row} type="cost" updateFunc={updateCostYoy} />;
 }
 
 function CostsTypeCell<TData>({ row }: { row: Row<TData> }) {

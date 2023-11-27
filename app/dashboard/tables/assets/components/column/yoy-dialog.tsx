@@ -12,25 +12,50 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { YoyCombobox } from "./yoy-combobox";
+import { useAssetStore } from "@/store/assetStore";
 
 type YoyDialogProps = {
   children: JSX.Element;
+  assetId: string;
 };
 
-export function YoyDialog({ children }: YoyDialogProps) {
+export function YoyDialog({ children, assetId }: YoyDialogProps) {
   const [open, setOpen] = useState(false);
   const [enable, setEnable] = useState(false);
   const [numYears, setNumYears] = useState(5);
-  const [yoyValues, setYoyValues] = useState<string[]>(
+  const [yoyValues, setYoyValues] = useState<number[]>(
     Array(numYears).fill("")
   );
+  const { assets, updateAssetYoyMode, updateAssetYoyAdvanced } =
+    useAssetStore();
+  const asset = assets.find((asset) => asset.id === assetId);
 
   useEffect(() => {
-    console.log(yoyValues);
-  }, [yoyValues]);
+    if (asset?.yoy_advanced) {
+      setYoyValues(asset.yoy_advanced);
+    }
+    setEnable(asset?.yoy_mode === "advanced");
+  }, []);
+
+  useEffect(() => {
+    if (asset?.yoy_advanced) {
+      setYoyValues(asset.yoy_advanced);
+    }
+    setEnable(asset?.yoy_mode === "advanced");
+  }, [assets.length]);
+
+  useEffect(() => {
+    updateAssetYoyMode(assetId, enable ? "advanced" : "simple");
+
+    if (enable) {
+      updateAssetYoyAdvanced(assetId, yoyValues);
+    }
+  }, [enable]);
+
   const currentYear = new Date().getFullYear();
 
-  const handleInputChange = (index: number, value: string) => {
+  const handleInputChange = (index: number, value: number) => {
     const newValues = [...yoyValues];
     newValues[index] = value;
     setYoyValues(newValues);
@@ -44,10 +69,11 @@ export function YoyDialog({ children }: YoyDialogProps) {
         <div key={index} className="text-center">
           <Label>{currentYear + index}</Label>
           <Input
+            type="number"
             disabled={!enable}
-            className="w-[70px] h-[35px] p-2 mt-2"
+            className="w-[70px] h-[35px] p-2 mt-2 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             value={yearValue}
-            onChange={(e) => handleInputChange(index, e.target.value)}
+            onChange={(e) => handleInputChange(index, +e.target.value)}
           />
         </div>
       );
@@ -56,8 +82,10 @@ export function YoyDialog({ children }: YoyDialogProps) {
 
   useEffect(() => {
     // Update the number of years when the button is clicked
-    setYoyValues(Array(numYears).fill(""));
-  }, [numYears]);
+    if (enable) {
+      updateAssetYoyAdvanced(assetId, yoyValues.slice(0, numYears));
+    }
+  }, [yoyValues, numYears]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,7 +99,7 @@ export function YoyDialog({ children }: YoyDialogProps) {
         </DialogHeader>
 
         <div className="flex items-center justify-between">
-          <Tabs defaultValue="5" className="flex items-center">
+          <Tabs defaultValue="5" className="flex items-center space-x-2">
             <TabsList>
               <TabsTrigger value="5" onClick={() => setNumYears(5)}>
                 5
@@ -86,6 +114,7 @@ export function YoyDialog({ children }: YoyDialogProps) {
                 50
               </TabsTrigger>
             </TabsList>
+            <YoyCombobox assetId={assetId} />
           </Tabs>
           <div className="flex items-center">
             <Label className="mr-2">{enable ? "Enabled" : "Disabled"}</Label>

@@ -11,10 +11,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useAssetStore } from "@/store/assetStore";
 
 const frameworks = [
   {
-    value: "usd",
+    value: "fixed",
     label: "USD",
   },
   {
@@ -24,12 +25,44 @@ const frameworks = [
 ];
 
 type PropsType = {
+  className?: string;
   disabled?: boolean;
+  assetId: string;
+  itemId: string;
+  type: "income" | "cost";
 };
 
-export function DetailsYoyCombobox({ disabled = false }: PropsType) {
+export function DetailsYoyCombobox({
+  className,
+  disabled = false,
+  assetId,
+  itemId,
+  type,
+}: PropsType) {
+  const { assets, updateIncomeYoyType, updateCostYoyType } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === assetId);
+  const income = asset?.incomes.find((item) => item.id === itemId);
+  const cost = asset?.costs.find((item) => item.id === itemId);
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("usd");
+  const [value, setValue] = React.useState(
+    type === "income" ? income?.yoy_type! : cost?.yoy_type!
+  );
+
+  React.useEffect(() => {
+    if (type === "income") {
+      updateIncomeYoyType(assetId, itemId, value);
+    } else {
+      updateCostYoyType(assetId, itemId, value);
+    }
+  }, [value]);
+
+  React.useEffect(() => {
+    if (type === "income") {
+      setValue(income?.yoy_type!);
+    } else {
+      setValue(cost?.yoy_type!);
+    }
+  }, [assets]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -38,11 +71,18 @@ export function DetailsYoyCombobox({ disabled = false }: PropsType) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between border-l-0 rounded-l-none disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-2"
+          className={cn(
+            `${
+              disabled && "hidden"
+            } justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3 w-[70px] `,
+            className
+          )}
           disabled={disabled}
         >
-          {value &&
-            frameworks.find((framework) => framework.value === value)?.label}
+          <p className="ml-auto">
+            {value &&
+              frameworks.find((framework) => framework.value === value)?.label}
+          </p>
 
           <ChevronsUpDown
             className={`${
@@ -59,8 +99,13 @@ export function DetailsYoyCombobox({ disabled = false }: PropsType) {
                 key={framework.value}
                 value={framework.value}
                 onSelect={(currentValue) => {
-                  setValue(currentValue);
-                  setOpen(false);
+                  if (currentValue === "fixed" || currentValue === "%") {
+                    setValue(currentValue as "fixed" | "%");
+                    setOpen(false);
+                  } else {
+                    setValue("fixed");
+                    setOpen(false);
+                  }
                 }}
               >
                 <Check

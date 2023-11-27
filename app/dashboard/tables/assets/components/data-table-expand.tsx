@@ -66,6 +66,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
   const handleSave = async (assetId: string) => {
     setStatus("LOADING");
     const updatedAsset = assets.find((asset) => assetId === asset.id);
+    console.log(updatedAsset);
     try {
       const response = await fetch("/api/update-asset", {
         method: "POST",

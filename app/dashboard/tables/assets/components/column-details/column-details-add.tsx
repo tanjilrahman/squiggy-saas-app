@@ -26,6 +26,10 @@ function ColumnDetailsAdd({
       type: "",
       value: 0,
       yoy: 0,
+      value_mode: "fixed",
+      yoy_advanced: [],
+      yoy_mode: "simple",
+      yoy_type: "fixed",
     };
 
     updateFunc(expanded!, newItem);

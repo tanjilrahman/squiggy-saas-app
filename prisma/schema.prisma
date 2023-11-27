@@ -24,37 +24,48 @@ model User {
 }
 
 model Asset {
-  id        String   @id @default(uuid())
-  name      String
-  value     Int
-  category  String
-  yoy       Int
-  profit    Int
-  roi       Int
-  note      String
-  createdAt DateTime @default(now())
-  incomes   Income[]
-  costs     Cost[]
-  User      User     @relation(fields: [userId], references: [id])
-  userId    String
+  id           String   @id @default(uuid())
+  name         String
+  value        Int
+  category     String
+  yoy          Int?
+  yoy_advanced Int[]
+  yoy_type     String
+  yoy_mode     String
+  profit       Int
+  roi          Int
+  note         String
+  createdAt    DateTime @default(now())
+  incomes      Income[]
+  costs        Cost[]
+  User         User     @relation(fields: [userId], references: [id])
+  userId       String
 }
 
 model Income {
-  id      String @id @default(uuid())
-  name    String
-  value   Int
-  yoy     Int
-  type    String
-  Asset   Asset  @relation(fields: [assetId], references: [id])
-  assetId String
+  id           String @id @default(uuid())
+  name         String
+  value        Int
+  yoy          Int?
+  yoy_advanced Int[]
+  yoy_type     String
+  yoy_mode     String
+  value_mode   String
+  type         String
+  Asset        Asset  @relation(fields: [assetId], references: [id])
+  assetId      String
 }
 
 model Cost {
-  id      String @id @default(uuid())
-  name    String
-  value   Int
-  yoy     Int
-  type    String
-  Asset   Asset  @relation(fields: [assetId], references: [id])
-  assetId String
+  id           String @id @default(uuid())
+  name         String
+  value        Int
+  yoy          Int?
+  yoy_advanced Int[]
+  yoy_type     String
+  yoy_mode     String
+  value_mode   String
+  type         String
+  Asset        Asset  @relation(fields: [assetId], references: [id])
+  assetId      String
 }

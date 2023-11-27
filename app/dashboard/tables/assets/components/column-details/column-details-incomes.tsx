@@ -21,12 +21,20 @@ function IncomesNameCell<TData>({ row }: { row: Row<TData> }) {
 function IncomesValueCell<TData>({ row }: { row: Row<TData> }) {
   const { updateIncomeValue } = useAssetStore();
 
-  return <ColumnDetailsValue row={row} updateFunc={updateIncomeValue} />;
+  return (
+    <ColumnDetailsValue
+      row={row}
+      type="income"
+      updateFunc={updateIncomeValue}
+    />
+  );
 }
 
 function IncomesYoyCell<TData>({ row }: { row: Row<TData> }) {
   const { updateIncomeYoy } = useAssetStore();
-  return <ColumnDetailsYoy row={row} updateFunc={updateIncomeYoy} />;
+  return (
+    <ColumnDetailsYoy row={row} type="income" updateFunc={updateIncomeYoy} />
+  );
 }
 
 function IncomesTypeCell<TData>({ row }: { row: Row<TData> }) {

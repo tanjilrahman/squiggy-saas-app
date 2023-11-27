@@ -28,24 +28,41 @@ type PropsType = {
   className?: string;
   disabled?: boolean;
   assetId: string;
+  itemId: string;
+  type: "income" | "cost";
 };
 
-export function YoyCombobox({
+export function DetailsValueCombobox({
   className,
   disabled = false,
   assetId,
+  itemId,
+  type,
 }: PropsType) {
-  const { assets, updateAssetYoyType } = useAssetStore();
+  const { assets, updateIncomeValueMode, updateCostValueMode } =
+    useAssetStore();
   const asset = assets.find((asset) => asset.id === assetId);
+  const income = asset?.incomes.find((item) => item.id === itemId);
+  const cost = asset?.costs.find((item) => item.id === itemId);
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(asset?.yoy_type!);
+  const [value, setValue] = React.useState(
+    type === "income" ? income?.value_mode! : cost?.value_mode!
+  );
 
   React.useEffect(() => {
-    updateAssetYoyType(assetId, value);
+    if (type === "income") {
+      updateIncomeValueMode(assetId, itemId, value);
+    } else {
+      updateCostValueMode(assetId, itemId, value);
+    }
   }, [value]);
 
   React.useEffect(() => {
-    setValue(asset?.yoy_type!);
+    if (type === "income") {
+      setValue(income?.value_mode!);
+    } else {
+      setValue(cost?.value_mode!);
+    }
   }, [assets]);
 
   return (
@@ -58,13 +75,15 @@ export function YoyCombobox({
           className={cn(
             `${
               disabled && "hidden"
-            } justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3`,
+            } justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3 w-[70px] `,
             className
           )}
           disabled={disabled}
         >
-          {value &&
-            frameworks.find((framework) => framework.value === value)?.label}
+          <p className="ml-auto">
+            {value &&
+              frameworks.find((framework) => framework.value === value)?.label}
+          </p>
 
           <ChevronsUpDown
             className={`${

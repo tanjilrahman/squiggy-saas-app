@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
         profit: updatedAsset?.profit,
         roi: updatedAsset?.roi,
         note: updatedAsset?.note,
+        yoy_advanced: updatedAsset?.yoy_advanced,
+        yoy_mode: updatedAsset?.yoy_mode,
+        yoy_type: updatedAsset?.yoy_type,
       },
     });
 
@@ -71,6 +74,10 @@ export async function POST(request: NextRequest) {
             type: income?.type,
             value: income?.value,
             yoy: income.yoy!,
+            yoy_advanced: income?.yoy_advanced,
+            yoy_mode: income?.yoy_mode,
+            yoy_type: income?.yoy_type,
+            value_mode: income?.value_mode,
           },
         });
       }
@@ -109,6 +116,10 @@ export async function POST(request: NextRequest) {
             type: cost?.type,
             value: cost?.value,
             yoy: cost.yoy!,
+            yoy_advanced: cost?.yoy_advanced,
+            yoy_mode: cost?.yoy_mode,
+            yoy_type: cost?.yoy_type,
+            value_mode: cost?.value_mode,
           },
         });
       }
@@ -133,6 +144,9 @@ export async function POST(request: NextRequest) {
         profit: updatedAsset?.profit,
         roi: updatedAsset?.roi,
         note: updatedAsset?.note || "",
+        yoy_advanced: updatedAsset?.yoy_advanced,
+        yoy_mode: updatedAsset?.yoy_mode,
+        yoy_type: updatedAsset?.yoy_type,
       },
     });
 
@@ -150,6 +164,10 @@ export async function POST(request: NextRequest) {
             type: income?.type,
             value: income?.value,
             yoy: income.yoy!,
+            yoy_advanced: income?.yoy_advanced,
+            yoy_mode: income?.yoy_mode,
+            yoy_type: income?.yoy_type,
+            value_mode: income?.value_mode,
           },
         });
       })
@@ -169,6 +187,10 @@ export async function POST(request: NextRequest) {
             type: cost?.type,
             value: cost?.value,
             yoy: cost.yoy!,
+            yoy_advanced: cost?.yoy_advanced,
+            yoy_mode: cost?.yoy_mode,
+            yoy_type: cost?.yoy_type,
+            value_mode: cost?.value_mode,
           },
         });
       })

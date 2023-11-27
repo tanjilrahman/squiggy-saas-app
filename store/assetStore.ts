@@ -42,6 +42,12 @@ type AssetStore = {
   updateAssetValue: (assetId: string, newValue: number) => void;
   updateAssetCategory: (assetId: string, newCategory: string) => void;
   updateAssetYoy: (assetId: string, newAssetYoy: number) => void;
+  updateAssetYoyType: (assetId: string, newYoyType: "fixed" | "%") => void;
+  updateAssetYoyMode: (
+    assetId: string,
+    newYoyMode: "simple" | "advanced"
+  ) => void;
+  updateAssetYoyAdvanced: (assetId: string, newYoyAdvanced: number[]) => void;
   updateAssetNote: (assetId: string, newNote: string) => void;
 
   updateIncomeName: (
@@ -78,6 +84,54 @@ type AssetStore = {
     assetId: string,
     incomeId: string,
     newValue: number
+  ) => void;
+
+  updateIncomeYoyType: (
+    assetId: string,
+    incomeId: string,
+    newYoyType: "fixed" | "%"
+  ) => void;
+
+  updateIncomeYoyMode: (
+    assetId: string,
+    incomeId: string,
+    newYoyMode: "simple" | "advanced"
+  ) => void;
+
+  updateIncomeYoyAdvanced: (
+    assetId: string,
+    incomeId: string,
+    newYoyAdvanced: number[]
+  ) => void;
+
+  updateIncomeValueMode: (
+    assetId: string,
+    incomeId: string,
+    newValueMode: "fixed" | "%"
+  ) => void;
+
+  updateCostYoyType: (
+    assetId: string,
+    costId: string,
+    newYoyType: "fixed" | "%"
+  ) => void;
+
+  updateCostYoyMode: (
+    assetId: string,
+    costId: string,
+    newYoyMode: "simple" | "advanced"
+  ) => void;
+
+  updateCostYoyAdvanced: (
+    assetId: string,
+    costId: string,
+    newYoyAdvanced: number[]
+  ) => void;
+
+  updateCostValueMode: (
+    assetId: string,
+    costId: string,
+    newValueMode: "fixed" | "%"
   ) => void;
 };
 
@@ -187,6 +241,29 @@ export const useAssetStore = create<AssetStore>((set) => ({
     }));
   },
 
+  updateAssetYoyType: (assetId, newYoyType) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId ? { ...asset, yoy_type: newYoyType } : asset
+      ),
+    }));
+  },
+  updateAssetYoyMode: (assetId, newYoyMode) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId ? { ...asset, yoy_mode: newYoyMode } : asset
+      ),
+    }));
+  },
+  updateAssetYoyAdvanced: (assetId, newYoyAdvanced) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? { ...asset, yoy_advanced: newYoyAdvanced }
+          : asset
+      ),
+    }));
+  },
   updateIncomeValue: (assetId, incomeId, newValue) => {
     set((state) => ({
       assets: state.assets.map((asset) =>
@@ -302,6 +379,146 @@ export const useAssetStore = create<AssetStore>((set) => ({
               ...asset,
               costs: asset.costs.map((cost) =>
                 cost.id === costId ? { ...cost, type: newCostType } : cost
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update income yoy_type
+  updateIncomeYoyType: (assetId, incomeId, newYoyType) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              incomes: asset.incomes.map((income) =>
+                income.id === incomeId
+                  ? { ...income, yoy_type: newYoyType }
+                  : income
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update income yoy_mode
+  updateIncomeYoyMode: (assetId, incomeId, newYoyMode) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              incomes: asset.incomes.map((income) =>
+                income.id === incomeId
+                  ? { ...income, yoy_mode: newYoyMode }
+                  : income
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update income yoy_advanced
+  updateIncomeYoyAdvanced: (assetId, incomeId, newYoyAdvanced) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              incomes: asset.incomes.map((income) =>
+                income.id === incomeId
+                  ? { ...income, yoy_advanced: newYoyAdvanced }
+                  : income
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update income value_mode
+  updateIncomeValueMode: (assetId, incomeId, newValueMode) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              incomes: asset.incomes.map((income) =>
+                income.id === incomeId
+                  ? { ...income, value_mode: newValueMode }
+                  : income
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update cost yoy_type
+  updateCostYoyType: (assetId, costId, newYoyType) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              costs: asset.costs.map((cost) =>
+                cost.id === costId ? { ...cost, yoy_type: newYoyType } : cost
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update cost yoy_mode
+  updateCostYoyMode: (assetId, costId, newYoyMode) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              costs: asset.costs.map((cost) =>
+                cost.id === costId ? { ...cost, yoy_mode: newYoyMode } : cost
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update cost yoy_advanced
+  updateCostYoyAdvanced: (assetId, costId, newYoyAdvanced) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              costs: asset.costs.map((cost) =>
+                cost.id === costId
+                  ? { ...cost, yoy_advanced: newYoyAdvanced }
+                  : cost
+              ),
+            }
+          : asset
+      ),
+    }));
+  },
+
+  // Function to update cost value_mode
+  updateCostValueMode: (assetId, costId, newValueMode) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId
+          ? {
+              ...asset,
+              costs: asset.costs.map((cost) =>
+                cost.id === costId
+                  ? { ...cost, value_mode: newValueMode }
+                  : cost
               ),
             }
           : asset
