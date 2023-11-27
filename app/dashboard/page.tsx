@@ -94,6 +94,7 @@ async function Dashboard() {
 
   return (
     <div className="mx-auto max-w-screen-xl">
+      {/* @ts-ignore */}
       <DashboardBody data={assets} />
     </div>
   );
