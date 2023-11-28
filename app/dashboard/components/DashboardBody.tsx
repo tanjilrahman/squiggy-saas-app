@@ -12,11 +12,11 @@ import StackedBarChart from "../charts/StackedBarChart";
 
 function DashboardBody({ data }: { data: Asset[] }) {
   const { nav } = useNavState();
-  const { setAssets, assets } = useAssetStore();
+  const { setAssets } = useAssetStore();
 
   useEffect(() => {
     setAssets(data);
-  }, []);
+  }, [data]);
 
   return (
     <div className="mx-auto pt-4 p-8">

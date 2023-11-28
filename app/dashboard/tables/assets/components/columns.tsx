@@ -88,6 +88,63 @@ function YoyCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnYoy row={row} updateFunc={updateAssetYoy} />;
 }
 
+function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
+  const [profit, setProfit] = useState(0);
+  const { assets } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === row.getValue("id"));
+  row.original.profit = profit;
+  useEffect(() => {
+    setProfit(calculateProfit(asset!));
+    row.original.profit = profit;
+  }, [assets]);
+  return (
+    <div className="flex w-[120px] space-x-2">
+      <span className="truncate font-medium">{formatValue2nd(profit)}</span>
+    </div>
+  );
+}
+
+function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
+  const [roi, setRoi] = useState(0);
+  const { assets } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === row.getValue("id"));
+  row.original.roi = roi;
+  useEffect(() => {
+    if (asset?.yoy_mode === "simple") {
+      if (asset?.yoy_type === "%") {
+        setRoi(
+          (asset.value * asset.yoy + calculateProfit(asset!)) / asset.value
+        );
+      }
+      if (asset?.yoy_type === "fixed") {
+        setRoi((asset.yoy + calculateProfit(asset!)) / asset.value);
+      }
+    }
+
+    if (asset?.yoy_mode === "advanced") {
+      if (asset?.yoy_type === "%") {
+        setRoi(
+          (asset.value * (asset.yoy_advanced[1] - asset.yoy_advanced[0]) +
+            calculateProfit(asset!)) /
+            asset.value
+        );
+      }
+      if (asset?.yoy_type === "fixed") {
+        setRoi(
+          (asset.yoy + (asset.yoy_advanced[1] - asset.yoy_advanced[0])) /
+            asset.value
+        );
+      }
+    }
+  }, [assets]);
+
+  return (
+    <div className="w-[40px] flex items-center">
+      <span>{Math.floor(roi * 10) / 10}%</span>
+    </div>
+  );
+}
+
 function DetailsHeader() {
   const { addAsset } = useAssetStore();
   const { setIsEditable, setExpanded } = useAssetExpandedState();
@@ -295,21 +352,7 @@ export const columns: ColumnDef<Asset>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Profit" />
     ),
-    cell: ({ row }) => {
-      const [profit, setProfit] = useState(0);
-      const { assets } = useAssetStore();
-      const asset = assets.find((asset) => asset.id === row.getValue("id"));
-      row.original.profit = profit;
-      useEffect(() => {
-        setProfit(calculateProfit(asset!));
-        row.original.profit = profit;
-      }, [assets]);
-      return (
-        <div className="flex w-[120px] space-x-2">
-          <span className="truncate font-medium">{formatValue2nd(profit)}</span>
-        </div>
-      );
-    },
+    cell: ProfitCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
@@ -319,46 +362,7 @@ export const columns: ColumnDef<Asset>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ROI" />
     ),
-    cell: ({ row }) => {
-      const [roi, setRoi] = useState(0);
-      const { assets } = useAssetStore();
-      const asset = assets.find((asset) => asset.id === row.getValue("id"));
-      row.original.roi = roi;
-      useEffect(() => {
-        if (asset?.yoy_mode === "simple") {
-          if (asset?.yoy_type === "%") {
-            setRoi(
-              (asset.value * asset.yoy + calculateProfit(asset!)) / asset.value
-            );
-          }
-          if (asset?.yoy_type === "fixed") {
-            setRoi((asset.yoy + calculateProfit(asset!)) / asset.value);
-          }
-        }
-
-        if (asset?.yoy_mode === "advanced") {
-          if (asset?.yoy_type === "%") {
-            setRoi(
-              (asset.value * (asset.yoy_advanced[1] - asset.yoy_advanced[0]) +
-                calculateProfit(asset!)) /
-                asset.value
-            );
-          }
-          if (asset?.yoy_type === "fixed") {
-            setRoi(
-              (asset.yoy + (asset.yoy_advanced[1] - asset.yoy_advanced[0])) /
-                asset.value
-            );
-          }
-        }
-      }, [assets]);
-
-      return (
-        <div className="w-[40px] flex items-center">
-          <span>{Math.floor(roi * 10) / 10}%</span>
-        </div>
-      );
-    },
+    cell: RoiCell,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
