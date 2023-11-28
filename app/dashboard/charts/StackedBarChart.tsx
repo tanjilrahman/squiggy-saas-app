@@ -5,8 +5,9 @@ import {
   formatValue,
 } from "@/lib/helperFunctions";
 import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
-import { Card, Title, BarChart, Text, Subtitle } from "@tremor/react";
+import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 import { useEffect, useState } from "react";
+import { Asset } from "../tables/assets/data/schema";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
@@ -20,19 +21,6 @@ export default function StackedBarChart() {
       setStackedChartData(convertToStackedChartData(selectedAssets));
     }
   }, [assets, selectedAssets]);
-
-  const data = [
-    { index: "Incomes", Passive: 21000, Mixed: 25000, Active: 57000 },
-
-    {
-      index: "Costs",
-      Sustain: 12000,
-      Seed: 30000,
-      Invest: 20000,
-    },
-
-    { index: "Margin", Margin: 41000 },
-  ];
 
   type PayloadDataType = {
     value: number;
@@ -55,8 +43,17 @@ export default function StackedBarChart() {
       typeValue: number;
     }
 
-    function getTypeValues(targetType: string): TypeValues[] {
+    function getTypeValues(targetType: string, assets: Asset[]): TypeValues[] {
       return assets.reduce((result, asset) => {
+        // Function to adjust values based on the percentage mode
+        const adjustValue = (
+          value: number,
+          value_mode: "fixed" | "%",
+          assetValue: number
+        ): number => {
+          return value_mode === "%" ? value * assetValue : value;
+        };
+
         const matchingIncomes = asset.incomes.filter(
           (income) => income.type === targetType.toLocaleLowerCase()
         );
@@ -66,7 +63,8 @@ export default function StackedBarChart() {
 
         if (matchingIncomes.length > 0) {
           const totalIncomeValue = matchingIncomes.reduce(
-            (sum, income) => sum + income.value,
+            (sum, income) =>
+              sum + adjustValue(income.value, income.value_mode, asset.value),
             0
           );
           result.push({
@@ -77,7 +75,8 @@ export default function StackedBarChart() {
 
         if (matchingCosts.length > 0) {
           const totalCostValue = matchingCosts.reduce(
-            (sum, cost) => sum + cost.value,
+            (sum, cost) =>
+              sum + adjustValue(cost.value, cost.value_mode, asset.value),
             0
           );
           result.push({
@@ -119,7 +118,7 @@ export default function StackedBarChart() {
               {payload.length > 1 && <Separator className="" />}
 
               <div className="pt-[2px] pb-2">
-                {getTypeValues(item.dataKey).map((asset, i) => (
+                {getTypeValues(item.dataKey, assets).map((asset, i) => (
                   <div key={i} className="grid grid-cols-4 px-3 space-y-[2px]">
                     <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
                       {asset.assetName}

@@ -13,7 +13,7 @@ import {
   PlusCircle,
   Trash2,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useAssetExpandedState,
   useAssetStore,
@@ -21,7 +21,7 @@ import {
 } from "@/store/assetStore";
 import { Button } from "@/components/ui/button";
 import { DataTableCombobox } from "./data-table-combobox";
-import { formatValue2nd } from "@/lib/helperFunctions";
+import { calculateProfit, formatValue2nd } from "@/lib/helperFunctions";
 import { DataTableRemove } from "./data-table-remove";
 import ColumnName from "./column/column-name";
 import ColumnValue from "./column/column-value";
@@ -296,11 +296,17 @@ export const columns: ColumnDef<Asset>[] = [
       <DataTableColumnHeader column={column} title="Profit" />
     ),
     cell: ({ row }) => {
+      const [profit, setProfit] = useState(0);
+      const { assets } = useAssetStore();
+      const asset = assets.find((asset) => asset.id === row.getValue("id"));
+      row.original.profit = profit;
+      useEffect(() => {
+        setProfit(calculateProfit(asset!));
+        row.original.profit = profit;
+      }, [assets]);
       return (
-        <div className="flex w-[80px] space-x-2">
-          <span className="truncate font-medium">
-            {formatValue2nd(row.getValue("profit"))}
-          </span>
+        <div className="flex w-[120px] space-x-2">
+          <span className="truncate font-medium">{formatValue2nd(profit)}</span>
         </div>
       );
     },
@@ -314,9 +320,42 @@ export const columns: ColumnDef<Asset>[] = [
       <DataTableColumnHeader column={column} title="ROI" />
     ),
     cell: ({ row }) => {
+      const [roi, setRoi] = useState(0);
+      const { assets } = useAssetStore();
+      const asset = assets.find((asset) => asset.id === row.getValue("id"));
+      row.original.roi = roi;
+      useEffect(() => {
+        if (asset?.yoy_mode === "simple") {
+          if (asset?.yoy_type === "%") {
+            setRoi(
+              (asset.value * asset.yoy + calculateProfit(asset!)) / asset.value
+            );
+          }
+          if (asset?.yoy_type === "fixed") {
+            setRoi((asset.yoy + calculateProfit(asset!)) / asset.value);
+          }
+        }
+
+        if (asset?.yoy_mode === "advanced") {
+          if (asset?.yoy_type === "%") {
+            setRoi(
+              (asset.value * (asset.yoy_advanced[1] - asset.yoy_advanced[0]) +
+                calculateProfit(asset!)) /
+                asset.value
+            );
+          }
+          if (asset?.yoy_type === "fixed") {
+            setRoi(
+              (asset.yoy + (asset.yoy_advanced[1] - asset.yoy_advanced[0])) /
+                asset.value
+            );
+          }
+        }
+      }, [assets]);
+
       return (
         <div className="w-[40px] flex items-center">
-          <span>{row.getValue("roi")}%</span>
+          <span>{Math.floor(roi * 10) / 10}%</span>
         </div>
       );
     },

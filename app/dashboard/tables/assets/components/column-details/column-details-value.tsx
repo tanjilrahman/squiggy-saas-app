@@ -64,7 +64,11 @@ function ColumnDetailsValue<TData>({
 
   return (
     <div className="flex items-center w-[200px] px-3 py-2 border border-transparent">
-      {itemType === "fixed" ? <p>{formatValue2nd(value)}</p> : <p>{value}%</p>}
+      {itemType === "fixed" ? (
+        <p>{formatValue2nd(value)}</p>
+      ) : (
+        <p>{formatValue2nd(value * asset?.value!)}</p>
+      )}
     </div>
   );
 }

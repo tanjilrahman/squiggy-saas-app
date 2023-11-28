@@ -48,13 +48,26 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
 
   // Iterate through the input data and sum values by category type
   inputData.forEach((asset) => {
+    // Function to adjust values based on the percentage mode
+    const adjustValue = (
+      value: number,
+      value_mode: "fixed" | "%",
+      assetValue: number
+    ): number => {
+      return value_mode === "%" ? value * assetValue : value;
+    };
+
     // Sum Incomes
     asset.incomes.forEach((income) => {
       const capitalizedType = capitalizeFirstLetter(income.type);
       if (!incomeTotals[capitalizedType]) {
         incomeTotals[capitalizedType] = 0;
       }
-      incomeTotals[capitalizedType] += income.value;
+      incomeTotals[capitalizedType] += adjustValue(
+        income.value,
+        income.value_mode,
+        asset.value
+      );
     });
 
     // Sum Costs
@@ -63,7 +76,11 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
       if (!costTotals[capitalizedType]) {
         costTotals[capitalizedType] = 0;
       }
-      costTotals[capitalizedType] += cost.value;
+      costTotals[capitalizedType] += adjustValue(
+        cost.value,
+        cost.value_mode,
+        asset.value
+      );
     });
   });
 
@@ -71,6 +88,7 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
   const margin =
     Object.values(incomeTotals).reduce((acc, income) => acc + income, 0) -
     Object.values(costTotals).reduce((acc, cost) => acc + cost, 0);
+
   // Organize the data into the desired format
   const result: ResultItem[] = [
     { index: "Incomes", ...incomeTotals },
@@ -95,3 +113,32 @@ export const formatValue = (value: number): string => {
 
 export const formatValue2nd = (number: number) =>
   `$${new Intl.NumberFormat("us").format(number).toString()} USD`;
+
+export function calculateProfit(asset: Asset): number {
+  // Function to adjust values based on the percentage mode
+  const adjustValue = (
+    value: number,
+    value_mode: "fixed" | "%",
+    assetValue: number
+  ): number => {
+    return value_mode === "%" ? value * assetValue : value;
+  };
+
+  // Sum up all adjusted income values
+  const totalIncome = asset.incomes.reduce(
+    (sum, income) =>
+      sum + adjustValue(income.value, income.value_mode, asset.value),
+    0
+  );
+
+  // Sum up all adjusted cost values
+  const totalCost = asset.costs.reduce(
+    (sum, cost) => sum + adjustValue(cost.value, cost.value_mode, asset.value),
+    0
+  );
+
+  // Calculate net income by subtracting total cost from total income
+  const netIncome = totalIncome - totalCost;
+
+  return netIncome;
+}

@@ -50,7 +50,11 @@ function ColumnDetailsYoy<TData>({
 
   useEffect(() => {
     if (mode === "advanced") {
-      updateFunc(expanded!, row.getValue("id"), yoyAdvanced![0]);
+      updateFunc(
+        expanded!,
+        row.getValue("id"),
+        yoyAdvanced![1] - yoyAdvanced![0]
+      );
     }
   }, [mode]);
 
@@ -59,7 +63,9 @@ function ColumnDetailsYoy<TData>({
       <div className="flex items-center w-[200px]">
         <Input
           id="yoy"
-          value={mode === "advanced" ? yoyAdvanced![0] : value}
+          value={
+            mode === "advanced" ? yoyAdvanced![1] - yoyAdvanced![0] : value
+          }
           disabled={!isEditable || mode === "advanced"}
           onChange={(e) => {
             setValue(+e.target.value);
@@ -98,14 +104,14 @@ function ColumnDetailsYoy<TData>({
     <div className="flex items-center w-[200px] px-3 py-2 border border-transparent">
       {itemType === "fixed" ? (
         mode === "advanced" ? (
-          <p>{formatValue2nd(yoyAdvanced![0])}</p>
+          <p>{formatValue2nd(yoyAdvanced![1] - yoyAdvanced![0])}</p>
         ) : (
           <p>{formatValue2nd(value)}</p>
         )
       ) : mode === "advanced" ? (
-        <p>{yoyAdvanced![0]}%</p>
+        <p>{yoyAdvanced![1] - yoyAdvanced![0]}%</p>
       ) : (
-        <p>{value}%</p>
+        <p>{formatValue2nd(value * asset?.value!)}</p>
       )}
       {mode === "advanced" && (
         <TrendingUp className="opacity-100 h-5 w-5 ml-2" />
