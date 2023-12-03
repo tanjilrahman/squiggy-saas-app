@@ -4,49 +4,48 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const { userId } = auth();
-  const { assetId, type, itemId } = await request.json();
+  const { planId, type, itemId } = await request.json();
 
   if (!userId) return Response.json({ code: "UNAUTHORIZED" }, { status: 401 });
 
   // Check if the user have this asset
 
-  const hasAsset = await db.user.findFirst({
+  const hasPlan = await db.user.findFirst({
     where: {
       id: userId,
-      assets: {
+      plans: {
         some: {
-          id: assetId,
+          id: planId,
         },
       },
     },
   });
 
-  if (!hasAsset) return Response.json({ code: "NOT FOUND" }, { status: 404 });
+  if (!hasPlan) return Response.json({ code: "NOT FOUND" }, { status: 404 });
 
-  if (assetId) {
-    await db.asset.delete({
+  if (planId) {
+    await db.plan.delete({
       where: {
-        id: assetId,
+        id: planId,
       },
       include: {
-        incomes: true,
-        costs: true,
+        actions: {
+          include: {
+            assetIns: true,
+            assetOuts: true,
+          },
+        },
       },
     });
   }
-
-  if (type == "income" && itemId) {
-    await db.income.delete({
+  if (type === "action" && itemId) {
+    await db.action.delete({
       where: {
         id: itemId,
       },
-    });
-  }
-
-  if (type == "cost" && itemId) {
-    await db.cost.delete({
-      where: {
-        id: itemId,
+      include: {
+        assetIns: true,
+        assetOuts: true,
       },
     });
   }

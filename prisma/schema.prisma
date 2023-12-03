@@ -16,6 +16,7 @@ model User {
   email String @unique
 
   assets Asset[]
+  plans  Plan[]
 
   stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
@@ -43,7 +44,7 @@ model Asset {
 }
 
 model Income {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   value        Int
   yoy          Int?
@@ -52,12 +53,13 @@ model Income {
   yoy_mode     String
   value_mode   String
   type         String
-  Asset        Asset  @relation(fields: [assetId], references: [id])
+  Asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
   assetId      String
+  createdAt    DateTime @default(now())
 }
 
 model Cost {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   value        Int
   yoy          Int?
@@ -66,6 +68,45 @@ model Cost {
   yoy_mode     String
   value_mode   String
   type         String
-  Asset        Asset  @relation(fields: [assetId], references: [id])
+  Asset        Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
   assetId      String
+  createdAt    DateTime @default(now())
+}
+
+model Plan {
+  id                 String   @id @default(uuid())
+  name               String
+  note               String
+  inflation          Int?
+  inflation_advanced Int[]
+  inflation_mode     String
+  status             String
+  actions            Action[]
+  createdAt          DateTime @default(now())
+  User               User     @relation(fields: [userId], references: [id])
+  userId             String
+}
+
+model Action {
+  id        String       @id @default(uuid())
+  name      String
+  timeframe Int[]
+  value     Int
+  status    String
+  assetIns  AssetInOut[] @relation("ActionIn")
+  assetOuts AssetInOut[] @relation("ActionOut")
+  createdAt DateTime     @default(now())
+  Plan      Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId    String
+}
+
+model AssetInOut {
+  id          String  @id @default(uuid())
+  assetId     String
+  type        String
+  allocation  Int
+  ActionIn    Action? @relation("ActionIn", fields: [actionInId], references: [id], onDelete: Cascade)
+  actionInId  String?
+  ActionOut   Action? @relation("ActionOut", fields: [actionOutId], references: [id], onDelete: Cascade)
+  actionOutId String?
 }

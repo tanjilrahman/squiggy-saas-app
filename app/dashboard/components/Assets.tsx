@@ -1,5 +1,4 @@
 import { columns } from "../tables/assets/components/columns";
-import { Asset } from "../tables/assets/data/schema";
 import { useAssetStore } from "@/store/assetStore";
 import { DataTableExpand } from "../tables/assets/components/data-table-expand";
 
