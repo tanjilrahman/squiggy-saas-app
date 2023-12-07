@@ -6,6 +6,7 @@ import { DetailsYoyCombobox } from "./details-yoy-combobox";
 import { DetailsYoyDialog } from "./details-yoy-dialog";
 import { TrendingUp } from "lucide-react";
 import { formatValue2nd } from "@/lib/helperFunctions";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 interface ColumnDetailsNameProps<TData> {
   row: Row<TData>;
@@ -19,7 +20,17 @@ function ColumnDetailsYoy<TData>({
   updateFunc,
 }: ColumnDetailsNameProps<TData>) {
   const { assets } = useAssetStore();
+  const { calculatedAssets } = useCalculatedAssetStore();
   const { expanded, isEditable } = useAssetExpandedState();
+
+  const calcAssetAll = calculatedAssets.find((year) => year[0].id === expanded);
+  const calcIncome =
+    calcAssetAll &&
+    calcAssetAll[0].incomes.find((item) => item.id === row.getValue("id"));
+  const calcCost =
+    calcAssetAll &&
+    calcAssetAll[0].costs.find((item) => item.id === row.getValue("id"));
+
   const asset = assets.find((asset) => asset.id === expanded);
   const income = asset?.incomes.find((item) => item.id === row.getValue("id"));
   const cost = asset?.costs.find((item) => item.id === row.getValue("id"));
@@ -31,18 +42,13 @@ function ColumnDetailsYoy<TData>({
   const [yoyAdvanced, setYoyAdvanced] = useState<number[] | undefined>(
     type === "income" ? income?.yoy_advanced : cost?.yoy_advanced
   );
-  const [itemType, setItemType] = useState(
-    type === "income" ? income?.yoy_type : cost?.yoy_type
-  );
 
   useEffect(() => {
     setValue(row.getValue("yoy"));
     if (type === "income") {
-      setItemType(income?.yoy_type!);
       setYoyAdvanced(income?.yoy_advanced);
       setMode(income?.yoy_mode);
     } else {
-      setItemType(cost?.yoy_type!);
       setYoyAdvanced(cost?.yoy_advanced);
       setMode(cost?.yoy_mode);
     }
@@ -102,16 +108,10 @@ function ColumnDetailsYoy<TData>({
 
   return (
     <div className="flex items-center w-[200px] px-3 py-2 border border-transparent">
-      {itemType === "fixed" ? (
-        mode === "advanced" ? (
-          <p>{formatValue2nd(yoyAdvanced![1] - yoyAdvanced![0])}</p>
-        ) : (
-          <p>{formatValue2nd(value)}</p>
-        )
-      ) : mode === "advanced" ? (
-        <p>{yoyAdvanced![1] - yoyAdvanced![0]}%</p>
+      {type === "income" ? (
+        <p>{formatValue2nd(calcIncome?.yoy_increase || 0)}</p>
       ) : (
-        <p>{formatValue2nd(value * asset?.value!)}</p>
+        <p>{formatValue2nd(calcCost?.yoy_increase || 0)}</p>
       )}
       {mode === "advanced" && (
         <TrendingUp className="opacity-100 h-5 w-5 ml-2" />

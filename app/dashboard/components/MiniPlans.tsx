@@ -10,7 +10,6 @@ function MiniPlans() {
   const [withPlans, setWithPlans] = useState(true);
 
   const actionsArray = plans.map((plan) => plan.actions || []).flat();
-  console.log(actionsArray);
 
   return (
     <div className="mx-auto w-full ">

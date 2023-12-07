@@ -20,6 +20,7 @@ export type IncomeCost = {
   name?: string;
   value: number;
   value_mode: "fixed" | "%";
+  yoy_increase?: number;
   yoy: number;
   yoy_advanced: number[];
   yoy_type: "fixed" | "%";
@@ -32,6 +33,9 @@ export type Asset = {
   name: string;
   value: number;
   category: string;
+  additions: number;
+  allocation: string;
+  yoy_increase?: number;
   yoy: number;
   yoy_advanced: number[];
   yoy_type: "fixed" | "%";

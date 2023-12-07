@@ -36,19 +36,27 @@ export async function POST(request: NextRequest) {
   }
 
   if (type == "income" && itemId) {
-    await db.income.delete({
-      where: {
-        id: itemId,
-      },
-    });
+    await db.income
+      .delete({
+        where: {
+          id: itemId,
+        },
+      })
+      .catch((e) => {
+        return Response.json({ code: "NOT FOUND" }, { status: 404 });
+      });
   }
 
   if (type == "cost" && itemId) {
-    await db.cost.delete({
-      where: {
-        id: itemId,
-      },
-    });
+    await db.cost
+      .delete({
+        where: {
+          id: itemId,
+        },
+      })
+      .catch((e) => {
+        return Response.json({ code: "NOT FOUND" }, { status: 404 });
+      });
   }
 
   return Response.json({ success: true });

@@ -1,0 +1,62 @@
+"use client";
+
+import React, { useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Settings } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { useHorizonState } from "@/store/store";
+
+function SettingsButton() {
+  const { setYear, year } = useHorizonState();
+
+  useEffect(() => {
+    const storedYear = localStorage.getItem("selectedYear");
+    if (storedYear) {
+      setYear(parseInt(storedYear, 10));
+    }
+  }, [setYear]);
+
+  const handleSetYear = (newYear: number) => {
+    localStorage.setItem("selectedYear", String(newYear));
+    setYear(newYear);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="rounded-full">
+        <Settings className="text-muted-foreground hover:opacity-70 transition-opacity duration-150 cursor-pointer" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          Time Horizon
+        </DropdownMenuLabel>
+        <Tabs
+          defaultValue={String(year)}
+          className="flex items-center space-x-2 mt-1"
+        >
+          <TabsList>
+            <TabsTrigger value="5" onClick={() => handleSetYear(5)}>
+              5
+            </TabsTrigger>
+            <TabsTrigger value="10" onClick={() => handleSetYear(10)}>
+              10
+            </TabsTrigger>
+            <TabsTrigger value="25" onClick={() => handleSetYear(25)}>
+              25
+            </TabsTrigger>
+            <TabsTrigger value="50" onClick={() => handleSetYear(50)}>
+              50
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export default SettingsButton;

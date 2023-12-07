@@ -49,6 +49,7 @@ type AssetStore = {
   ) => void;
   updateAssetYoyAdvanced: (assetId: string, newYoyAdvanced: number[]) => void;
   updateAssetNote: (assetId: string, newNote: string) => void;
+  updateAssetAllocation: (assetId: string, newAllocation: string) => void;
 
   updateIncomeName: (
     assetId: string,
@@ -230,6 +231,13 @@ export const useAssetStore = create<AssetStore>((set) => ({
     set((state) => ({
       assets: state.assets.map((asset) =>
         asset.id === assetId ? { ...asset, note: newNote } : asset
+      ),
+    }));
+  },
+  updateAssetAllocation: (assetId, newAllocation) => {
+    set((state) => ({
+      assets: state.assets.map((asset) =>
+        asset.id === assetId ? { ...asset, allocation: newAllocation } : asset
       ),
     }));
   },

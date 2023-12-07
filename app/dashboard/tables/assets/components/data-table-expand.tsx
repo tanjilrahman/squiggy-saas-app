@@ -34,6 +34,7 @@ import DataTableTextArea from "./data-table-textarea";
 import { Button } from "@/components/ui/button";
 import { Asset } from "../data/schema";
 import { AlertCircle, Check, Loader2 } from "lucide-react";
+import { ProfitAllocationCombobox } from "./profit-allocation-combobox";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -196,11 +197,17 @@ export function DataTableExpand<TData extends Asset, TValue>({
                             />
                           </div>
                         </div>
-                        <div className="w-full flex">
+                        <div className="w-full flex justify-between my-4">
+                          <div className="space-x-4">
+                            <ProfitAllocationCombobox
+                              disabled={!isEditable}
+                              assetId={row.getValue("id")}
+                            />
+                          </div>
                           <Button
                             type="submit"
                             disabled={!isEditable}
-                            className="ml-auto my-4"
+                            className="ml-auto"
                             onClick={() => handleSave(row.getValue("id"))}
                           >
                             {status === "LOADING" && (

@@ -36,6 +36,7 @@ model Asset {
   profit       Int
   roi          Int
   note         String
+  allocation   String?
   createdAt    DateTime @default(now())
   incomes      Income[]
   costs        Cost[]

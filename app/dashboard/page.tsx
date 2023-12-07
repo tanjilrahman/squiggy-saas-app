@@ -29,7 +29,7 @@ async function Dashboard() {
 
   if (!dbUser) return redirect("/auth-callback?origin=dashboard");
 
-  const assets = await db.asset.findMany({
+  const initialAssets = await db.asset.findMany({
     where: {
       userId: dbUser.id,
     },
@@ -42,7 +42,7 @@ async function Dashboard() {
     },
   });
 
-  const plans = await db.plan.findMany({
+  const initialPlans = await db.plan.findMany({
     where: {
       userId: dbUser.id,
     },
@@ -63,8 +63,12 @@ async function Dashboard() {
 
   return (
     <div className="mx-auto max-w-screen-xl">
-      {/* @ts-ignore */}
-      <DashboardBody assets={assets} plans={plans} />
+      <DashboardBody
+        // @ts-ignore
+        initialAssets={initialAssets}
+        // @ts-ignore
+        initialPlans={initialPlans}
+      />
     </div>
   );
 }

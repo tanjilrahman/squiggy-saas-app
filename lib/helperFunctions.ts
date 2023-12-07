@@ -1,4 +1,4 @@
-import { Asset, IncomeCost } from "@/app/dashboard/tables/assets/data/schema";
+import { Asset } from "@/app/dashboard/tables/assets/data/schema";
 
 export interface ChartData {
   category: string;
@@ -107,38 +107,38 @@ export const formatValue = (value: number): string => {
   } else if (absValue >= 1e3) {
     return Math.floor(+(value / 1e3).toFixed(1)) + "K";
   } else {
-    return value.toString();
+    return Math.floor(value).toString();
   }
 };
 
 export const formatValue2nd = (number: number) =>
   `$${new Intl.NumberFormat("us").format(number).toString()} USD`;
 
-export function calculateProfit(asset: Asset): number {
-  // Function to adjust values based on the percentage mode
-  const adjustValue = (
-    value: number,
-    value_mode: "fixed" | "%",
-    assetValue: number
-  ): number => {
-    return value_mode === "%" ? value * assetValue : value;
-  };
+export function addProfitsToCurrency(allAssets: Asset[][]): Asset[][] {
+  return allAssets.map((scenario, targetAsset) => {
+    return scenario.map((asset, targetYear) => {
+      if (asset.category === "currency") {
+        const allocatedAssets = allAssets
+          .flat()
+          .filter(
+            (otherAsset, index) =>
+              index % scenario.length === targetYear &&
+              otherAsset.id !== asset.id &&
+              otherAsset.allocation === asset.id
+          );
 
-  // Sum up all adjusted income values
-  const totalIncome = asset.incomes.reduce(
-    (sum, income) =>
-      sum + adjustValue(income.value, income.value_mode, asset.value),
-    0
-  );
+        const totalProfit = allocatedAssets.reduce(
+          (sum, otherAsset) => (sum += otherAsset.profit || 0),
+          0
+        );
+        if (targetYear < scenario.length - 1) {
+          const nextYearAsset = allAssets[targetAsset][targetYear + 1];
 
-  // Sum up all adjusted cost values
-  const totalCost = asset.costs.reduce(
-    (sum, cost) => sum + adjustValue(cost.value, cost.value_mode, asset.value),
-    0
-  );
-
-  // Calculate net income by subtracting total cost from total income
-  const netIncome = totalIncome - totalCost;
-
-  return netIncome;
+          nextYearAsset.value = asset.value + totalProfit;
+        }
+        asset.additions += totalProfit;
+      }
+      return asset;
+    });
+  });
 }

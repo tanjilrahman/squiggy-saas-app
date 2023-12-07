@@ -6,6 +6,7 @@ import { auth, currentUser } from "@clerk/nextjs";
 import Logo from "@/components/Logo";
 import UserButton from "@/components/UserButton";
 import { Button } from "./ui/button";
+import SettingsButton from "./SettingsButton";
 
 async function Header() {
   const { userId } = auth();
@@ -34,7 +35,7 @@ async function Header() {
               <p className="hover:underline cursor-pointer text-muted-foreground/60">
                 Guide
               </p>
-              <Settings className="text-muted-foreground hover:opacity-70 transition-opacity duration-150 cursor-pointer" />
+              <SettingsButton />
             </>
           ) : (
             <div className="flex items-center justify-end space-x-4 ">

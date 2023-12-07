@@ -4,6 +4,7 @@ import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 import { Row } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { DetailsValueCombobox } from "./details-value-combobox";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 interface ColumnDetailsNameProps<TData> {
   row: Row<TData>;
@@ -18,7 +19,17 @@ function ColumnDetailsValue<TData>({
 }: ColumnDetailsNameProps<TData>) {
   const [value, setValue] = useState<number>(row.getValue("value"));
   const { assets } = useAssetStore();
+  const { calculatedAssets } = useCalculatedAssetStore();
   const { expanded, isEditable } = useAssetExpandedState();
+
+  const calcAssetAll = calculatedAssets.find((year) => year[0].id === expanded);
+  const calcIncome =
+    calcAssetAll &&
+    calcAssetAll[0].incomes.find((item) => item.id === row.getValue("id"));
+  const calcCost =
+    calcAssetAll &&
+    calcAssetAll[0].costs.find((item) => item.id === row.getValue("id"));
+
   const asset = assets.find((asset) => asset.id === expanded);
   const income = asset?.incomes.find((item) => item.id === row.getValue("id"));
   const cost = asset?.costs.find((item) => item.id === row.getValue("id"));
@@ -64,10 +75,10 @@ function ColumnDetailsValue<TData>({
 
   return (
     <div className="flex items-center w-[200px] px-3 py-2 border border-transparent">
-      {itemType === "fixed" ? (
-        <p>{formatValue2nd(value)}</p>
+      {type === "income" ? (
+        <p>{formatValue2nd(calcIncome?.value || 0)}</p>
       ) : (
-        <p>{formatValue2nd(value * asset?.value!)}</p>
+        <p>{formatValue2nd(calcCost?.value || 0)}</p>
       )}
     </div>
   );

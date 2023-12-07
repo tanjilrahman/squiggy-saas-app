@@ -21,11 +21,12 @@ import {
 } from "@/store/assetStore";
 import { Button } from "@/components/ui/button";
 import { DataTableCombobox } from "./data-table-combobox";
-import { calculateProfit, formatValue2nd } from "@/lib/helperFunctions";
+import { formatValue2nd } from "@/lib/helperFunctions";
 import { DataTableRemove } from "./data-table-remove";
 import ColumnName from "./column/column-name";
 import ColumnValue from "./column/column-value";
 import ColumnYoy from "./column/column-yoy";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function NameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateAssetName } = useAssetStore();
@@ -89,58 +90,29 @@ function YoyCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
-  const [profit, setProfit] = useState(0);
-  const { assets } = useAssetStore();
-  const asset = assets.find((asset) => asset.id === row.getValue("id"));
-  row.original.profit = profit;
-  useEffect(() => {
-    setProfit(calculateProfit(asset!));
-    row.original.profit = profit;
-  }, [assets]);
+  const { calculatedAssets } = useCalculatedAssetStore();
+
+  const calcAssetAll = calculatedAssets.find(
+    (year) => year[0].id === row.getValue("id")
+  );
   return (
     <div className="flex w-[120px] space-x-2">
-      <span className="truncate font-medium">{formatValue2nd(profit)}</span>
+      <span className="truncate font-medium">
+        {formatValue2nd((calcAssetAll && calcAssetAll[0].profit) || 0)}
+      </span>
     </div>
   );
 }
 
 function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
-  const [roi, setRoi] = useState(0);
-  const { assets } = useAssetStore();
-  const asset = assets.find((asset) => asset.id === row.getValue("id"));
-  row.original.roi = roi;
-  useEffect(() => {
-    if (asset?.yoy_mode === "simple") {
-      if (asset?.yoy_type === "%") {
-        setRoi(
-          (asset.value * asset.yoy + calculateProfit(asset!)) / asset.value
-        );
-      }
-      if (asset?.yoy_type === "fixed") {
-        setRoi((asset.yoy + calculateProfit(asset!)) / asset.value);
-      }
-    }
+  const { calculatedAssets } = useCalculatedAssetStore();
 
-    if (asset?.yoy_mode === "advanced") {
-      if (asset?.yoy_type === "%") {
-        setRoi(
-          (asset.value * (asset.yoy_advanced[1] - asset.yoy_advanced[0]) +
-            calculateProfit(asset!)) /
-            asset.value
-        );
-      }
-      if (asset?.yoy_type === "fixed") {
-        setRoi(
-          (asset.yoy + (asset.yoy_advanced[1] - asset.yoy_advanced[0])) /
-            asset.value
-        );
-      }
-    }
-  }, [assets]);
-
+  const calcAssetAll = calculatedAssets.find(
+    (year) => year[0].id === row.getValue("id")
+  );
   return (
     <div className="w-[40px] flex items-center">
-      <span>{Math.floor(roi * 10) / 10}%</span>
+      <span>{(calcAssetAll && calcAssetAll[0].roi) || 0}%</span>
     </div>
   );
 }
@@ -158,6 +130,8 @@ function DetailsHeader() {
       value: 0,
       category: "",
       note: "",
+      additions: 0,
+      allocation: "",
       yoy: 0,
       yoy_advanced: [],
       yoy_type: "fixed",
