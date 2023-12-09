@@ -3,9 +3,8 @@ import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Row } from "@tanstack/react-table";
 import { PlusCircle, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { ColumnDetailsDialog } from "./column-details-dialog";
 import { useAssetStore } from "@/store/assetStore";
-import { AssetInOut } from "../../data/schema";
+import { DetailsAssetoutDialog } from "./details-assetout-dialog";
 
 interface ColumnDetailsAssetsOutProps<TData> {
   row: Row<TData>;
@@ -14,52 +13,46 @@ interface ColumnDetailsAssetsOutProps<TData> {
 function ColumnDetailsAssetsOut<TData>({
   row,
 }: ColumnDetailsAssetsOutProps<TData>) {
-  const [value, setValue] = useState<AssetInOut[]>(row.getValue("assetOuts"));
+  const [value, setValue] = useState<string>(row.getValue("assetOut"));
   const { plans, removeActionAssetOutId, updateActionAssetOut } =
     usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
 
+  const asset = assets.find((asset) => asset.id === value);
+
   useEffect(() => {
-    setValue(row.getValue("assetOuts"));
+    setValue(row.getValue("assetOut"));
   }, [plans]);
 
   return (
     <div className="w-[200px]">
-      {value?.map((item) => {
-        const asset = assets.find((asset) => asset.id === item.assetId);
-        return (
-          <div key={item.assetId} className="flex items-center space-x-2 mb-2">
-            <div
-              className={`${
-                !isEditable && "border-transparent bg-transparent"
-              } flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background`}
-            >
-              {asset?.name}
-            </div>
-            {isEditable && (
-              <Button
-                disabled={!isEditable}
-                variant="outline"
-                className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
-                onClick={() =>
-                  removeActionAssetOutId(
-                    expanded!,
-                    row.getValue("id"),
-                    item.assetId
-                  )
-                }
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+      {value && (
+        <div className="flex items-center space-x-2 mb-2">
+          <div
+            className={`${
+              !isEditable && "border-transparent bg-transparent"
+            } flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background`}
+          >
+            {asset?.name}
           </div>
-        );
-      })}
+          {isEditable && (
+            <Button
+              disabled={!isEditable}
+              variant="outline"
+              className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
+              onClick={() =>
+                removeActionAssetOutId(expanded!, row.getValue("id"), value)
+              }
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      )}
 
-      {isEditable && value.length < 1 && (
-        <ColumnDetailsDialog
-          type="assetOuts"
+      {isEditable && !value && (
+        <DetailsAssetoutDialog
           planId={expanded!}
           columnId={row.getValue("id")}
           updateFunc={updateActionAssetOut}
@@ -67,7 +60,7 @@ function ColumnDetailsAssetsOut<TData>({
           <Button variant="outline" className="w-full">
             <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
           </Button>
-        </ColumnDetailsDialog>
+        </DetailsAssetoutDialog>
       )}
     </div>
   );

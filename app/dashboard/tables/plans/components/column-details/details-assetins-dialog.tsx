@@ -13,7 +13,7 @@ import { usePlanStore } from "@/store/planStore";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { AssetInOut } from "../../data/schema";
+import { AssetIn } from "../../data/schema";
 import { AllocationTypeCombobox } from "../allocation-type-combobox";
 import { Input } from "@/components/ui/input";
 
@@ -21,15 +21,13 @@ type ColumnDetailsDialogProps = {
   children: JSX.Element;
   planId: string;
   columnId: string;
-  type: "assetIns" | "assetOuts";
-  updateFunc: (planId: string, actionId: string, asset: AssetInOut) => void;
+  updateFunc: (planId: string, actionId: string, asset: AssetIn) => void;
 };
 
-export function ColumnDetailsDialog({
+export function DetailsAssetinsDialog({
   children,
   planId,
   columnId,
-  type,
   updateFunc,
 }: ColumnDetailsDialogProps) {
   const { assets } = useAssetStore();
@@ -41,7 +39,7 @@ export function ColumnDetailsDialog({
   const action = plan?.actions.find((action) => action.id === columnId);
 
   const handleAdd = (assetId: string) => {
-    const assetIns: AssetInOut = {
+    const assetIns: AssetIn = {
       id: uuid(),
       assetId,
       allocation: allocation,
@@ -73,7 +71,7 @@ export function ColumnDetailsDialog({
         </div>
 
         {assets.map((asset) => {
-          const isAssetInColumn = action?.[type]?.some(
+          const isAssetInColumn = action?.assetIns?.some(
             (item) => item.assetId === asset.id
           );
 

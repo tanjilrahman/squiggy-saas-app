@@ -89,25 +89,23 @@ model Plan {
 }
 
 model Action {
-  id        String       @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
   timeframe Int[]
   value     Int
   status    String
-  assetIns  AssetInOut[] @relation("ActionIn")
-  assetOuts AssetInOut[] @relation("ActionOut")
-  createdAt DateTime     @default(now())
-  Plan      Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  assetIns  AssetIn[]
+  assetOut  String
+  createdAt DateTime  @default(now())
+  Plan      Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId    String
 }
 
-model AssetInOut {
-  id          String  @id @default(uuid())
-  assetId     String
-  type        String
-  allocation  Int
-  ActionIn    Action? @relation("ActionIn", fields: [actionInId], references: [id], onDelete: Cascade)
-  actionInId  String?
-  ActionOut   Action? @relation("ActionOut", fields: [actionOutId], references: [id], onDelete: Cascade)
-  actionOutId String?
+model AssetIn {
+  id         String  @id @default(uuid())
+  assetId    String
+  type       String
+  allocation Int
+  ActionIn   Action? @relation(fields: [actionInId], references: [id], onDelete: Cascade)
+  actionInId String?
 }

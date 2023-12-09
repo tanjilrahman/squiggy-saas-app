@@ -50,7 +50,6 @@ async function Dashboard() {
       actions: {
         include: {
           assetIns: true,
-          assetOuts: true,
         },
       },
     },

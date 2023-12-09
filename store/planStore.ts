@@ -1,7 +1,7 @@
 import {
   Plan,
   Action,
-  AssetInOut,
+  AssetIn,
 } from "@/app/dashboard/tables/plans/data/schema";
 import { create } from "zustand";
 
@@ -51,12 +51,12 @@ type PlanStore = {
   updateActionAssetIn: (
     planId: string,
     actionId: string,
-    newAssetIn: AssetInOut
+    newAssetIn: AssetIn
   ) => void;
   updateActionAssetOut: (
     planId: string,
     actionId: string,
-    newAssetOut: AssetInOut
+    newAssetOut: string
   ) => void;
   removeActionAssetInId: (
     planId: string,
@@ -232,7 +232,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
               ...plan,
               actions: plan.actions.map((action) =>
                 action.id === actionId
-                  ? { ...action, assetOuts: [...action.assetOuts, newAssetOut] }
+                  ? { ...action, assetOut: newAssetOut }
                   : action
               ),
             }
@@ -273,9 +273,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
                 action.id === actionId
                   ? {
                       ...action,
-                      assetOuts: action.assetOuts.filter(
-                        (asset) => asset.assetId !== assetOutId
-                      ),
+                      assetOut: "",
                     }
                   : action
               ),

@@ -24,30 +24,36 @@ export async function POST(request: NextRequest) {
   if (!hasPlan) return Response.json({ code: "NOT FOUND" }, { status: 404 });
 
   if (planId) {
-    await db.plan.delete({
-      where: {
-        id: planId,
-      },
-      include: {
-        actions: {
-          include: {
-            assetIns: true,
-            assetOuts: true,
+    await db.plan
+      .delete({
+        where: {
+          id: planId,
+        },
+        include: {
+          actions: {
+            include: {
+              assetIns: true,
+            },
           },
         },
-      },
-    });
+      })
+      .catch((e) => {
+        return Response.json({ code: "NOT FOUND" }, { status: 404 });
+      });
   }
   if (type === "action" && itemId) {
-    await db.action.delete({
-      where: {
-        id: itemId,
-      },
-      include: {
-        assetIns: true,
-        assetOuts: true,
-      },
-    });
+    await db.action
+      .delete({
+        where: {
+          id: itemId,
+        },
+        include: {
+          assetIns: true,
+        },
+      })
+      .catch((e) => {
+        return Response.json({ code: "NOT FOUND" }, { status: 404 });
+      });
   }
 
   return Response.json({ success: true });

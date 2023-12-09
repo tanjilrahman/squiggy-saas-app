@@ -3,9 +3,9 @@ import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Row } from "@tanstack/react-table";
 import { PlusCircle, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { ColumnDetailsDialog } from "./column-details-dialog";
 import { useAssetStore } from "@/store/assetStore";
-import { AssetInOut } from "../../data/schema";
+import { AssetIn } from "../../data/schema";
+import { DetailsAssetinsDialog } from "./details-assetins-dialog";
 
 interface ColumnDetailsAssetsInProps<TData> {
   row: Row<TData>;
@@ -14,7 +14,7 @@ interface ColumnDetailsAssetsInProps<TData> {
 function ColumnDetailsAssetsIn<TData>({
   row,
 }: ColumnDetailsAssetsInProps<TData>) {
-  const [value, setValue] = useState<AssetInOut[]>(row.getValue("assetIns"));
+  const [value, setValue] = useState<AssetIn[]>(row.getValue("assetIns"));
   const { plans, removeActionAssetInId, updateActionAssetIn } = usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
@@ -60,8 +60,7 @@ function ColumnDetailsAssetsIn<TData>({
       })}
 
       {isEditable && (
-        <ColumnDetailsDialog
-          type="assetIns"
+        <DetailsAssetinsDialog
           planId={expanded!}
           columnId={row.getValue("id")}
           updateFunc={updateActionAssetIn}
@@ -69,7 +68,7 @@ function ColumnDetailsAssetsIn<TData>({
           <Button variant="outline" className="w-full">
             <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
           </Button>
-        </ColumnDetailsDialog>
+        </DetailsAssetinsDialog>
       )}
     </div>
   );

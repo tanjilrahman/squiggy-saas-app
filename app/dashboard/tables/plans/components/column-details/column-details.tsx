@@ -46,9 +46,7 @@ function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
   const action = plan?.actions.find(
     (action) => action.id === row.getValue("id")
   );
-  const asset = assets.find(
-    (asset) => asset.id === action?.assetOuts[0]?.assetId
-  );
+  const asset = assets.find((asset) => asset.id === action?.assetOut);
   useEffect(() => {
     setValue(asset?.value || 0);
   }, [plans]);
@@ -125,7 +123,7 @@ export const ColumnDetails: ColumnDef<Plan>[] = [
     cell: ActionAssetsInCell,
   },
   {
-    accessorKey: "assetOuts",
+    accessorKey: "assetOut",
     header: ({ column }) => (
       <DataTableColumnHeader
         sort={false}

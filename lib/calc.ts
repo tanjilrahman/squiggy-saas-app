@@ -30,7 +30,6 @@ export function calculateAsset(
           rescaleFactor *= 1 - action.allocation / 100;
         }
       }
-      console.log(rescaleFactor);
     }
   }
 
@@ -137,7 +136,6 @@ export function calculateAsset(
             rescaleFactor *= 1 - action.allocation / 100;
           }
         }
-        console.log(rescaleFactor);
       }
     }
 

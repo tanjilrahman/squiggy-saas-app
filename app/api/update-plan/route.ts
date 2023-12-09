@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
               timeframe: action.timeframe,
               value: action.value,
               status: action.status,
+              assetOut: action.assetOut,
               assetIns: {
                 upsert: action.assetIns.map((assetIn) => ({
                   where: {
@@ -55,43 +56,19 @@ export async function POST(request: NextRequest) {
                   },
                 })),
               },
-              assetOuts: {
-                upsert: action.assetOuts.map((assetOut) => ({
-                  where: {
-                    id: assetOut.id,
-                  },
-                  update: {
-                    assetId: assetOut.assetId,
-                    type: assetOut.type,
-                    allocation: assetOut.allocation,
-                  },
-                  create: {
-                    assetId: assetOut.assetId,
-                    type: assetOut.type,
-                    allocation: assetOut.allocation,
-                  },
-                })),
-              },
             },
             create: {
               name: action.name,
               timeframe: action.timeframe,
               value: action.value,
               status: action.status,
+              assetOut: action.assetOut,
               assetIns: {
                 create: action.assetIns.map((assetIn) => ({
                   id: assetIn.id,
                   assetId: assetIn.assetId,
                   type: assetIn.type,
                   allocation: assetIn.allocation,
-                })),
-              },
-              assetOuts: {
-                create: action.assetOuts.map((assetOut) => ({
-                  id: assetOut.id,
-                  assetId: assetOut.assetId,
-                  type: assetOut.type,
-                  allocation: assetOut.allocation,
                 })),
               },
             },
@@ -122,11 +99,9 @@ export async function POST(request: NextRequest) {
             timeframe: action.timeframe,
             value: action.value,
             status: action.status,
+            assetOut: action.assetOut,
             assetIns: {
               create: action.assetIns,
-            },
-            assetOuts: {
-              create: action.assetOuts,
             },
           })),
         },
@@ -135,7 +110,6 @@ export async function POST(request: NextRequest) {
         actions: {
           include: {
             assetIns: true,
-            assetOuts: true,
           },
         },
       },

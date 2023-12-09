@@ -36,12 +36,10 @@ export function ProfitAllocationCombobox({
 
   React.useEffect(() => {
     updateAssetAllocation(assetId, value!);
-    console.log(value);
   }, [value]);
 
   React.useEffect(() => {
     setValue(asset?.allocation);
-    console.log(assets.find((asset) => asset.id === assetId)?.allocation);
   }, [assets]);
 
   const selectedAsset = assets.find((asset) => asset.id === value);

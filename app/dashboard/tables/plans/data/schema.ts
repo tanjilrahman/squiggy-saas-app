@@ -15,7 +15,7 @@
 
 // export type Task = z.infer<typeof taskSchema>
 
-export type AssetInOut = {
+export type AssetIn = {
   id: string;
   assetId: string;
   allocation: number;
@@ -26,8 +26,8 @@ export type Action = {
   id: string;
   name: string;
   timeframe: number[];
-  assetIns: AssetInOut[];
-  assetOuts: AssetInOut[];
+  assetIns: AssetIn[];
+  assetOut: string;
   value: number;
   status: string;
 };

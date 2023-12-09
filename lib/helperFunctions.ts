@@ -54,7 +54,7 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
       value_mode: "fixed" | "%",
       assetValue: number
     ): number => {
-      return value_mode === "%" ? value * assetValue : value;
+      return value_mode === "%" ? (value / 100) * assetValue : value;
     };
 
     // Sum Incomes
