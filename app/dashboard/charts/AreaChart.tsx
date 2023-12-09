@@ -13,7 +13,7 @@ interface ChartData {
 }
 
 function convertToChartData(calculatedAssets: Asset[][]): ChartData[] {
-  return calculatedAssets[0].map((_, index) => {
+  return calculatedAssets[0]?.map((_, index) => {
     const year = 2023 + index; // Assuming the calculation starts from 2023
 
     const totalAssetValue = calculatedAssets

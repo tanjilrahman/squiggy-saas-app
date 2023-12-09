@@ -4,10 +4,11 @@ import { usePlanStore } from "@/store/planStore";
 import { columns } from "../tables/mini-plans/components/columns";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function MiniPlans() {
   const { plans } = usePlanStore();
-  const [withPlans, setWithPlans] = useState(true);
+  const { activePlans, setActivePlans } = useCalculatedAssetStore();
 
   const actionsArray = plans.map((plan) => plan.actions || []).flat();
 
@@ -16,8 +17,8 @@ function MiniPlans() {
       <div className="mb-4 flex justify-between items-center">
         <p className="font-medium text-xl">Plans</p>
         <Switch
-          checked={withPlans}
-          onCheckedChange={() => setWithPlans(!withPlans)}
+          checked={activePlans}
+          onCheckedChange={() => setActivePlans(!activePlans)}
         />
       </div>
       <div className="hidden flex-1 flex-col md:flex">

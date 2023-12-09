@@ -14,6 +14,8 @@ import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { AssetInOut } from "../../data/schema";
+import { AllocationTypeCombobox } from "../allocation-type-combobox";
+import { Input } from "@/components/ui/input";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
@@ -33,6 +35,8 @@ export function ColumnDetailsDialog({
   const { assets } = useAssetStore();
   const { plans } = usePlanStore();
   const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<"absolute" | "cumulative">("absolute");
+  const [allocation, setAllocation] = useState(100);
   const plan = plans.find((plan) => plan.id === planId);
   const action = plan?.actions.find((action) => action.id === columnId);
 
@@ -40,8 +44,8 @@ export function ColumnDetailsDialog({
     const assetIns: AssetInOut = {
       id: uuid(),
       assetId,
-      allocation: 100,
-      type: "absolute",
+      allocation: allocation,
+      type: value,
     };
     updateFunc(planId, columnId, assetIns);
     setOpen(false);
@@ -50,7 +54,7 @@ export function ColumnDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[880px]">
         <DialogHeader>
           <DialogTitle>Available Assets</DialogTitle>
           <DialogDescription>
@@ -58,10 +62,16 @@ export function ColumnDetailsDialog({
             undone.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-5 text-muted-foreground">
-          <div className="col-span-2 px-2">Asset name</div>
-          <div className="col-span-2 px-2">Value</div>
+        <div className="flex space-x-2">
+          <div className="flex-grow grid grid-cols-6 text-muted-foreground">
+            <div className="col-span-2 px-2">Asset name</div>
+            <div className="col-span-2 px-2">Value</div>
+            <div className="px-2">Allocation(%)</div>
+            <div className="px-2">Type</div>
+          </div>
+          <div className="w-16"></div>
         </div>
+
         {assets.map((asset) => {
           const isAssetInColumn = action?.[type]?.some(
             (item) => item.assetId === asset.id
@@ -69,19 +79,28 @@ export function ColumnDetailsDialog({
 
           if (!isAssetInColumn) {
             return (
-              <div
-                key={asset.id}
-                className="grid grid-cols-5 items-center gap-2"
-              >
-                <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                  {asset.name}
+              <div key={asset.id} className="flex space-x-2 items-center">
+                <div className="flex-grow grid grid-cols-6 gap-2">
+                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                    {asset.name}
+                  </div>
+                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                    {formatValue2nd(asset.value)}
+                  </div>
+                  <Input
+                    id="name"
+                    value={allocation}
+                    onChange={(e) => {
+                      setAllocation(+e.target.value);
+                    }}
+                    className="font-medium disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+                  />
+                  <AllocationTypeCombobox value={value} setValue={setValue} />
                 </div>
-                <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                  {formatValue2nd(asset.value)}
-                </div>
+
                 <Button
                   variant="secondary"
-                  className="col-span-1 p-3 space-x-2 data-[state=open]:bg-muted"
+                  className="p-3 space-x-2 data-[state=open]:bg-muted"
                   onClick={() => handleAdd(asset.id!)}
                 >
                   <PlusCircle className="h-4 w-4 mr-1" /> Add
@@ -90,7 +109,7 @@ export function ColumnDetailsDialog({
             );
           }
 
-          return null; // or you can omit this line as null is returned by default
+          return null;
         })}
       </DialogContent>
     </Dialog>

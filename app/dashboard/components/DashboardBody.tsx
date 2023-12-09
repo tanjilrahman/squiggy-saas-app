@@ -12,9 +12,8 @@ import { Plan } from "../tables/plans/data/schema";
 import { usePlanStore } from "@/store/planStore";
 import MiniPlans from "@/app/dashboard/components/MiniPlans";
 import AreaChart from "../charts/AreaChart";
-import { calculateAsset } from "@/lib/calc";
+import { addProfitsToCurrency, calculateAsset } from "@/lib/calc";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
-import { addProfitsToCurrency } from "@/lib/helperFunctions";
 
 type DashboardBodyProps = {
   initialAssets: Asset[];
@@ -25,7 +24,8 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   const { nav } = useNavState();
   const { year } = useHorizonState();
   const { assets, setAssets } = useAssetStore();
-  const { setCalculatedAssets } = useCalculatedAssetStore();
+  const { plans } = usePlanStore();
+  const { activePlans, setCalculatedAssets } = useCalculatedAssetStore();
   const { setPlans } = usePlanStore();
 
   useEffect(() => {
@@ -37,12 +37,16 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   }, [initialPlans]);
 
   useEffect(() => {
-    const calculateAssets = assets.map((asset) => calculateAsset(asset, year));
+    const calculateAssets = assets.map((asset) =>
+      activePlans || nav === "plans"
+        ? calculateAsset(asset, year, plans)
+        : calculateAsset(asset, year)
+    );
 
     const calculateAssetsWithAllocation = addProfitsToCurrency(calculateAssets);
 
     setCalculatedAssets(calculateAssetsWithAllocation);
-  }, [assets, year]);
+  }, [assets, plans, year, activePlans, nav]);
 
   return (
     <div className="mx-auto pt-4 p-8">

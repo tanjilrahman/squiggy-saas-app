@@ -113,32 +113,3 @@ export const formatValue = (value: number): string => {
 
 export const formatValue2nd = (number: number) =>
   `$${new Intl.NumberFormat("us").format(number).toString()} USD`;
-
-export function addProfitsToCurrency(allAssets: Asset[][]): Asset[][] {
-  return allAssets.map((scenario, targetAsset) => {
-    return scenario.map((asset, targetYear) => {
-      if (asset.category === "currency") {
-        const allocatedAssets = allAssets
-          .flat()
-          .filter(
-            (otherAsset, index) =>
-              index % scenario.length === targetYear &&
-              otherAsset.id !== asset.id &&
-              otherAsset.allocation === asset.id
-          );
-
-        const totalProfit = allocatedAssets.reduce(
-          (sum, otherAsset) => (sum += otherAsset.profit || 0),
-          0
-        );
-        if (targetYear < scenario.length - 1) {
-          const nextYearAsset = allAssets[targetAsset][targetYear + 1];
-
-          nextYearAsset.value = asset.value + totalProfit;
-        }
-        asset.additions += totalProfit;
-      }
-      return asset;
-    });
-  });
-}

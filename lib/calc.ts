@@ -1,12 +1,46 @@
 import { Asset } from "@/app/dashboard/tables/assets/data/schema";
+import { Plan } from "@/app/dashboard/tables/plans/data/schema";
 
-export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
+export function calculateAsset(
+  initialAsset: Asset,
+  years: number,
+  plans?: Plan[]
+): Asset[] {
   // 1st year Asset Calculation
+  let rescaleFactor = 1;
+
+  if (plans) {
+    const actionsForYear = plans
+      ?.map((plan) =>
+        plan.actions.filter((action) => action.timeframe[0] === 0)
+      )
+      .flat();
+
+    const actionsForAsset = actionsForYear
+      ?.map((action) =>
+        action.assetIns.filter((asset) => asset.assetId === initialAsset.id)
+      )
+      .flat();
+
+    if (actionsForAsset) {
+      for (const action of actionsForAsset) {
+        if (action.type === "absolute") {
+          rescaleFactor -= action.allocation / 100; // cannot go below 0
+        } else if (action.type === "cumulative") {
+          rescaleFactor *= 1 - action.allocation / 100;
+        }
+      }
+      console.log(rescaleFactor);
+    }
+  }
+
+  rescaleFactor = Math.max(rescaleFactor, 0);
+
   const calculatedIncomes = initialAsset.incomes.map((income) => {
     const incomeValue =
       income.value_mode === "fixed"
-        ? income.value
-        : (income.value / 100) * initialAsset.value;
+        ? income.value * rescaleFactor
+        : (income.value / 100) * initialAsset.value * rescaleFactor;
 
     const yoyIncrease =
       income.yoy_mode === "simple"
@@ -23,8 +57,8 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
   const calculatedCosts = initialAsset.costs.map((cost) => {
     const costValue =
       cost.value_mode === "fixed"
-        ? cost.value
-        : (cost.value / 100) * initialAsset.value;
+        ? cost.value * rescaleFactor
+        : (cost.value / 100) * initialAsset.value * rescaleFactor;
 
     const yoyIncrease =
       cost.yoy_mode === "simple"
@@ -59,7 +93,7 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
     category: initialAsset.category,
     name: initialAsset.name,
     note: initialAsset.note,
-    value: initialAsset.value,
+    value: initialAsset.value * rescaleFactor,
     yoy_advanced: initialAsset.yoy_advanced,
     yoy_mode: initialAsset.yoy_mode,
     yoy_type: initialAsset.yoy_type,
@@ -79,8 +113,39 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
   for (let year = 1; year < years; year++) {
     const prevAsset = result[year - 1];
 
+    if (plans) {
+      const actionsForYear = plans
+        ?.map((plan) =>
+          plan.actions.filter(
+            (action) =>
+              action.timeframe[0] <= year && action.timeframe[1] >= year
+          )
+        )
+        .flat();
+
+      const actionsForAsset = actionsForYear
+        ?.map((action) =>
+          action.assetIns.filter((asset) => asset.assetId === prevAsset.id)
+        )
+        .flat();
+
+      if (actionsForAsset) {
+        for (const action of actionsForAsset) {
+          if (action.type === "absolute") {
+            rescaleFactor -= action.allocation / 100; // cannot go below 0
+          } else if (action.type === "cumulative") {
+            rescaleFactor *= 1 - action.allocation / 100;
+          }
+        }
+        console.log(rescaleFactor);
+      }
+    }
+
+    rescaleFactor = Math.max(rescaleFactor, 0);
+
     const newIncomes = prevAsset.incomes.map((income) => {
-      const newIncomeValue = income.value + income.yoy_increase!;
+      const newIncomeValue =
+        (income.value + income.yoy_increase!) * rescaleFactor;
 
       const yoyIncrease =
         income.yoy_mode === "simple"
@@ -95,7 +160,7 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
     });
 
     const newCosts = prevAsset.costs.map((cost) => {
-      const newCostValue = cost.value + cost.yoy_increase!;
+      const newCostValue = (cost.value + cost.yoy_increase!) * rescaleFactor;
 
       const yoyIncrease =
         cost.yoy_mode === "simple"
@@ -120,7 +185,7 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
 
     const newAsset: Asset = {
       ...prevAsset,
-      value: prevAsset.value + prevAsset.yoy_increase!,
+      value: (prevAsset.value + prevAsset.yoy_increase!) * rescaleFactor,
       yoy_increase: newAssetYoy,
       profit:
         newIncomes.reduce((sum, income) => sum + income.value, 0) -
@@ -133,4 +198,33 @@ export function calculateAsset(initialAsset: Asset, years: number): Asset[] {
   }
 
   return result;
+}
+
+export function addProfitsToCurrency(allAssets: Asset[][]): Asset[][] {
+  return allAssets.map((scenario, targetAsset) => {
+    return scenario.map((asset, targetYear) => {
+      if (asset.category === "currency") {
+        const allocatedAssets = allAssets
+          .flat()
+          .filter(
+            (otherAsset, index) =>
+              index % scenario.length === targetYear &&
+              otherAsset.id !== asset.id &&
+              otherAsset.allocation === asset.id
+          );
+
+        const totalProfit = allocatedAssets.reduce(
+          (sum, otherAsset) => (sum += otherAsset.profit || 0),
+          0
+        );
+        if (targetYear < scenario.length - 1) {
+          const nextYearAsset = allAssets[targetAsset][targetYear + 1];
+
+          nextYearAsset.value = asset.value + totalProfit;
+        }
+        asset.additions += totalProfit;
+      }
+      return asset;
+    });
+  });
 }

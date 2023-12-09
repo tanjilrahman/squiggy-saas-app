@@ -144,7 +144,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
 
   addAsset: (newAsset) => {
     set((state) => ({
-      assets: [newAsset, ...state.assets],
+      assets: [...state.assets, newAsset],
     }));
   },
 
@@ -154,7 +154,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         asset.id === assetId
           ? {
               ...asset,
-              incomes: [newIncome, ...asset.incomes],
+              incomes: [...asset.incomes, newIncome],
             }
           : asset
       ),
@@ -167,7 +167,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         asset.id === assetId
           ? {
               ...asset,
-              costs: [newCost, ...asset.costs],
+              costs: [...asset.costs, newCost],
             }
           : asset
       ),

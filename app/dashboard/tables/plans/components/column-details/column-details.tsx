@@ -5,13 +5,14 @@ import { DataTableColumnHeader } from "../data-table-column-header";
 import ColumnDetailsName from "./column-details-name";
 import ColumnDetailsAdd from "./column-details-add";
 import ColumnDetailsDelete from "./column-details-delete";
-import { usePlanStore } from "@/store/planStore";
+import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Plan } from "../../data/schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatValue, formatValue2nd } from "@/lib/helperFunctions";
 import ColumnDetailsTimeframe from "./column-details-timeframe";
 import ColumnDetailsAssetsIn from "./column-details-assetin";
 import ColumnDetailsAssetsOut from "./column-details-assetout";
+import { useAssetStore } from "@/store/assetStore";
 
 function ActionNameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateActionName } = usePlanStore();
@@ -37,13 +38,21 @@ function ActionAssetsOutCell<TData>({ row }: { row: Row<TData> }) {
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
   const [value, setValue] = useState(0);
+  const { assets } = useAssetStore();
   const { plans } = usePlanStore();
-  const plan = plans.find((plan) => plan.id === row.getValue("id"));
-  // row.original.profit = profit;
-  // useEffect(() => {
-  //   setProfit(calculateProfit(asset!));
-  //   row.original.profit = profit;
-  // }, [assets]);
+  const { expanded } = usePlanExpandedState();
+
+  const plan = plans.find((plan) => plan.id === expanded);
+  const action = plan?.actions.find(
+    (action) => action.id === row.getValue("id")
+  );
+  const asset = assets.find(
+    (asset) => asset.id === action?.assetOuts[0]?.assetId
+  );
+  useEffect(() => {
+    setValue(asset?.value || 0);
+  }, [plans]);
+
   return (
     <div className="flex w-[80px] px-3 py-2 border border-transparent">
       <span className="truncate font-medium">{formatValue(value)}</span>

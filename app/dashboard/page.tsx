@@ -38,7 +38,7 @@ async function Dashboard() {
       costs: true,
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: "asc",
     },
   });
 
