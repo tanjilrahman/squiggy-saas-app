@@ -84,9 +84,11 @@ function ColumnDetailsAssetsIn<TData>({
               <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
             </Button>
           </DetailsAssetinsDialog>
-          <p className="mt-4 text-muted-foreground">
-            Est. value: {formatValue(estValue)}
-          </p>
+          {value.length > 0 && (
+            <p className="mt-4 text-muted-foreground">
+              Est. value: {formatValue(estValue)}
+            </p>
+          )}
         </div>
       )}
     </div>

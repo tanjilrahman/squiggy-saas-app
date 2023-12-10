@@ -75,7 +75,9 @@ export function DetailsAssetinsDialog({
             (item) => item.assetId === asset.id
           );
 
-          if (!isAssetInColumn) {
+          const isAssetOutColumn = action?.assetOut === asset.id;
+
+          if (!isAssetInColumn && !isAssetOutColumn) {
             return (
               <div key={asset.id} className="flex space-x-2 items-center">
                 <div className="flex-grow grid grid-cols-4 gap-2">
