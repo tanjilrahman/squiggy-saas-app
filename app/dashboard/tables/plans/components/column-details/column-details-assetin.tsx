@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/assetStore";
 import { AssetIn } from "../../data/schema";
 import { DetailsAssetinsDialog } from "./details-assetins-dialog";
+import { formatValue } from "@/lib/helperFunctions";
 
 interface ColumnDetailsAssetsInProps<TData> {
   row: Row<TData>;
@@ -15,6 +16,7 @@ function ColumnDetailsAssetsIn<TData>({
   row,
 }: ColumnDetailsAssetsInProps<TData>) {
   const [value, setValue] = useState<AssetIn[]>(row.getValue("assetIns"));
+  const [estValue, setEstValue] = useState(0);
   const { plans, removeActionAssetInId, updateActionAssetIn } = usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
@@ -22,6 +24,18 @@ function ColumnDetailsAssetsIn<TData>({
   useEffect(() => {
     setValue(row.getValue("assetIns"));
   }, [plans]);
+
+  useEffect(() => {
+    const totalValue = value.reduce((sum, assetin) => {
+      const assetValue = assets.find(
+        (asset) => asset.id === assetin.assetId
+      )?.value;
+      const est = (assetValue || 0) * (assetin.allocation / 100);
+      return est + sum;
+    }, 0);
+
+    setEstValue(totalValue);
+  }, [value]);
 
   return (
     <div className="w-[200px]">
@@ -60,15 +74,20 @@ function ColumnDetailsAssetsIn<TData>({
       })}
 
       {isEditable && (
-        <DetailsAssetinsDialog
-          planId={expanded!}
-          columnId={row.getValue("id")}
-          updateFunc={updateActionAssetIn}
-        >
-          <Button variant="outline" className="w-full">
-            <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
-          </Button>
-        </DetailsAssetinsDialog>
+        <div>
+          <DetailsAssetinsDialog
+            planId={expanded!}
+            columnId={row.getValue("id")}
+            updateFunc={updateActionAssetIn}
+          >
+            <Button variant="outline" className="w-full">
+              <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
+            </Button>
+          </DetailsAssetinsDialog>
+          <p className="mt-4 text-muted-foreground">
+            Est. value: {formatValue(estValue)}
+          </p>
+        </div>
       )}
     </div>
   );

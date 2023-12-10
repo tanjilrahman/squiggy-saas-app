@@ -52,7 +52,7 @@ export function DetailsAssetinsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[880px]">
+      <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle>Available Assets</DialogTitle>
           <DialogDescription>
@@ -61,9 +61,9 @@ export function DetailsAssetinsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex space-x-2">
-          <div className="flex-grow grid grid-cols-6 text-muted-foreground">
-            <div className="col-span-2 px-2">Asset name</div>
-            <div className="col-span-2 px-2">Value</div>
+          <div className="flex-grow grid grid-cols-4 text-muted-foreground">
+            <div className="col-span-1 px-2">Asset name</div>
+            <div className="col-span-1 px-2">Value</div>
             <div className="px-2">Allocation(%)</div>
             <div className="px-2">Type</div>
           </div>
@@ -78,11 +78,11 @@ export function DetailsAssetinsDialog({
           if (!isAssetInColumn) {
             return (
               <div key={asset.id} className="flex space-x-2 items-center">
-                <div className="flex-grow grid grid-cols-6 gap-2">
-                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                <div className="flex-grow grid grid-cols-4 gap-2">
+                  <div className="col-span-1 bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
                     {asset.name}
                   </div>
-                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                  <div className="col-span-1 bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
                     {formatValue2nd(asset.value)}
                   </div>
                   <Input
@@ -97,7 +97,7 @@ export function DetailsAssetinsDialog({
                 </div>
 
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   className="p-3 space-x-2 data-[state=open]:bg-muted"
                   onClick={() => handleAdd(asset.id!)}
                 >

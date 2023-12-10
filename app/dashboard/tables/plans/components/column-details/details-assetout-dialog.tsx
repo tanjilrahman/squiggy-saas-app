@@ -65,15 +65,15 @@ export function DetailsAssetoutDialog({
             return (
               <div key={asset.id} className="flex space-x-2 items-center">
                 <div className="flex-grow grid grid-cols-4 gap-2">
-                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                  <div className="col-span-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
                     {asset.name}
                   </div>
-                  <div className="col-span-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
+                  <div className="col-span-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
                     {formatValue2nd(asset.value)}
                   </div>
                 </div>
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   className="p-3 space-x-2 data-[state=open]:bg-muted"
                   onClick={() => handleAdd(asset.id!)}
                 >
