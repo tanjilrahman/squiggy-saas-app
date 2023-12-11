@@ -1,11 +1,11 @@
 import { Asset } from "@/app/dashboard/tables/assets/data/schema";
 
-export interface ChartData {
+export interface BarChartData {
   category: string;
   ["Total value"]: number;
 }
 
-export const convertToChartData = (data: Asset[]): ChartData[] => {
+export const convertToChartData = (data: Asset[]): BarChartData[] => {
   const categoryTotals: { [key: string]: number } = {};
 
   data.forEach((asset) => {
@@ -18,7 +18,7 @@ export const convertToChartData = (data: Asset[]): ChartData[] => {
     }
   });
 
-  const chartData: ChartData[] = Object.entries(categoryTotals).map(
+  const chartData: BarChartData[] = Object.entries(categoryTotals).map(
     ([category, totalValue]) => ({
       category: category.charAt(0).toUpperCase() + category.slice(1),
       ["Total value"]: totalValue,
@@ -28,7 +28,7 @@ export const convertToChartData = (data: Asset[]): ChartData[] => {
   return chartData;
 };
 
-export interface ResultItem {
+export interface StackedChartData {
   index: string;
   [key: string]: string | number;
 }
@@ -37,7 +37,9 @@ interface Totals {
   [key: string]: number;
 }
 
-export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
+export const convertToStackedChartData = (
+  inputData: Asset[]
+): StackedChartData[] => {
   // Initialize objects to store income, cost, and margin totals by category type
   const incomeTotals: Totals = {};
   const costTotals: Totals = {};
@@ -90,7 +92,7 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
     Object.values(costTotals).reduce((acc, cost) => acc + cost, 0);
 
   // Organize the data into the desired format
-  const result: ResultItem[] = [
+  const result: StackedChartData[] = [
     { index: "Incomes", ...incomeTotals },
     { index: "Costs", ...costTotals },
     { index: "Margin", Margin: margin },
@@ -98,6 +100,46 @@ export const convertToStackedChartData = (inputData: Asset[]): ResultItem[] => {
 
   return result;
 };
+
+export interface AreaChartData {
+  year: number;
+  "Total Asset Value": number;
+  "Total Income": number;
+  "Total Cost": number;
+  "Asset YOY Increase": number;
+}
+
+export function convertToAreaChartData(
+  calculatedAssets: Asset[][]
+): AreaChartData[] {
+  return calculatedAssets[0]?.map((_, index) => {
+    const year = 2023 + index; // Assuming the calculation starts from 2023
+
+    const totalAssetValue = calculatedAssets
+      .map((scenario) => scenario[index].value)
+      .reduce((sum, value) => sum + value, 0);
+
+    const totalIncome = calculatedAssets
+      .map((scenario) => scenario[index].incomes[0]?.value)
+      .reduce((sum, value) => sum + (value || 0), 0);
+
+    const totalCost = calculatedAssets
+      .map((scenario) => scenario[index].costs[0]?.value)
+      .reduce((sum, value) => sum + (value || 0), 0);
+
+    const assetYOYIncrease = calculatedAssets
+      .map((scenario) => scenario[index].yoy_increase!)
+      .reduce((sum, value) => sum + value, 0);
+
+    return {
+      year,
+      "Total Asset Value": totalAssetValue,
+      "Total Income": totalIncome,
+      "Total Cost": totalCost,
+      "Asset YOY Increase": assetYOYIncrease,
+    };
+  });
+}
 
 export const formatValue = (value: number): string => {
   const absValue = Math.abs(value);

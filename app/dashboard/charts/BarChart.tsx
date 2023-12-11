@@ -1,32 +1,82 @@
 import { Separator } from "@/components/ui/separator";
+import { addProfitsToCurrency, calculateAsset } from "@/lib/calc";
 import {
-  ChartData,
+  BarChartData,
+  convertToAreaChartData,
   convertToChartData,
+  convertToStackedChartData,
   formatValue,
 } from "@/lib/helperFunctions";
 import { useAssetStore } from "@/store/assetStore";
 import { useSelectedAssetStore } from "@/store/assetStore";
-import { BarChart as BC, Card, Subtitle, Title } from "@tremor/react";
-import { useEffect, useState } from "react";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
+import {
+  useAreaChartDataStore,
+  useBarChartDataStore,
+  useStackedChartDataStore,
+} from "@/store/chartStore";
+import { useHorizonState } from "@/store/store";
+import {
+  BarChart as BC,
+  Card,
+  EventProps,
+  Subtitle,
+  Title,
+} from "@tremor/react";
+import { useEffect } from "react";
 
 type PayloadDataType = {
   value: number;
-  payload: ChartData;
+  payload: BarChartData;
 };
+
+type EventPropsWithChartData = EventProps & BarChartData;
 
 export default function BarChart() {
   const { assets } = useAssetStore();
+  const { year } = useHorizonState();
+  const { activePlans, setActivePlans, barChartActive, setBarChartActive } =
+    useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const [chartdata, setChartData] = useState<ChartData[]>([]);
+  const { barChartdata, setBarChartData } = useBarChartDataStore();
+  const { setStackedChartData } = useStackedChartDataStore();
+  const { setAreaChartData } = useAreaChartDataStore();
 
   useEffect(() => {
     const filteredAssetsWithCategory = assets.filter((asset) => asset.category);
     if (selectedAssets.length == 0) {
-      setChartData(convertToChartData(filteredAssetsWithCategory));
+      setBarChartData(convertToChartData(filteredAssetsWithCategory));
     } else {
-      setChartData(convertToChartData(selectedAssets));
+      setBarChartData(convertToChartData(selectedAssets));
     }
   }, [assets, selectedAssets]);
+
+  const onValueChange = (value: EventPropsWithChartData) => {
+    const category = value?.category?.toLowerCase();
+    setBarChartActive(!barChartActive);
+    setActivePlans(false);
+
+    const filteredAssetsWithCategory = assets.filter(
+      (asset) => asset.category === category
+    );
+
+    const calculatedAssets = () => {
+      const filteredPureAsset = assets.filter(
+        (asset) =>
+          !asset.action_asset && (category ? asset.category === category : true)
+      );
+      return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+    };
+
+    const calculateAssetsWithAllocation = addProfitsToCurrency(
+      calculatedAssets()
+    );
+
+    setStackedChartData(
+      convertToStackedChartData(category ? filteredAssetsWithCategory : assets)
+    );
+    setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
+  };
 
   const customTooltip = ({
     payload,
@@ -36,10 +86,10 @@ export default function BarChart() {
     active: boolean;
   }) => {
     if (!active || !payload) return null;
-    let totalValue = payload[0].value;
+    let totalValue = payload[0]?.value;
 
     const categoryItems = assets.filter(
-      (asset) => payload[0].payload.category.toLowerCase() === asset.category
+      (asset) => payload[0]?.payload.category.toLowerCase() === asset.category
     );
 
     return (
@@ -78,14 +128,17 @@ export default function BarChart() {
       <Title>Assets</Title>
       <Subtitle>Some text to add</Subtitle>
       <BC
-        className=""
-        data={chartdata}
+        className="mt-6"
+        data={barChartdata}
         index="category"
         categories={["Total value"]}
         colors={["indigo"]}
         valueFormatter={formatValue}
         yAxisWidth={40}
+        showLegend={false}
         showAnimation={true}
+        // @ts-ignore
+        onValueChange={onValueChange}
         // @ts-ignore
         customTooltip={customTooltip}
       />

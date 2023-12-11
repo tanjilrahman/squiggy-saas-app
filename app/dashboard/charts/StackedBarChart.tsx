@@ -1,18 +1,19 @@
 import { Separator } from "@/components/ui/separator";
 import {
-  ResultItem,
+  StackedChartData,
   convertToStackedChartData,
   formatValue,
 } from "@/lib/helperFunctions";
 import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
 import { Card, Title, BarChart, Subtitle } from "@tremor/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Asset } from "../tables/assets/data/schema";
+import { useStackedChartDataStore } from "@/store/chartStore";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const [stackedChartData, setStackedChartData] = useState<ResultItem[]>([]);
+  const { stackedChartdata, setStackedChartData } = useStackedChartDataStore();
 
   useEffect(() => {
     const filteredPureAssets = assets.filter((asset) => !asset.action_asset);
@@ -27,7 +28,7 @@ export default function StackedBarChart() {
     value: number;
     className: string;
     dataKey: string;
-    payload: ResultItem[];
+    payload: StackedChartData[];
   };
 
   const customTooltipFunction = ({
@@ -146,7 +147,7 @@ export default function StackedBarChart() {
       <Subtitle>Some text to add</Subtitle>
       <BarChart
         className="mt-4 h-80"
-        data={stackedChartData}
+        data={stackedChartdata}
         index="index"
         categories={[
           "Passive",

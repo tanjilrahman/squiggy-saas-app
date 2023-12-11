@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { DataTable } from "../tables/assets/components/data-table";
 import { usePlanStore } from "@/store/planStore";
 import { columns } from "../tables/mini-plans/components/columns";
@@ -8,7 +7,8 @@ import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function MiniPlans() {
   const { plans } = usePlanStore();
-  const { activePlans, setActivePlans } = useCalculatedAssetStore();
+  const { activePlans, barChartActive, setActivePlans } =
+    useCalculatedAssetStore();
 
   const actionsArray = plans.map((plan) => plan.actions || []).flat();
 
@@ -18,6 +18,7 @@ function MiniPlans() {
         <p className="font-medium text-xl">Plans</p>
         <Switch
           checked={activePlans}
+          disabled={barChartActive}
           onCheckedChange={() => setActivePlans(!activePlans)}
         />
       </div>

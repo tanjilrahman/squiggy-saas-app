@@ -25,7 +25,8 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   const { year } = useHorizonState();
   const { assets, setAssets } = useAssetStore();
   const { plans } = usePlanStore();
-  const { activePlans, setCalculatedAssets } = useCalculatedAssetStore();
+  const { activePlans, setCalculatedAssets, barChartActive } =
+    useCalculatedAssetStore();
   const { setPlans } = usePlanStore();
 
   useEffect(() => {
@@ -37,21 +38,23 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   }, [initialPlans]);
 
   useEffect(() => {
-    const calculatedAssets = () => {
-      const filteredPureAsset = assets.filter((asset) => !asset.action_asset);
+    if (!barChartActive) {
+      const calculatedAssets = () => {
+        const filteredPureAsset = assets.filter((asset) => !asset.action_asset);
 
-      if (activePlans || nav === "plans") {
-        return assets.map((asset) => calculateAsset(asset, year, plans));
-      } else {
-        return filteredPureAsset.map((asset) => calculateAsset(asset, year));
-      }
-    };
+        if (activePlans || nav === "plans") {
+          return assets.map((asset) => calculateAsset(asset, year, plans));
+        } else {
+          return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+        }
+      };
 
-    const calculateAssetsWithAllocation = addProfitsToCurrency(
-      calculatedAssets()
-    );
+      const calculateAssetsWithAllocation = addProfitsToCurrency(
+        calculatedAssets()
+      );
 
-    setCalculatedAssets(calculateAssetsWithAllocation);
+      setCalculatedAssets(calculateAssetsWithAllocation);
+    }
   }, [assets, plans, year, activePlans, nav]);
 
   return (
