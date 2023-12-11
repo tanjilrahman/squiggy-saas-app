@@ -1,21 +1,25 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatValue2nd } from "@/lib/helperFunctions";
-import { useAssetStore } from "@/store/assetStore";
+import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 import { usePlanStore } from "@/store/planStore";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Route } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { AssetIn } from "../../data/schema";
 import { AllocationTypeCombobox } from "../allocation-type-combobox";
 import { Input } from "@/components/ui/input";
+import { useNavState, useShowActionAssets } from "@/store/store";
+import { Asset } from "../../../assets/data/schema";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
@@ -30,13 +34,17 @@ export function DetailsAssetinsDialog({
   columnId,
   updateFunc,
 }: ColumnDetailsDialogProps) {
-  const { assets } = useAssetStore();
+  const { assets, addAsset } = useAssetStore();
   const { plans } = usePlanStore();
+  const { setNav } = useNavState();
+  const { setShow } = useShowActionAssets();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<"absolute" | "cumulative">("absolute");
   const [allocation, setAllocation] = useState(100);
   const plan = plans.find((plan) => plan.id === planId);
   const action = plan?.actions.find((action) => action.id === columnId);
+
+  const { setIsEditable, setExpanded } = useAssetExpandedState();
 
   const handleAdd = (assetId: string) => {
     const assetIns: AssetIn = {
@@ -49,6 +57,36 @@ export function DetailsAssetinsDialog({
     setOpen(false);
   };
 
+  const handleCreate = () => {
+    setShow(true);
+    setNav("assets");
+
+    const newAssetId = uuid();
+
+    const newAsset: Asset = {
+      id: newAssetId,
+      action_asset: true,
+      name: "",
+      value: 0,
+      category: "",
+      note: "",
+      additions: 0,
+      allocation: "",
+      yoy: 0,
+      yoy_advanced: [],
+      yoy_type: "fixed",
+      yoy_mode: "simple",
+      profit: 0,
+      roi: 0,
+      incomes: [],
+      costs: [],
+    };
+
+    addAsset(newAsset);
+    setExpanded(newAssetId);
+    setIsEditable(true);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -56,8 +94,8 @@ export function DetailsAssetinsDialog({
         <DialogHeader>
           <DialogTitle>Available Assets</DialogTitle>
           <DialogDescription>
-            Do you really want to delete this record? This process cannot be
-            undone.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus
+            commodi magnam recusandae dolorem quae.
           </DialogDescription>
         </DialogHeader>
         <div className="flex space-x-2">
@@ -81,7 +119,10 @@ export function DetailsAssetinsDialog({
             return (
               <div key={asset.id} className="flex space-x-2 items-center">
                 <div className="flex-grow grid grid-cols-4 gap-2">
-                  <div className="col-span-1 bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
+                  <div className="col-span-1 flex items-center bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
+                    {asset.action_asset && (
+                      <Route className="h-4 w-4 mr-2 text-indigo-500" />
+                    )}
                     {asset.name}
                   </div>
                   <div className="col-span-1 bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
@@ -111,6 +152,12 @@ export function DetailsAssetinsDialog({
 
           return null;
         })}
+        <DialogFooter className="mt-4">
+          <DialogClose asChild>
+            <Button variant="ghost">Cancel</Button>
+          </DialogClose>
+          <Button onClick={handleCreate}>Create new asset</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

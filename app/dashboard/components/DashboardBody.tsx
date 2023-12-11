@@ -37,13 +37,19 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   }, [initialPlans]);
 
   useEffect(() => {
-    const calculateAssets = assets.map((asset) =>
-      activePlans || nav === "plans"
-        ? calculateAsset(asset, year, plans)
-        : calculateAsset(asset, year)
-    );
+    const calculatedAssets = () => {
+      const filteredPureAsset = assets.filter((asset) => !asset.action_asset);
 
-    const calculateAssetsWithAllocation = addProfitsToCurrency(calculateAssets);
+      if (activePlans || nav === "plans") {
+        return assets.map((asset) => calculateAsset(asset, year, plans));
+      } else {
+        return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+      }
+    };
+
+    const calculateAssetsWithAllocation = addProfitsToCurrency(
+      calculatedAssets()
+    );
 
     setCalculatedAssets(calculateAssetsWithAllocation);
   }, [assets, plans, year, activePlans, nav]);

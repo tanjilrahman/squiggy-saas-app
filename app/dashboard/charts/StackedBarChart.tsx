@@ -15,8 +15,9 @@ export default function StackedBarChart() {
   const [stackedChartData, setStackedChartData] = useState<ResultItem[]>([]);
 
   useEffect(() => {
+    const filteredPureAssets = assets.filter((asset) => !asset.action_asset);
     if (selectedAssets.length == 0) {
-      setStackedChartData(convertToStackedChartData(assets));
+      setStackedChartData(convertToStackedChartData(filteredPureAssets));
     } else {
       setStackedChartData(convertToStackedChartData(selectedAssets));
     }

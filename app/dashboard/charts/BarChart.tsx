@@ -20,8 +20,9 @@ export default function BarChart() {
   const [chartdata, setChartData] = useState<ChartData[]>([]);
 
   useEffect(() => {
+    const filteredAssetsWithCategory = assets.filter((asset) => asset.category);
     if (selectedAssets.length == 0) {
-      setChartData(convertToChartData(assets));
+      setChartData(convertToChartData(filteredAssetsWithCategory));
     } else {
       setChartData(convertToChartData(selectedAssets));
     }

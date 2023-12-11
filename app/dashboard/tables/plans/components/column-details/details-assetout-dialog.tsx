@@ -44,8 +44,8 @@ export function DetailsAssetoutDialog({
         <DialogHeader>
           <DialogTitle>Available Assets</DialogTitle>
           <DialogDescription>
-            Do you really want to delete this record? This process cannot be
-            undone.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus
+            commodi magnam.
           </DialogDescription>
         </DialogHeader>
         <div className="flex space-x-2">

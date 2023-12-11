@@ -11,6 +11,7 @@ import {
   ChevronUp,
   Pencil,
   PlusCircle,
+  Route,
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -36,6 +37,15 @@ function NameCell<TData>({ row }: { row: Row<TData> }) {
 
 function CategoryCell<TData>({ row }: { row: Row<TData> }) {
   const { expanded, isEditable } = useAssetExpandedState();
+  const { assets } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === row.getValue("id"));
+
+  if (asset?.action_asset)
+    return (
+      <div className="flex items-center space-x-2 px-4 py-2">
+        <Route className="h-4 w-4 text-indigo-500" /> <span>Plan Asset</span>
+      </div>
+    );
 
   if (row.getValue("id") === expanded)
     return (

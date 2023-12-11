@@ -5,14 +5,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import { useHorizonState } from "@/store/store";
+import { useHorizonState, useShowActionAssets } from "@/store/store";
+import { Switch } from "@tremor/react";
 
 function SettingsButton() {
   const { setYear, year } = useHorizonState();
+  const { setShow, show } = useShowActionAssets();
 
   useEffect(() => {
     const storedYear = localStorage.getItem("selectedYear");
@@ -24,6 +27,18 @@ function SettingsButton() {
   const handleSetYear = (newYear: number) => {
     localStorage.setItem("selectedYear", String(newYear));
     setYear(newYear);
+  };
+
+  useEffect(() => {
+    const storedShow = localStorage.getItem("showActionAssets");
+    if (storedShow) {
+      setShow(JSON.parse(storedShow));
+    }
+  }, [setShow]);
+
+  const handleSetShow = (show: boolean) => {
+    localStorage.setItem("showActionAssets", String(show));
+    setShow(show);
   };
 
   return (
@@ -54,6 +69,18 @@ function SettingsButton() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex items-center justify-between text-sm">
+            <p>Action Assets</p>
+            <Switch
+              checked={show}
+              color="indigo"
+              onChange={() => handleSetShow(!show)}
+            />
+          </div>
+        </DropdownMenuLabel>
       </DropdownMenuContent>
     </DropdownMenu>
   );

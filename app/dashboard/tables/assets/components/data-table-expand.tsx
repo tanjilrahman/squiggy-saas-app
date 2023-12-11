@@ -200,7 +200,9 @@ export function DataTableExpand<TData extends Asset, TValue>({
                         <div className="w-full flex justify-between my-4">
                           <div className="space-x-4">
                             <ProfitAllocationCombobox
-                              disabled={!isEditable}
+                              disabled={
+                                !isEditable || assets[row.index].action_asset
+                              }
                               assetId={row.getValue("id")}
                             />
                           </div>

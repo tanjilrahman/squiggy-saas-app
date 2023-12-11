@@ -12,10 +12,20 @@ export const useNavState = create<navState>()((set) => ({
 
 interface horizonState {
   year: number;
-  setYear: (nav: number) => void;
+  setYear: (year: number) => void;
 }
 
 export const useHorizonState = create<horizonState>()((set) => ({
   year: 5,
   setYear: (year: number) => set({ year }),
+}));
+
+interface showActionAssets {
+  show: boolean;
+  setShow: (show: boolean) => void;
+}
+
+export const useShowActionAssets = create<showActionAssets>()((set) => ({
+  show: true,
+  setShow: (show: boolean) => set({ show }),
 }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavState } from "@/store/store";
 import { CandlestickChart, KanbanSquare, Route } from "lucide-react";
 import { usePathname } from "next/navigation";
