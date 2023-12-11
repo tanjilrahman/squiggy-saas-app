@@ -89,6 +89,7 @@ export function calculateAsset(
 
   const calculatedInitialAsset: Asset = {
     id: initialAsset.id,
+    action_asset: initialAsset.action_asset,
     category: initialAsset.category,
     name: initialAsset.name,
     note: initialAsset.note,
