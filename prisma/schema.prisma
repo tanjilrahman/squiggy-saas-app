@@ -26,6 +26,7 @@ model User {
 
 model Asset {
   id           String   @id @default(uuid())
+  action_asset Boolean
   name         String
   value        Int
   category     String

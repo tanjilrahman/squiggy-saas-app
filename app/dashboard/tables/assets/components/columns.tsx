@@ -112,7 +112,7 @@ function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
   );
   return (
     <div className="w-[40px] flex items-center">
-      <span>{(calcAssetAll && calcAssetAll[0].roi) || 0}%</span>
+      <span>{(calcAssetAll && calcAssetAll[0].roi?.toFixed(1)) || 0}%</span>
     </div>
   );
 }
@@ -126,6 +126,7 @@ function DetailsHeader() {
 
     const newAsset: Asset = {
       id: newAssetId,
+      action_asset: false,
       name: "",
       value: 0,
       category: "",

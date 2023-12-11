@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
         id: updatedAsset.id,
       },
       data: {
+        action_asset: updatedAsset?.action_asset,
         name: updatedAsset?.name,
         value: updatedAsset?.value,
         category: updatedAsset?.category,
@@ -108,6 +109,7 @@ export async function POST(request: NextRequest) {
           },
         },
         id: updatedAsset?.id,
+        action_asset: updatedAsset?.action_asset,
         name: updatedAsset?.name,
         value: updatedAsset?.value,
         category: updatedAsset?.category,
