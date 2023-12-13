@@ -52,8 +52,13 @@ export default function BarChart() {
   }, [assets, selectedAssets]);
 
   const onValueChange = (value: EventPropsWithChartData) => {
+    const normalAssets = assets.filter((asset) => asset.category);
     const category = value?.category?.toLowerCase();
-    setBarChartActive(!barChartActive);
+    if (category) {
+      setBarChartActive(true);
+    } else {
+      setBarChartActive(false);
+    }
     setActivePlans(false);
 
     const filteredAssetsWithCategory = assets.filter(
@@ -73,7 +78,9 @@ export default function BarChart() {
     );
 
     setStackedChartData(
-      convertToStackedChartData(category ? filteredAssetsWithCategory : assets)
+      convertToStackedChartData(
+        category ? filteredAssetsWithCategory : normalAssets
+      )
     );
     setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
   };
