@@ -20,12 +20,12 @@ export const useHorizonState = create<horizonState>()((set) => ({
   setYear: (year: number) => set({ year }),
 }));
 
-interface showActionAssets {
-  show: boolean;
-  setShow: (show: boolean) => void;
-}
+// interface showActionAssets {
+//   show: boolean;
+//   setShow: (show: boolean) => void;
+// }
 
-export const useShowActionAssets = create<showActionAssets>()((set) => ({
-  show: true,
-  setShow: (show: boolean) => set({ show }),
-}));
+// export const useShowActionAssets = create<showActionAssets>()((set) => ({
+//   show: true,
+//   setShow: (show: boolean) => set({ show }),
+// }));

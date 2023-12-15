@@ -9,7 +9,7 @@ import { useAssetStore } from "@/store/assetStore";
 import BarChart from "../charts/BarChart";
 import StackedBarChart from "../charts/StackedBarChart";
 import { Plan } from "../tables/plans/data/schema";
-import { usePlanStore } from "@/store/planStore";
+import { usePlanStore, useSelectedPlanStore } from "@/store/planStore";
 import MiniPlans from "@/app/dashboard/components/MiniPlans";
 import AreaChart from "../charts/AreaChart";
 import { addProfitsToCurrency, calculateAsset } from "@/lib/calc";
@@ -25,6 +25,7 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   const { year } = useHorizonState();
   const { assets, setAssets } = useAssetStore();
   const { plans } = usePlanStore();
+  const { selectedPlan } = useSelectedPlanStore();
   const { activePlans, setCalculatedAssets, barChartActive } =
     useCalculatedAssetStore();
   const { setPlans } = usePlanStore();
@@ -43,6 +44,18 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
         const filteredPureAsset = assets.filter((asset) => !asset.action_asset);
 
         if (activePlans || nav === "plans") {
+          if (nav === "plans" && selectedPlan) {
+            const assetInIds = selectedPlan.actions
+              .map((action) =>
+                action.assetIns.map((assetin) => assetin.assetId)
+              )
+              .flat();
+
+            const assetIns = assets.filter((asset) =>
+              assetInIds.includes(asset.id)
+            );
+            return assetIns.map((asset) => calculateAsset(asset, year, plans));
+          }
           return assets.map((asset) => calculateAsset(asset, year, plans));
         } else {
           return filteredPureAsset.map((asset) => calculateAsset(asset, year));
@@ -55,7 +68,7 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
 
       setCalculatedAssets(calculateAssetsWithAllocation);
     }
-  }, [assets, plans, year, activePlans, nav]);
+  }, [assets, plans, year, activePlans, nav, selectedPlan]);
 
   return (
     <div className="mx-auto pt-4 p-8">

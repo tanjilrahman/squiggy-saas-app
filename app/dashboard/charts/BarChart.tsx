@@ -43,16 +43,16 @@ export default function BarChart() {
   const { setAreaChartData } = useAreaChartDataStore();
 
   useEffect(() => {
-    const filteredAssetsWithCategory = assets.filter((asset) => asset.category);
+    const pureAssets = assets.filter((asset) => !asset.action_asset);
     if (selectedAssets.length == 0) {
-      setBarChartData(convertToChartData(filteredAssetsWithCategory));
+      setBarChartData(convertToChartData(activePlans ? assets : pureAssets));
     } else {
       setBarChartData(convertToChartData(selectedAssets));
     }
-  }, [assets, selectedAssets]);
+  }, [assets, selectedAssets, activePlans]);
 
   const onValueChange = (value: EventPropsWithChartData) => {
-    const normalAssets = assets.filter((asset) => asset.category);
+    const normalAssets = assets.filter((asset) => !asset.action_asset);
     const category = value?.category?.toLowerCase();
     if (category) {
       setBarChartActive(true);

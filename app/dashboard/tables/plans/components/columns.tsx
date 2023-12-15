@@ -16,9 +16,14 @@ import { Button } from "@/components/ui/button";
 import { DataTableRemove } from "./data-table-remove";
 import ColumnName from "./column/column-name";
 import { Plan } from "../data/schema";
-import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
+import {
+  usePlanExpandedState,
+  usePlanStore,
+  useSelectedPlanStore,
+} from "@/store/planStore";
 import ColumnInflation from "./column/column-inflation";
 import ColumnNote from "./column/column-note";
+import { CustomRadio } from "@/components/ui/custom-radio";
 
 function NameCell<TData>({ row }: { row: Row<TData> }) {
   const { updatePlanName } = usePlanStore();
@@ -32,19 +37,29 @@ function NoteCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnNote row={row} updateFunc={updatePlanNote} />;
 }
 
-function SelectHeader<TValue extends Plan>({
+function SelectCell<TValue extends Plan>({
   table,
+  row,
 }: {
   table: Table<TValue>;
+  row: Row<TValue>;
 }) {
+  const { setSelectedPlan } = useSelectedPlanStore();
   useEffect(() => {
-    table.getFilteredSelectedRowModel().rows.map((row) => row.original);
-  }, [table.getFilteredSelectedRowModel().rows.length]);
+    const selectedAssets = table
+      .getFilteredSelectedRowModel()
+      .rows.map((row) => row.original);
+    setSelectedPlan(selectedAssets[0]);
+  }, [table.getFilteredSelectedRowModel()]);
+
   return (
-    <Checkbox
-      checked={table.getIsAllPageRowsSelected()}
-      onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      aria-label="Select all"
+    <CustomRadio
+      checked={row.getIsSelected()}
+      onCheckedChange={(value) => {
+        table.resetRowSelection(false);
+        row.toggleSelected(!!value);
+      }}
+      aria-label="Select row"
       className="translate-y-[2px]"
     />
   );
@@ -191,15 +206,8 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
 export const columns: ColumnDef<Plan>[] = [
   {
     id: "select",
-    header: SelectHeader,
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
+    // header: SelectHeader,
+    cell: SelectCell,
     enableSorting: false,
     enableHiding: false,
   },

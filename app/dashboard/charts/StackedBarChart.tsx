@@ -9,20 +9,24 @@ import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 import { useEffect } from "react";
 import { Asset } from "../tables/assets/data/schema";
 import { useStackedChartDataStore } from "@/store/chartStore";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
+  const { activePlans } = useCalculatedAssetStore();
   const { stackedChartdata, setStackedChartData } = useStackedChartDataStore();
+  const pureAssets = assets.filter((asset) => !asset.action_asset);
 
   useEffect(() => {
-    const filteredPureAssets = assets.filter((asset) => !asset.action_asset);
     if (selectedAssets.length == 0) {
-      setStackedChartData(convertToStackedChartData(filteredPureAssets));
+      setStackedChartData(
+        convertToStackedChartData(activePlans ? assets : pureAssets)
+      );
     } else {
       setStackedChartData(convertToStackedChartData(selectedAssets));
     }
-  }, [assets, selectedAssets]);
+  }, [assets, selectedAssets, activePlans]);
 
   type PayloadDataType = {
     value: number;
@@ -120,7 +124,10 @@ export default function StackedBarChart() {
               {payload.length > 1 && <Separator className="" />}
 
               <div className="pt-[2px] pb-2">
-                {getTypeValues(item.dataKey, assets).map((asset, i) => (
+                {getTypeValues(
+                  item.dataKey,
+                  activePlans ? assets : pureAssets
+                ).map((asset, i) => (
                   <div key={i} className="grid grid-cols-4 px-3 space-y-[2px]">
                     <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
                       {asset.assetName}

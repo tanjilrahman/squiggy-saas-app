@@ -19,6 +19,28 @@ export const usePlanExpandedState = create<PlanExpandedState>((set) => ({
   setIsEditable: (boolean) => set({ isEditable: boolean }),
 }));
 
+type SelectedPlanStore = {
+  selectedPlan: Plan | null;
+  setSelectedPlan: (plan: Plan) => void;
+};
+
+export const useSelectedPlanStore = create<SelectedPlanStore>((set) => ({
+  selectedPlan: null,
+  setSelectedPlan: (selectedPlan) => set({ selectedPlan }),
+}));
+
+type SelectedMiniPlanStore = {
+  startTime: number | null;
+  setStartTime: (number: number | null) => void;
+};
+
+export const useSelectedMiniPlanStore = create<SelectedMiniPlanStore>(
+  (set) => ({
+    startTime: null,
+    setStartTime: (startTime) => set({ startTime }),
+  })
+);
+
 type PlanStore = {
   plans: Plan[];
   setPlans: (plans: Plan[]) => void;

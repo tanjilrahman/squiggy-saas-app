@@ -10,12 +10,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import { useHorizonState, useShowActionAssets } from "@/store/store";
+import { useHorizonState } from "@/store/store";
 import { Switch } from "@tremor/react";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function SettingsButton() {
   const { setYear, year } = useHorizonState();
-  const { setShow, show } = useShowActionAssets();
+  const { setActivePlans, activePlans } = useCalculatedAssetStore();
 
   useEffect(() => {
     const storedYear = localStorage.getItem("selectedYear");
@@ -32,13 +33,13 @@ function SettingsButton() {
   useEffect(() => {
     const storedShow = localStorage.getItem("showActionAssets");
     if (storedShow) {
-      setShow(JSON.parse(storedShow));
+      setActivePlans(JSON.parse(storedShow));
     }
-  }, [setShow]);
+  }, [setActivePlans]);
 
   const handleSetShow = (show: boolean) => {
     localStorage.setItem("showActionAssets", String(show));
-    setShow(show);
+    setActivePlans(show);
   };
 
   return (
@@ -73,11 +74,11 @@ function SettingsButton() {
 
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center justify-between text-sm">
-            <p>Action Assets</p>
+            <p>Plan Assets</p>
             <Switch
-              checked={show}
+              checked={activePlans}
               color="indigo"
-              onChange={() => handleSetShow(!show)}
+              onChange={() => handleSetShow(!activePlans)}
             />
           </div>
         </DropdownMenuLabel>

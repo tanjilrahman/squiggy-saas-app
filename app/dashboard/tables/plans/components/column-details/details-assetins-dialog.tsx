@@ -18,8 +18,9 @@ import { v4 as uuid } from "uuid";
 import { AssetIn } from "../../data/schema";
 import { AllocationTypeCombobox } from "../allocation-type-combobox";
 import { Input } from "@/components/ui/input";
-import { useNavState, useShowActionAssets } from "@/store/store";
+import { useNavState } from "@/store/store";
 import { Asset } from "../../../assets/data/schema";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
@@ -37,7 +38,7 @@ export function DetailsAssetinsDialog({
   const { assets, addAsset } = useAssetStore();
   const { plans } = usePlanStore();
   const { setNav } = useNavState();
-  const { setShow } = useShowActionAssets();
+  const { setActivePlans } = useCalculatedAssetStore();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<"absolute" | "cumulative">("absolute");
   const [allocation, setAllocation] = useState(100);
@@ -58,7 +59,7 @@ export function DetailsAssetinsDialog({
   };
 
   const handleCreate = () => {
-    setShow(true);
+    setActivePlans(true);
     setNav("assets");
 
     const newAssetId = uuid();
@@ -68,7 +69,7 @@ export function DetailsAssetinsDialog({
       action_asset: true,
       name: "",
       value: 0,
-      category: "",
+      category: "plan asset",
       note: "",
       additions: 0,
       allocation: "",

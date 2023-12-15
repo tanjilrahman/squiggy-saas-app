@@ -29,10 +29,14 @@ export const useStackedChartDataStore = create<StackedChartDataStore>(
 
 type AreaChartDataStore = {
   areaChartdata: AreaChartData[];
+  yearSelected: number | null;
+  setYearSelected: (yearSelected: number | null) => void;
   setAreaChartData: (areaChartdata: AreaChartData[]) => void;
 };
 
 export const useAreaChartDataStore = create<AreaChartDataStore>((set) => ({
   areaChartdata: [],
+  yearSelected: null,
+  setYearSelected: (yearSelected) => set({ yearSelected }),
   setAreaChartData: (areaChartdata) => set({ areaChartdata }),
 }));

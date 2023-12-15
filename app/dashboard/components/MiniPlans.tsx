@@ -1,9 +1,9 @@
-import { DataTable } from "../tables/assets/components/data-table";
 import { usePlanStore } from "@/store/planStore";
 import { columns } from "../tables/mini-plans/components/columns";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { DataTable } from "../tables/mini-plans/components/data-table";
 
 function MiniPlans() {
   const { plans } = usePlanStore();

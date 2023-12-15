@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef, Row } from "@tanstack/react-table";
+import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { useState } from "react";
 import { usePlanStore } from "@/store/planStore";
@@ -13,8 +13,14 @@ function ActionNameCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnName row={row} />;
 }
 
-function ActionTimeframeCell<TData>({ row }: { row: Row<TData> }) {
-  return <ColumnTimeframe row={row} />;
+function ActionTimeframeCell<TData>({
+  table,
+  row,
+}: {
+  table: Table<TData>;
+  row: Row<TData>;
+}) {
+  return <ColumnTimeframe row={row} table={table} />;
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
