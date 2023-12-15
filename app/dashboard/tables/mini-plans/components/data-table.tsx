@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { useAreaChartDataStore } from "@/store/chartStore";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { DataRow } from "./data-row";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -75,62 +76,32 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => {
-                const tf: number[] = row.getValue("timeframe");
-                const [highlight, setHighlight] = React.useState(false);
-
-                React.useEffect(() => {
-                  if (yearSelected && activePlans) {
-                    const selected =
-                      yearSelected >= tf[0] && yearSelected <= tf[1];
-                    setHighlight(selected);
-                  } else {
-                    setHighlight(false);
-                  }
-                }, [yearSelected, activePlans]);
-
-                return (
-                  <TableRow
+              table
+                .getRowModel()
+                .rows.map((row) => (
+                  <DataRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={`${highlight && "bg-muted/50"} ${
-                      activePlans && "cursor-pointer"
-                    }`}
-                    onClick={() => {
-                      if (activePlans) {
-                        table.resetRowSelection(false);
-                        row.toggleSelected(!row.getIsSelected());
-                      }
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })
+                    row={row}
+                    yearSelected={yearSelected}
+                    activePlans={activePlans}
+                    table={table}
+                  />
+                ))
             ) : (
               <TableRow>
                 <TableCell
