@@ -44,11 +44,11 @@ export function calculateAsset(
     const yoyIncrease =
       income.yoy_mode === "simple"
         ? income.yoy_type === "fixed"
-          ? income.yoy
-          : (income.yoy / 100) * incomeValue
+          ? income.yoy || 0
+          : ((income.yoy || 0) / 100) * incomeValue
         : income.yoy_type === "fixed"
-        ? income.yoy_advanced[0]
-        : (income.yoy_advanced[0] / 100) * incomeValue;
+        ? income.yoy_advanced[0] || 0
+        : ((income.yoy_advanced[0] || 0) / 100) * incomeValue;
 
     return { ...income, value: incomeValue, yoy_increase: yoyIncrease };
   });
@@ -62,11 +62,11 @@ export function calculateAsset(
     const yoyIncrease =
       cost.yoy_mode === "simple"
         ? cost.yoy_type === "fixed"
-          ? cost.yoy
-          : (cost.yoy / 100) * costValue
+          ? cost.yoy || 0
+          : ((cost.yoy || 0) / 100) * costValue
         : cost.yoy_type === "fixed"
-        ? cost.yoy_advanced[0]
-        : (cost.yoy_advanced[0] / 100) * costValue;
+        ? cost.yoy_advanced[0] || 0
+        : ((cost.yoy_advanced[0] || 0) / 100) * costValue;
 
     return { ...cost, value: costValue, yoy_increase: yoyIncrease };
   });
@@ -78,14 +78,14 @@ export function calculateAsset(
   const calculatedAssetYoy =
     initialAsset.yoy_mode === "simple"
       ? initialAsset.yoy_type === "fixed"
-        ? initialAsset.yoy
-        : (initialAsset.yoy / 100) * initialAsset.value
+        ? initialAsset.yoy || 0
+        : ((initialAsset.yoy || 0) / 100) * initialAsset.value
       : initialAsset.yoy_type === "fixed"
-      ? initialAsset.yoy_advanced[0]
-      : (initialAsset.yoy_advanced[0] / 100) * initialAsset.value;
+      ? initialAsset.yoy_advanced[0] || 0
+      : ((initialAsset.yoy_advanced[0] || 0) / 100) * initialAsset.value;
 
   const calculatedAssetROI =
-    (calculatedAssetYoy + calculateAssetProfit) / initialAsset.value;
+    ((calculatedAssetYoy || 0) + calculateAssetProfit) / initialAsset.value;
 
   const calculatedInitialAsset: Asset = {
     id: initialAsset.id,
@@ -149,11 +149,11 @@ export function calculateAsset(
       const yoyIncrease =
         income.yoy_mode === "simple"
           ? income.yoy_type === "fixed"
-            ? income.yoy
-            : (income.yoy / 100) * newIncomeValue
+            ? income.yoy || 0
+            : ((income.yoy || 0) / 100) * newIncomeValue
           : income.yoy_type === "fixed"
-          ? income.yoy_advanced[year]
-          : (income.yoy_advanced[year] / 100) * newIncomeValue;
+          ? income.yoy_advanced[year] || 0
+          : ((income.yoy_advanced[year] || 0) / 100) * newIncomeValue;
 
       return { ...income, value: newIncomeValue, yoy_increase: yoyIncrease };
     });
@@ -164,11 +164,11 @@ export function calculateAsset(
       const yoyIncrease =
         cost.yoy_mode === "simple"
           ? cost.yoy_type === "fixed"
-            ? cost.yoy
-            : (cost.yoy / 100) * newCostValue
+            ? cost.yoy || 0
+            : ((cost.yoy || 0) / 100) * newCostValue
           : cost.yoy_type === "fixed"
-          ? cost.yoy_advanced[year]
-          : (cost.yoy_advanced[year] / 100) * newCostValue;
+          ? cost.yoy_advanced[year] || 0
+          : ((cost.yoy_advanced[year] || 0) / 100) * newCostValue;
 
       return { ...cost, value: newCostValue, yoy_increase: yoyIncrease };
     });
@@ -176,11 +176,11 @@ export function calculateAsset(
     const newAssetYoy =
       prevAsset.yoy_mode === "simple"
         ? prevAsset.yoy_type === "fixed"
-          ? prevAsset.yoy
-          : (prevAsset.yoy / 100) * prevAsset.value
+          ? prevAsset.yoy || 0
+          : ((prevAsset.yoy || 0) / 100) * prevAsset.value
         : prevAsset.yoy_type === "fixed"
-        ? prevAsset.yoy_advanced[year]
-        : (prevAsset.yoy_advanced[year] / 100) * prevAsset.value;
+        ? prevAsset.yoy_advanced[year] || 0
+        : ((prevAsset.yoy_advanced[year] || 0) / 100) * prevAsset.value;
 
     const newAsset: Asset = {
       ...prevAsset,
