@@ -6,12 +6,11 @@ import { DetailsYoyCombobox } from "./details-yoy-combobox";
 import { DetailsYoyDialog } from "./details-yoy-dialog";
 import { TrendingUp } from "lucide-react";
 import { formatValue2nd } from "@/lib/helperFunctions";
-import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 interface ColumnDetailsNameProps<TData> {
   row: Row<TData>;
   type: "income" | "cost";
-  updateFunc: (assetId: string, columnId: string, value: number) => void;
+  updateFunc: (assetId: string, columnId: string, value: number | null) => void;
 }
 
 function ColumnDetailsYoy<TData>({
@@ -20,27 +19,22 @@ function ColumnDetailsYoy<TData>({
   updateFunc,
 }: ColumnDetailsNameProps<TData>) {
   const { assets } = useAssetStore();
-  const { calculatedAssets } = useCalculatedAssetStore();
   const { expanded, isEditable } = useAssetExpandedState();
-
-  const calcAssetAll = calculatedAssets.find((year) => year[0].id === expanded);
-  const calcIncome =
-    calcAssetAll &&
-    calcAssetAll[0].incomes.find((item) => item.id === row.getValue("id"));
-  const calcCost =
-    calcAssetAll &&
-    calcAssetAll[0].costs.find((item) => item.id === row.getValue("id"));
 
   const asset = assets.find((asset) => asset.id === expanded);
   const income = asset?.incomes.find((item) => item.id === row.getValue("id"));
   const cost = asset?.costs.find((item) => item.id === row.getValue("id"));
 
-  const [value, setValue] = useState<number>(row.getValue("yoy"));
+  const [value, setValue] = useState<number | null>(row.getValue("yoy"));
   const [mode, setMode] = useState(
     type === "income" ? income?.yoy_mode : cost?.yoy_mode
   );
-  const [yoyAdvanced, setYoyAdvanced] = useState<number[] | undefined>(
+  const [yoyAdvanced, setYoyAdvanced] = useState<(number | null)[] | undefined>(
     type === "income" ? income?.yoy_advanced : cost?.yoy_advanced
+  );
+
+  const [yoyType, setYoyType] = React.useState(
+    type === "income" ? income?.yoy_type! : cost?.yoy_type!
   );
 
   useEffect(() => {
@@ -48,19 +42,19 @@ function ColumnDetailsYoy<TData>({
     if (type === "income") {
       setYoyAdvanced(income?.yoy_advanced);
       setMode(income?.yoy_mode);
+      setYoyType(income?.yoy_type!);
+      console.log(income?.yoy);
     } else {
       setYoyAdvanced(cost?.yoy_advanced);
       setMode(cost?.yoy_mode);
+      setYoyType(cost?.yoy_type!);
+      console.log(cost?.yoy);
     }
   }, [assets]);
 
   useEffect(() => {
     if (mode === "advanced") {
-      updateFunc(
-        expanded!,
-        row.getValue("id"),
-        yoyAdvanced![1] - yoyAdvanced![0]
-      );
+      updateFunc(expanded!, row.getValue("id"), yoyAdvanced![0]);
     }
   }, [mode]);
 
@@ -69,9 +63,8 @@ function ColumnDetailsYoy<TData>({
       <div className="flex items-center w-[200px]">
         <Input
           id="yoy"
-          value={
-            mode === "advanced" ? yoyAdvanced![1] - yoyAdvanced![0] : value
-          }
+          type="number"
+          value={mode === "advanced" ? yoyAdvanced![0] || "" : value || ""}
           disabled={!isEditable || mode === "advanced"}
           onChange={(e) => {
             setValue(+e.target.value);
@@ -83,10 +76,10 @@ function ColumnDetailsYoy<TData>({
             "disabled:bg-transparent disabled:border-transparent"
           } ${
             !isEditable ? "w-full" : "w-[100px]"
-          } disabled:opacity-100 border-r-0 rounded-r-none`}
+          } disabled:opacity-100 border-r-0 rounded-r-none pr-0 text-right flex-grow`}
         />
         <DetailsYoyCombobox
-          className="border-l-0 rounded-l-none px-2"
+          className="px-2 border-l-0 rounded-l-none"
           disabled={!isEditable}
           assetId={expanded!}
           itemId={row.getValue("id")}
@@ -107,14 +100,20 @@ function ColumnDetailsYoy<TData>({
     );
 
   return (
-    <div className="flex items-center w-[200px] px-3 py-2 border border-transparent">
-      {type === "income" ? (
-        <p>{formatValue2nd(calcIncome?.yoy_increase || 0)}</p>
+    <div className="flex items-center w-[200px] px-3 py-2 border border-transparent justify-end">
+      {yoyType === "%" ? (
+        <p>{mode === "advanced" ? yoyAdvanced![0] : value}%</p>
       ) : (
-        <p>{formatValue2nd(calcCost?.yoy_increase || 0)}</p>
+        <p>
+          {mode === "advanced"
+            ? formatValue2nd(yoyAdvanced![0])
+            : formatValue2nd(value)}
+        </p>
       )}
-      {mode === "advanced" && (
-        <TrendingUp className="opacity-100 h-5 w-5 ml-2" />
+      {mode === "advanced" ? (
+        <TrendingUp className="w-5 h-5 ml-2 opacity-100" />
+      ) : (
+        <div className="w-5 h-5 ml-2" />
       )}
     </div>
   );

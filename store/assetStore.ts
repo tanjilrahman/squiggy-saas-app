@@ -41,13 +41,16 @@ type AssetStore = {
   updateAssetName: (assetId: string, newName: string) => void;
   updateAssetValue: (assetId: string, newValue: number) => void;
   updateAssetCategory: (assetId: string, newCategory: string) => void;
-  updateAssetYoy: (assetId: string, newAssetYoy: number) => void;
+  updateAssetYoy: (assetId: string, newAssetYoy: number | null) => void;
   updateAssetYoyType: (assetId: string, newYoyType: "fixed" | "%") => void;
   updateAssetYoyMode: (
     assetId: string,
     newYoyMode: "simple" | "advanced"
   ) => void;
-  updateAssetYoyAdvanced: (assetId: string, newYoyAdvanced: number[]) => void;
+  updateAssetYoyAdvanced: (
+    assetId: string,
+    newYoyAdvanced: (number | null)[]
+  ) => void;
   updateAssetNote: (assetId: string, newNote: string) => void;
   updateAssetAllocation: (assetId: string, newAllocation: string) => void;
 
@@ -64,7 +67,7 @@ type AssetStore = {
   updateIncomeYoy: (
     assetId: string,
     incomeId: string,
-    newIncomeYoy: number
+    newIncomeYoy: number | null
   ) => void;
   updateIncomeType: (
     assetId: string,
@@ -77,7 +80,11 @@ type AssetStore = {
     newCostType: string
   ) => void;
 
-  updateCostYoy: (assetId: string, costId: string, newCostYoy: number) => void;
+  updateCostYoy: (
+    assetId: string,
+    costId: string,
+    newCostYoy: number | null
+  ) => void;
 
   updateCostName: (assetId: string, costId: string, newName: string) => void;
 
@@ -102,7 +109,7 @@ type AssetStore = {
   updateIncomeYoyAdvanced: (
     assetId: string,
     incomeId: string,
-    newYoyAdvanced: number[]
+    newYoyAdvanced: (number | null)[]
   ) => void;
 
   updateIncomeValueMode: (
@@ -126,7 +133,7 @@ type AssetStore = {
   updateCostYoyAdvanced: (
     assetId: string,
     costId: string,
-    newYoyAdvanced: number[]
+    newYoyAdvanced: (number | null)[]
   ) => void;
 
   updateCostValueMode: (

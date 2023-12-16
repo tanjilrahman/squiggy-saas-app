@@ -20,21 +20,26 @@ function ColumnValue<TData>({ row, updateFunc }: ColumnValueProps<TData>) {
 
   if (row.getValue("id") === expanded && isEditable)
     return (
-      <Input
-        id="value"
-        type="text"
-        value={value}
-        onChange={(e) => {
-          const numericValue = +e.target.value.replace(/\D/g, "");
-          setValue(numericValue);
-          updateFunc(row.getValue("id"), numericValue);
-        }}
-        className="w-[150px] disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
-      />
+      <div className="flex items-center w-[150px]">
+        <Input
+          id="value"
+          type="text"
+          value={value}
+          onChange={(e) => {
+            const numericValue = +e.target.value.replace(/\D/g, "");
+            setValue(numericValue);
+            updateFunc(row.getValue("id"), numericValue);
+          }}
+          className="flex-grow pr-0 text-right border-r-0 rounded-r-none disabled:opacity-100 disabled:bg-transparent disabled:border-transparent"
+        />
+        <div className="h-10 py-2 pl-2 pr-3 text-sm leading-relaxed border border-l-0 rounded-md rounded-l-none border-input bg-background ring-offset-background">
+          USD
+        </div>
+      </div>
     );
 
   return (
-    <div className="w-[150px] px-3 py-2 border border-transparent">
+    <div className="w-[150px] px-3 py-2 border border-transparent text-right">
       <p>{formatValue2nd(value)}</p>
     </div>
   );

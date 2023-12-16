@@ -42,8 +42,8 @@ function CategoryCell<TData>({ row }: { row: Row<TData> }) {
 
   if (asset?.action_asset)
     return (
-      <div className="flex items-center space-x-2 px-4 py-2">
-        <Route className="h-4 w-4 text-indigo-500" /> <span>Plan Asset</span>
+      <div className="flex items-center px-4 py-2 space-x-2">
+        <Route className="w-4 h-4 text-indigo-500" /> <span>Plan Asset</span>
       </div>
     );
 
@@ -106,8 +106,8 @@ function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
     (year) => year[0].id === row.getValue("id")
   );
   return (
-    <div className="flex w-[120px] space-x-2">
-      <span className="truncate font-medium">
+    <div className="flex w-[100px] space-x-2 justify-end">
+      <span className="font-medium truncate">
         {formatValue2nd((calcAssetAll && calcAssetAll[0].profit) || 0)}
       </span>
     </div>
@@ -121,8 +121,14 @@ function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
     (year) => year[0].id === row.getValue("id")
   );
   return (
-    <div className="w-[40px] flex items-center">
-      <span>{(calcAssetAll && calcAssetAll[0].roi?.toFixed(1)) || 0}%</span>
+    <div className="w-[60px] flex items-center justify-end">
+      <p>
+        {(calcAssetAll &&
+          calcAssetAll[0].value > 0 &&
+          calcAssetAll[0].roi?.toFixed(2)) ||
+          "N/A"}
+        {calcAssetAll && calcAssetAll[0].value > 0 && "%"}
+      </p>
     </div>
   );
 }
@@ -143,7 +149,7 @@ function DetailsHeader() {
       note: "",
       additions: 0,
       allocation: "",
-      yoy: 0,
+      yoy: null,
       yoy_advanced: [],
       yoy_type: "fixed",
       yoy_mode: "simple",
@@ -164,7 +170,7 @@ function DetailsHeader() {
       className="flex space-x-1 h-8 px-2 data-[state=open]:bg-muted ml-auto"
       onClick={handleAddAsset}
     >
-      <PlusCircle className="h-4 w-4" />
+      <PlusCircle className="w-4 h-4" />
       <span>Add Asset</span>
     </Button>
   );
@@ -202,7 +208,7 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
   };
 
   return (
-    <div className="flex space-x-2 justify-end ml-auto items-center">
+    <div className="flex items-center justify-end ml-auto space-x-2">
       <div
         className={`${
           expanded !== row.getValue("id") && "opacity-0"
@@ -214,7 +220,7 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
           onClick={() => setIsEditable(!isEditable)}
         >
-          <Pencil className="h-4 w-4" />
+          <Pencil className="w-4 h-4" />
           <span className="sr-only">Pencil</span>
         </Button>
         <DataTableRemove handleRemove={handleRemove}>
@@ -223,7 +229,7 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
             variant="outline"
             className="flex h-8 w-8 p-0 data-[state=open]:bg-muted mx-auto"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="w-4 h-4" />
             <span className="sr-only">Trash</span>
           </Button>
         </DataTableRemove>
@@ -242,9 +248,9 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
         }}
       >
         {expanded === row.getValue("id") ? (
-          <ChevronUp className="h-4 w-8" />
+          <ChevronUp className="w-8 h-4" />
         ) : (
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="w-4 h-4" />
         )}
         <span className="sr-only">Toggle</span>
       </Button>
@@ -310,7 +316,7 @@ export const columns: ColumnDef<Asset>[] = [
       <DataTableColumnHeader
         column={column}
         title="Value"
-        className="translate-x-3"
+        classNameButton="ml-auto"
       />
     ),
     cell: ValueCell,
@@ -324,7 +330,8 @@ export const columns: ColumnDef<Asset>[] = [
       <DataTableColumnHeader
         column={column}
         title="YOY Change"
-        className="translate-x-3"
+        className="-translate-x-6"
+        classNameButton="ml-auto"
       />
     ),
     cell: YoyCell,
@@ -335,7 +342,12 @@ export const columns: ColumnDef<Asset>[] = [
   {
     accessorKey: "profit",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Profit" />
+      <DataTableColumnHeader
+        column={column}
+        title="Profit"
+        className="translate-x-4"
+        classNameButton="ml-auto"
+      />
     ),
     cell: ProfitCell,
     filterFn: (row, id, value) => {
@@ -345,7 +357,11 @@ export const columns: ColumnDef<Asset>[] = [
   {
     accessorKey: "roi",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ROI" />
+      <DataTableColumnHeader
+        column={column}
+        title="ROI"
+        classNameButton="ml-auto"
+      />
     ),
     cell: RoiCell,
     filterFn: (row, id, value) => {

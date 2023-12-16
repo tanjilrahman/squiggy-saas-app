@@ -153,5 +153,5 @@ export const formatValue = (value: number): string => {
   }
 };
 
-export const formatValue2nd = (number: number) =>
-  `$${new Intl.NumberFormat("us").format(number).toString()} USD`;
+export const formatValue2nd = (number: number | null) =>
+  `${new Intl.NumberFormat("us").format(number || 0).toString()} USD`;

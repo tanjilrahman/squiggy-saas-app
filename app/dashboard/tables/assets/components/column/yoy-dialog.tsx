@@ -24,7 +24,7 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
   const [open, setOpen] = useState(false);
   const [enable, setEnable] = useState(false);
   const [numYears, setNumYears] = useState(5);
-  const [yoyValues, setYoyValues] = useState<number[]>(
+  const [yoyValues, setYoyValues] = useState<(number | null)[]>(
     Array(numYears).fill("")
   );
   const { assets, updateAssetYoyMode, updateAssetYoyAdvanced } =
@@ -55,9 +55,9 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
 
   const currentYear = new Date().getFullYear();
 
-  const handleInputChange = (index: number, value: number) => {
+  const handleInputChange = (index: number, value: number | null) => {
     const newValues = [...yoyValues];
-    newValues[index] = value;
+    newValues[index] = value || 0;
     setYoyValues(newValues);
   };
 
@@ -72,8 +72,10 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
             type="number"
             disabled={!enable}
             className="w-[70px] h-[35px] p-2 mt-2 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            value={yearValue}
-            onChange={(e) => handleInputChange(index, +e.target.value)}
+            value={yearValue || ""}
+            onChange={(e) => {
+              handleInputChange(index, +e.target.value);
+            }}
           />
         </div>
       );
@@ -126,7 +128,7 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
         </div>
 
         <ScrollArea type="always" className="w-full">
-          <div className="flex space-x-2 px-1 pb-4">{generateYearInputs()}</div>
+          <div className="flex px-1 pb-4 space-x-2">{generateYearInputs()}</div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </DialogContent>

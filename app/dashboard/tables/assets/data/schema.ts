@@ -4,7 +4,7 @@ export type IncomeCost = {
   value: number;
   value_mode: "fixed" | "%";
   yoy_increase?: number;
-  yoy: number;
+  yoy: number | null;
   yoy_advanced: number[];
   yoy_type: "fixed" | "%";
   yoy_mode: "simple" | "advanced";
@@ -20,8 +20,8 @@ export type Asset = {
   additions: number;
   allocation: string;
   yoy_increase?: number;
-  yoy: number;
-  yoy_advanced: number[];
+  yoy: number | null;
+  yoy_advanced: (number | null)[];
   yoy_type: "fixed" | "%";
   yoy_mode: "simple" | "advanced";
   profit?: number;

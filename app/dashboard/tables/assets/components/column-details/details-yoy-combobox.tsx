@@ -74,7 +74,7 @@ export function DetailsYoyCombobox({
           className={cn(
             `${
               disabled && "hidden"
-            } justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3 w-[70px] `,
+            } justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3 `,
             className
           )}
           disabled={disabled}

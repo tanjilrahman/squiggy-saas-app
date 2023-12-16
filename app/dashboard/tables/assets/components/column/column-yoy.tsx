@@ -6,27 +6,21 @@ import React, { useEffect, useState } from "react";
 import { YoyCombobox } from "./yoy-combobox";
 import { YoyDialog } from "./yoy-dialog";
 import { formatValue2nd } from "@/lib/helperFunctions";
-import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 interface ColumnYoyProps<TData> {
   row: Row<TData>;
-  updateFunc: (assetId: string, value: number) => void;
+  updateFunc: (assetId: string, value: number | null) => void;
 }
 
 function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
   const { expanded, isEditable } = useAssetExpandedState();
   const { assets } = useAssetStore();
-  const { calculatedAssets } = useCalculatedAssetStore();
-
-  const calcAssetAll = calculatedAssets.find(
-    (year) => year[0].id === row.getValue("id")
-  );
 
   const asset = assets.find((asset) => asset.id === row.getValue("id"));
 
-  const [value, setValue] = useState<number>(row.getValue("yoy"));
+  const [value, setValue] = useState<number | null>(row.getValue("yoy"));
   const [mode, setMode] = useState(asset?.yoy_mode);
-  const [yoyAdvanced, setYoyAdvanced] = useState<number[] | undefined>(
+  const [yoyAdvanced, setYoyAdvanced] = useState<(number | null)[] | undefined>(
     asset?.yoy_advanced
   );
   const [type, setType] = useState(asset?.yoy_type!);
@@ -40,7 +34,7 @@ function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
 
   useEffect(() => {
     if (mode === "advanced") {
-      updateFunc(row.getValue("id"), yoyAdvanced![1] - yoyAdvanced![0]);
+      updateFunc(row.getValue("id"), yoyAdvanced![0]);
     }
   }, [mode]);
 
@@ -49,9 +43,8 @@ function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
       <div className="flex items-center w-[170px]">
         <Input
           id="yoy"
-          value={
-            mode === "advanced" ? yoyAdvanced![1] - yoyAdvanced![0] : value
-          }
+          type="number"
+          value={mode === "advanced" ? yoyAdvanced![0] || "" : value || ""}
           disabled={!isEditable || mode === "advanced"}
           onChange={(e) => {
             if (mode === "simple") {
@@ -64,10 +57,10 @@ function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
             "disabled:bg-transparent disabled:border-transparent"
           } ${
             !isEditable ? "w-full" : "w-[60px]"
-          } disabled:opacity-100 border-r-0 rounded-r-none`}
+          } disabled:opacity-100 border-r-0 rounded-r-none pr-0 text-right flex-grow`}
         />
         <YoyCombobox
-          className="border-l-0 rounded-l-none px-2"
+          className="px-2 border-l-0 rounded-l-none"
           disabled={!isEditable}
           assetId={expanded!}
         />
@@ -81,23 +74,20 @@ function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
       </div>
     );
   return (
-    <div className="flex items-center w-[170px] px-3 py-2 border border-transparent">
-      {/* {type === "fixed" ? (
-        mode === "advanced" ? (
-          <p>{formatValue2nd(yoyAdvanced![1] - yoyAdvanced![0])}</p>
-        ) : (
-          <p>{formatValue2nd(value)}</p>
-        )
-      ) : mode === "advanced" ? (
-        <p>{yoyAdvanced![1] - yoyAdvanced![0]}%</p>
+    <div className="flex items-center w-[170px] px-3 py-2 border border-transparent justify-end ml-auto">
+      {type === "%" ? (
+        <p>{mode === "advanced" ? yoyAdvanced![0] : value}%</p>
       ) : (
-        <p>{formatValue2nd(value * asset?.value!)}</p>
-      )} */}
-      <p>
-        {formatValue2nd((calcAssetAll && calcAssetAll[0].yoy_increase) || 0)}
-      </p>
-      {mode === "advanced" && (
-        <TrendingUp className="opacity-100 h-5 w-5 ml-2" />
+        <p>
+          {mode === "advanced"
+            ? formatValue2nd(yoyAdvanced![0])
+            : formatValue2nd(value)}
+        </p>
+      )}
+      {mode === "advanced" ? (
+        <TrendingUp className="w-5 h-5 ml-2 opacity-100" />
+      ) : (
+        <TrendingUp className="w-5 h-5 ml-2 opacity-0" />
       )}
     </div>
   );

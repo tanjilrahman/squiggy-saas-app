@@ -75,7 +75,8 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         sort={false}
         column={column}
         title="Value"
-        className="translate-x-3"
+        className="-translate-x-8"
+        classNameButton="ml-auto"
       />
     ),
     cell: CostsValueCell,
@@ -90,7 +91,8 @@ export const ColumnDetailsCosts: ColumnDef<Asset>[] = [
         sort={false}
         column={column}
         title="YOY Change"
-        className="translate-x-3"
+        className="-translate-x-14"
+        classNameButton="ml-auto"
       />
     ),
     cell: CostsYoyCell,
