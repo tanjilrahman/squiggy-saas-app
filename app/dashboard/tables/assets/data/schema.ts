@@ -5,7 +5,7 @@ export type IncomeCost = {
   value_mode: "fixed" | "%";
   yoy_increase?: number;
   yoy: number | null;
-  yoy_advanced: number[];
+  yoy_advanced: (number | null)[];
   yoy_type: "fixed" | "%";
   yoy_mode: "simple" | "advanced";
   type: string;

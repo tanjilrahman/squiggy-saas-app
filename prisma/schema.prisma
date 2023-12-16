@@ -30,8 +30,8 @@ model Asset {
   name         String
   value        Int
   category     String
-  yoy          Int?
-  yoy_advanced Int[]
+  yoy          Float?
+  yoy_advanced Float[]
   yoy_type     String
   yoy_mode     String
   profit       Int
@@ -49,8 +49,8 @@ model Income {
   id           String   @id @default(uuid())
   name         String
   value        Int
-  yoy          Int?
-  yoy_advanced Int[]
+  yoy          Float?
+  yoy_advanced Float[]
   yoy_type     String
   yoy_mode     String
   value_mode   String
@@ -64,8 +64,8 @@ model Cost {
   id           String   @id @default(uuid())
   name         String
   value        Int
-  yoy          Int?
-  yoy_advanced Int[]
+  yoy          Float?
+  yoy_advanced Float[]
   yoy_type     String
   yoy_mode     String
   value_mode   String
@@ -79,8 +79,8 @@ model Plan {
   id                 String   @id @default(uuid())
   name               String
   note               String
-  inflation          Int?
-  inflation_advanced Int[]
+  inflation          Float?
+  inflation_advanced Float[]
   inflation_mode     String
   status             String
   actions            Action[]
