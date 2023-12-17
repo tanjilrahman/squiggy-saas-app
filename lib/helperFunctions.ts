@@ -153,5 +153,6 @@ export const formatValue = (value: number): string => {
   }
 };
 
-export const formatValue2nd = (number: number | null) =>
-  `${new Intl.NumberFormat("us").format(number || 0).toString()} USD`;
+export const formatNumericValue = (numericValue: number | null) => {
+  return new Intl.NumberFormat("en-US").format(numericValue || 0);
+};

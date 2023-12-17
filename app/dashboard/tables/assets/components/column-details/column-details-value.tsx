@@ -1,9 +1,10 @@
 import { Input } from "@/components/ui/input";
-import { formatValue2nd } from "@/lib/helperFunctions";
 import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 import { Row } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { DetailsValueCombobox } from "./details-value-combobox";
+import { FormatValueCurrency } from "@/components/FormatValueCurrency";
+import { formatNumericValue } from "@/lib/helperFunctions";
 
 interface ColumnDetailsNameProps<TData> {
   row: Row<TData>;
@@ -43,7 +44,7 @@ function ColumnDetailsValue<TData>({
         <Input
           id="value"
           type="text"
-          value={!isEditable ? formatValue2nd(value) : value}
+          value={formatNumericValue(value)}
           disabled={!isEditable}
           onChange={(e) => {
             const numericValue = +e.target.value.replace(/\D/g, "");
@@ -65,7 +66,11 @@ function ColumnDetailsValue<TData>({
 
   return (
     <div className="flex items-center w-[200px] px-3 py-2 border border-transparent justify-end">
-      {itemType === "%" ? <p>{value}%</p> : <p>{formatValue2nd(value)}</p>}
+      {itemType === "%" ? (
+        <p>{value}%</p>
+      ) : (
+        <FormatValueCurrency number={value} />
+      )}
     </div>
   );
 }

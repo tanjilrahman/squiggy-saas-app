@@ -12,17 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAssetStore } from "@/store/assetStore";
-
-const frameworks = [
-  {
-    value: "fixed",
-    label: "USD",
-  },
-  {
-    value: "%",
-    label: "%",
-  },
-];
+import { useUserState } from "@/store/store";
 
 type PropsType = {
   className?: string;
@@ -39,6 +29,18 @@ export function YoyCombobox({
   const asset = assets.find((asset) => asset.id === assetId);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(asset?.yoy_type!);
+  const { user } = useUserState();
+
+  const frameworks = [
+    {
+      value: "fixed",
+      label: user?.currency.toUpperCase(),
+    },
+    {
+      value: "%",
+      label: "%",
+    },
+  ];
 
   React.useEffect(() => {
     updateAssetYoyType(assetId, value);

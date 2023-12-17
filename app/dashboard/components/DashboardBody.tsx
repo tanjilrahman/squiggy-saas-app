@@ -3,7 +3,12 @@
 import React, { useEffect } from "react";
 import Plans from "@/app/dashboard/components/Plans";
 import Assets from "@/app/dashboard/components/Assets";
-import { useHorizonState, useNavState } from "@/store/store";
+import {
+  UserStateType,
+  useHorizonState,
+  useNavState,
+  useUserState,
+} from "@/store/store";
 import { Asset } from "../tables/assets/data/schema";
 import { useAssetStore } from "@/store/assetStore";
 import BarChart from "../charts/BarChart";
@@ -18,9 +23,14 @@ import { useCalculatedAssetStore } from "@/store/calculationStore";
 type DashboardBodyProps = {
   initialAssets: Asset[];
   initialPlans: Plan[];
+  dbUser: UserStateType;
 };
 
-function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
+function DashboardBody({
+  initialAssets,
+  initialPlans,
+  dbUser,
+}: DashboardBodyProps) {
   const { nav } = useNavState();
   const { year } = useHorizonState();
   const { assets, setAssets } = useAssetStore();
@@ -29,6 +39,16 @@ function DashboardBody({ initialAssets, initialPlans }: DashboardBodyProps) {
   const { activePlans, setCalculatedAssets, barChartActive } =
     useCalculatedAssetStore();
   const { setPlans } = usePlanStore();
+
+  const { setUser } = useUserState();
+
+  useEffect(() => {
+    dbUser &&
+      setUser({
+        currency: dbUser.currency,
+        isPro: false,
+      });
+  }, [dbUser]);
 
   useEffect(() => {
     setAssets(initialAssets);

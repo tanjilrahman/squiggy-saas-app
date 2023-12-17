@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       data: {
         id: userId,
         email: user?.emailAddresses[0].emailAddress,
+        currency: "usd",
       },
     });
   }

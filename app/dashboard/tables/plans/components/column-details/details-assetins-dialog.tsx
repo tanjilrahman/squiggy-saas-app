@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatValue2nd } from "@/lib/helperFunctions";
 import { useAssetExpandedState, useAssetStore } from "@/store/assetStore";
 import { usePlanStore } from "@/store/planStore";
 import { PlusCircle, Route } from "lucide-react";
@@ -21,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { useNavState } from "@/store/store";
 import { Asset } from "../../../assets/data/schema";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { FormatValueCurrency } from "@/components/FormatValueCurrency";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
@@ -127,7 +127,7 @@ export function DetailsAssetinsDialog({
                     {asset.name}
                   </div>
                   <div className="col-span-1 bg-secondary text-secondary-foreground h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
-                    {formatValue2nd(asset.value)}
+                    <FormatValueCurrency number={asset.value} />
                   </div>
                   <Input
                     id="name"

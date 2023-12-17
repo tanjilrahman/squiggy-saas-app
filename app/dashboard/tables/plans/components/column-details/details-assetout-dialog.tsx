@@ -1,3 +1,4 @@
+import { FormatValueCurrency } from "@/components/FormatValueCurrency";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatValue2nd } from "@/lib/helperFunctions";
 import { useAssetStore } from "@/store/assetStore";
 import { usePlanStore } from "@/store/planStore";
 import { PlusCircle } from "lucide-react";
@@ -69,7 +69,7 @@ export function DetailsAssetoutDialog({
                     {asset.name}
                   </div>
                   <div className="col-span-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
-                    {formatValue2nd(asset.value)}
+                    <FormatValueCurrency number={asset.value} />
                   </div>
                 </div>
                 <Button

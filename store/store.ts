@@ -1,5 +1,10 @@
 import { create } from "zustand";
 
+export type UserStateType = {
+  currency: string;
+  isPro: boolean;
+};
+
 interface navState {
   nav: string;
   setNav: (nav: string) => void;
@@ -7,7 +12,7 @@ interface navState {
 
 export const useNavState = create<navState>()((set) => ({
   nav: "assets",
-  setNav: (nav: string) => set({ nav }),
+  setNav: (nav) => set({ nav }),
 }));
 
 interface horizonState {
@@ -17,15 +22,22 @@ interface horizonState {
 
 export const useHorizonState = create<horizonState>()((set) => ({
   year: 5,
-  setYear: (year: number) => set({ year }),
+  setYear: (year) => set({ year }),
 }));
 
-// interface showActionAssets {
-//   show: boolean;
-//   setShow: (show: boolean) => void;
-// }
+interface UserState {
+  user: UserStateType | null;
+  setUser: (user: UserStateType) => void;
+  updateCurrency: (currency: string) => void;
+}
 
-// export const useShowActionAssets = create<showActionAssets>()((set) => ({
-//   show: true,
-//   setShow: (show: boolean) => set({ show }),
-// }));
+export const useUserState = create<UserState>()((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  updateCurrency: (currency) => {
+    set((state) => ({
+      ...state,
+      currency,
+    }));
+  },
+}));

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { DetailsYoyCombobox } from "./details-yoy-combobox";
 import { DetailsYoyDialog } from "./details-yoy-dialog";
 import { TrendingUp } from "lucide-react";
-import { formatValue2nd } from "@/lib/helperFunctions";
+import { FormatValueCurrency } from "@/components/FormatValueCurrency";
 
 interface ColumnDetailsNameProps<TData> {
   row: Row<TData>;
@@ -105,9 +105,11 @@ function ColumnDetailsYoy<TData>({
         <p>{mode === "advanced" ? yoyAdvanced![0] : value}%</p>
       ) : (
         <p>
-          {mode === "advanced"
-            ? formatValue2nd(yoyAdvanced![0])
-            : formatValue2nd(value)}
+          {mode === "advanced" ? (
+            <FormatValueCurrency number={yoyAdvanced![0]} />
+          ) : (
+            <FormatValueCurrency number={value} />
+          )}
         </p>
       )}
       {mode === "advanced" ? (

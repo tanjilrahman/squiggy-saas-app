@@ -44,7 +44,9 @@ function UserButton({ userName, userEmail, userImg, userId }: UserButtonTypes) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
+              Profile
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/register")}>
               Billing
             </DropdownMenuItem>

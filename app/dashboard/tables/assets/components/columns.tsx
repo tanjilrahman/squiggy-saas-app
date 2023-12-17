@@ -22,12 +22,12 @@ import {
 } from "@/store/assetStore";
 import { Button } from "@/components/ui/button";
 import { DataTableCombobox } from "./data-table-combobox";
-import { formatValue2nd } from "@/lib/helperFunctions";
 import { DataTableRemove } from "./data-table-remove";
 import ColumnName from "./column/column-name";
 import ColumnValue from "./column/column-value";
 import ColumnYoy from "./column/column-yoy";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { FormatValueCurrency } from "@/components/FormatValueCurrency";
 
 function NameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateAssetName } = useAssetStore();
@@ -107,9 +107,9 @@ function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
   );
   return (
     <div className="flex w-[100px] space-x-2 justify-end">
-      <span className="font-medium truncate">
-        {formatValue2nd((calcAssetAll && calcAssetAll[0].profit) || 0)}
-      </span>
+      <p className="font-medium truncate">
+        <FormatValueCurrency number={calcAssetAll && calcAssetAll[0].profit} />
+      </p>
     </div>
   );
 }

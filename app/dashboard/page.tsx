@@ -1,5 +1,6 @@
 import DashboardBody from "@/app/dashboard/components/DashboardBody";
 import { db } from "@/db";
+import { UserStateType } from "@/store/store";
 import { auth } from "@clerk/nextjs";
 import { promises as fs } from "fs";
 import { redirect } from "next/navigation";
@@ -28,6 +29,11 @@ async function Dashboard() {
   });
 
   if (!dbUser) return redirect("/auth-callback?origin=dashboard");
+
+  const dbUserObject: UserStateType = {
+    currency: dbUser.currency,
+    isPro: false,
+  };
 
   const initialAssets = await db.asset.findMany({
     where: {
@@ -67,6 +73,7 @@ async function Dashboard() {
         initialAssets={initialAssets}
         // @ts-ignore
         initialPlans={initialPlans}
+        dbUser={dbUserObject}
       />
     </div>
   );

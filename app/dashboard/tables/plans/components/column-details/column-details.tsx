@@ -8,7 +8,7 @@ import ColumnDetailsDelete from "./column-details-delete";
 import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Plan } from "../../data/schema";
 import { useEffect, useState } from "react";
-import { formatValue, formatValue2nd } from "@/lib/helperFunctions";
+import { formatValue } from "@/lib/helperFunctions";
 import ColumnDetailsTimeframe from "./column-details-timeframe";
 import ColumnDetailsAssetsIn from "./column-details-assetin";
 import ColumnDetailsAssetsOut from "./column-details-assetout";
