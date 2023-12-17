@@ -43,12 +43,10 @@ function ColumnDetailsYoy<TData>({
       setYoyAdvanced(income?.yoy_advanced);
       setMode(income?.yoy_mode);
       setYoyType(income?.yoy_type!);
-      console.log(income?.yoy);
     } else {
       setYoyAdvanced(cost?.yoy_advanced);
       setMode(cost?.yoy_mode);
       setYoyType(cost?.yoy_type!);
-      console.log(cost?.yoy);
     }
   }, [assets]);
 

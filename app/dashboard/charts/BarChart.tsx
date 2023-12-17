@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import { addProfitsToCurrency, calculateAsset } from "@/lib/calc";
 import {
   BarChartData,
@@ -24,11 +23,7 @@ import {
   Title,
 } from "@tremor/react";
 import { useEffect } from "react";
-
-type PayloadDataType = {
-  value: number;
-  payload: BarChartData;
-};
+import { BarTooltip } from "./lib/BarTooltip";
 
 type EventPropsWithChartData = EventProps & BarChartData;
 
@@ -85,51 +80,6 @@ export default function BarChart() {
     setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
   };
 
-  const customTooltip = ({
-    payload,
-    active,
-  }: {
-    payload: PayloadDataType[];
-    active: boolean;
-  }) => {
-    if (!active || !payload) return null;
-    let totalValue = payload[0]?.value;
-
-    const categoryItems = assets.filter(
-      (asset) => payload[0]?.payload.category.toLowerCase() === asset.category
-    );
-
-    return (
-      <div className="w-56 rounded-tremor-default text-tremor-default bg-tremor-background dark:bg-dark-tremor-background-muted p-3 shadow-tremor-dropdown border border-tremor-border dark:border dark:border-dark-tremor-border">
-        {categoryItems.map((item, idx) => (
-          <div key={idx}>
-            <div className="grid grid-cols-4">
-              <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
-                {item.name}
-              </p>
-              <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
-                {formatValue(item.value)}
-              </p>
-              <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-2">
-                ({Math.floor((item.value / totalValue) * 100)}%)
-              </p>
-            </div>
-            <Separator className="my-1" />
-          </div>
-        ))}
-        <div className="grid grid-cols-4">
-          <p className="text-tremor-content dark:text-dark-tremor-content-emphasis font-semibold col-span-2 flex items-center">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 mr-1" />
-            Total
-          </p>
-          <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
-            {formatValue(totalValue)}
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Card className="z-10">
       <Title>Assets</Title>
@@ -147,7 +97,7 @@ export default function BarChart() {
         // @ts-ignore
         onValueChange={onValueChange}
         // @ts-ignore
-        customTooltip={customTooltip}
+        customTooltip={BarTooltip}
       />
     </Card>
   );
