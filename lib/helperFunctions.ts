@@ -1,5 +1,4 @@
 import { Asset } from "@/app/dashboard/tables/assets/data/schema";
-import { useAreaChartDataStore } from "@/store/chartStore";
 
 export interface BarChartData {
   category: string;
@@ -39,9 +38,9 @@ interface Totals {
 }
 
 export const convertToStackedChartData = (
-  inputData: Asset[]
+  inputData: Asset[],
+  yearSelected: number | null
 ): StackedChartData[] => {
-  const { yearSelected } = useAreaChartDataStore();
   // Initialize objects to store income, cost, and margin totals by category type
   const incomeTotals: Totals = {};
   const costTotals: Totals = {};

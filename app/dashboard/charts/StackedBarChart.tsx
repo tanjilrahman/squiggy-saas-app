@@ -4,10 +4,12 @@ import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 import { useEffect } from "react";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { StackedBarTooltip } from "./lib/StackedBarTooltip";
+import { useAreaChartDataStore } from "@/store/chartStore";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
+  const { yearSelected } = useAreaChartDataStore();
   const {
     activePlans,
     singleYearCalculatedAsset,
@@ -29,7 +31,10 @@ export default function StackedBarChart() {
       <Subtitle>Some text to add</Subtitle>
       <BarChart
         className="mt-4 h-80"
-        data={convertToStackedChartData(singleYearCalculatedAsset)}
+        data={convertToStackedChartData(
+          singleYearCalculatedAsset,
+          yearSelected
+        )}
         index="index"
         categories={[
           "Passive",
