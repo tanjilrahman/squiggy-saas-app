@@ -17,7 +17,6 @@ import { useCalculatedAssetStore } from "@/store/calculationStore";
 import {
   useAreaChartDataStore,
   useBarChartDataStore,
-  useStackedChartDataStore,
 } from "@/store/chartStore";
 import { useAssetStore } from "@/store/assetStore";
 import { useSelectedMiniPlanStore } from "@/store/planStore";
@@ -27,11 +26,16 @@ type EventPropsWithChartData = EventProps & AreaChartData;
 export default function AreaChart() {
   const { assets } = useAssetStore();
   const { startTime } = useSelectedMiniPlanStore();
-  const { calculatedAssets, activePlans } = useCalculatedAssetStore();
+  const {
+    calculatedAssets,
+    activePlans,
+    singleYearCalculatedAsset,
+    barChartActive,
+    setSingleYearCalculatedAsset,
+  } = useCalculatedAssetStore();
   const { areaChartdata, setAreaChartData, yearSelected, setYearSelected } =
     useAreaChartDataStore();
-  const { setBarChartData } = useBarChartDataStore();
-  const { setStackedChartData } = useStackedChartDataStore();
+  const { barChartdata, setBarChartData } = useBarChartDataStore();
 
   useEffect(() => {
     setAreaChartData(convertToAreaChartData(calculatedAssets));
@@ -45,23 +49,46 @@ export default function AreaChart() {
     const selectedYearAssets = calculatedAssets.map((assetYears) => {
       return assetYears.filter((_, i) => i === year);
     });
-    console.log(selectedYearAssets);
+    // console.log(selectedYearAssets);
 
     const normalAssets = assets.filter((asset) => !asset.action_asset);
     const selectedWithoutPlanAssets = selectedYearAssets
       .flat()
       .filter((asset) => !asset.action_asset);
 
-    const assetsToConvert = year
-      ? activePlans
-        ? selectedYearAssets.flat()
-        : selectedWithoutPlanAssets
-      : activePlans
-      ? assets
-      : normalAssets;
+    let assetsToConvert;
 
+    const selectedWithCategory = selectedYearAssets
+      .flat()
+      .filter(
+        (asset) => singleYearCalculatedAsset[0]?.category === asset.category
+      );
+
+    if (year) {
+      if (barChartActive) {
+        assetsToConvert = selectedWithCategory;
+      } else {
+        if (activePlans) {
+          assetsToConvert = selectedYearAssets.flat();
+        } else {
+          assetsToConvert = selectedWithoutPlanAssets;
+        }
+      }
+    } else {
+      if (barChartActive) {
+        assetsToConvert = selectedWithCategory;
+      } else {
+        if (activePlans) {
+          assetsToConvert = assets;
+        } else {
+          assetsToConvert = normalAssets;
+        }
+      }
+      // console.log(selectedWithCategory);
+    }
+
+    setSingleYearCalculatedAsset(assetsToConvert);
     setBarChartData(convertToChartData(assetsToConvert));
-    setStackedChartData(convertToStackedChartData(assetsToConvert));
   };
 
   useEffect(() => {

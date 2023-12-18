@@ -110,7 +110,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
 
   addPlan: (newPlan) => {
     set((state) => ({
-      plans: [newPlan, ...state.plans],
+      plans: [...state.plans, newPlan],
     }));
   },
 
@@ -120,7 +120,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
         plan.id === planId
           ? {
               ...plan,
-              actions: [newAction, ...plan.actions],
+              actions: [...plan.actions, newAction],
             }
           : plan
       ),

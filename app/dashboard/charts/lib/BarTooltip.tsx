@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { BarChartData, formatValue } from "@/lib/helperFunctions";
 import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { Asset } from "../../tables/assets/data/schema";
 
 type PayloadDataType = {
   value: number;
@@ -15,19 +16,18 @@ export const BarTooltip = ({
   payload: PayloadDataType[];
   active: boolean;
 }) => {
-  const { assets } = useAssetStore();
-  const { activePlans } = useCalculatedAssetStore();
+  const { activePlans, singleYearCalculatedAsset } = useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const pureAssets = assets.filter((asset) => !asset.action_asset);
 
   if (!active || !payload) return null;
   let totalValue = payload[0]?.value;
 
-  function getTypeValues() {
+  function getTypeValues(assetsToConvert: Asset[]) {
+    const pureAssets = assetsToConvert.filter((asset) => !asset.action_asset);
     const filteredAssets =
       selectedAssets.length == 0
         ? activePlans
-          ? assets
+          ? assetsToConvert
           : pureAssets
         : selectedAssets;
 
@@ -52,7 +52,7 @@ export const BarTooltip = ({
       </div>
       <Separator />
       <div className="py-2 space-y-1">
-        {getTypeValues().map((item, idx) => (
+        {getTypeValues(singleYearCalculatedAsset).map((item, idx) => (
           <div key={idx} className="grid grid-cols-4 px-3">
             <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
               {item.name}

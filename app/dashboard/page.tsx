@@ -60,7 +60,7 @@ async function Dashboard() {
       },
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: "asc",
     },
   });
 

@@ -16,18 +16,22 @@ export function calculateAsset(
       )
       .flat();
 
-    const actionsForAsset = actionsForYear
-      ?.map((action) =>
+    const actions = actionsForYear
+      ?.filter((action) =>
         action.assetIns.filter((asset) => asset.assetId === initialAsset.id)
       )
       .flat();
 
-    if (actionsForAsset) {
-      for (const action of actionsForAsset) {
-        if (action.type === "absolute") {
-          rescaleFactor -= action.allocation / 100; // cannot go below 0
-        } else if (action.type === "cumulative") {
-          rescaleFactor *= 1 - action.allocation / 100;
+    if (actions) {
+      for (const action of actions) {
+        const timeframe = action.timeframe[1] - action.timeframe[0];
+        for (const asset of action.assetIns) {
+          if (asset.type === "absolute") {
+            rescaleFactor -= asset.allocation / 100; // cannot go below 0
+          } else if (asset.type === "cumulative") {
+            const thisYearAllocation = asset.allocation / 100 / timeframe;
+            rescaleFactor -= thisYearAllocation;
+          }
         }
       }
     }
@@ -123,18 +127,25 @@ export function calculateAsset(
         )
         .flat();
 
-      const actionsForAsset = actionsForYear
-        ?.map((action) =>
-          action.assetIns.filter((asset) => asset.assetId === prevAsset.id)
+      const actions = actionsForYear
+        ?.filter((action) =>
+          action.assetIns.filter((asset) => asset.assetId === initialAsset.id)
         )
         .flat();
 
-      if (actionsForAsset) {
-        for (const action of actionsForAsset) {
-          if (action.type === "absolute") {
-            rescaleFactor -= action.allocation / 100; // cannot go below 0
-          } else if (action.type === "cumulative") {
-            rescaleFactor *= 1 - action.allocation / 100;
+      if (actions) {
+        for (const action of actions) {
+          const timeframe = action.timeframe[1] - action.timeframe[0];
+          const inTimeframe =
+            year > action.timeframe[0] && year <= action.timeframe[1];
+          console.log(action.name, inTimeframe);
+          for (const asset of action.assetIns) {
+            if (asset.type === "absolute") {
+              rescaleFactor -= asset.allocation / 100; // cannot go below 0
+            } else if (asset.type === "cumulative" && inTimeframe) {
+              const thisYearAllocation = asset.allocation / 100 / timeframe;
+              rescaleFactor -= thisYearAllocation;
+            }
           }
         }
       }
@@ -143,8 +154,18 @@ export function calculateAsset(
     rescaleFactor = Math.max(rescaleFactor, 0);
 
     const newIncomes = prevAsset.incomes.map((income) => {
+      const initialIncome = initialAsset.incomes.find(
+        (intialIncome) => intialIncome.id === income.id
+      );
+      const currentAssetValue =
+        (prevAsset.value + prevAsset.yoy_increase!) * rescaleFactor;
+
       const newIncomeValue =
-        (income.value + income.yoy_increase!) * rescaleFactor;
+        income.value_mode === "fixed"
+          ? (income.value + income.yoy_increase!) * rescaleFactor
+          : ((initialIncome!.value / 100) * currentAssetValue +
+              income.yoy_increase!) *
+            rescaleFactor;
 
       const yoyIncrease =
         income.yoy_mode === "simple"
@@ -159,7 +180,18 @@ export function calculateAsset(
     });
 
     const newCosts = prevAsset.costs.map((cost) => {
-      const newCostValue = (cost.value + cost.yoy_increase!) * rescaleFactor;
+      const initialCost = initialAsset.costs.find(
+        (intialCost) => intialCost.id === cost.id
+      );
+      const currentAssetValue =
+        (prevAsset.value + prevAsset.yoy_increase!) * rescaleFactor;
+
+      const newCostValue =
+        cost.value_mode === "fixed"
+          ? (cost.value + cost.yoy_increase!) * rescaleFactor
+          : ((initialCost!.value / 100) * currentAssetValue +
+              cost.yoy_increase!) *
+            rescaleFactor;
 
       const yoyIncrease =
         cost.yoy_mode === "simple"
@@ -216,13 +248,76 @@ export function addProfitsToCurrency(allAssets: Asset[][]): Asset[][] {
           (sum, otherAsset) => (sum += otherAsset.profit || 0),
           0
         );
+
+        // Calculate new incomes for the "currency" asset
+        const newIncomes = asset.incomes.map((income) => {
+          const initialIncome = scenario[0].incomes.find(
+            (intialIncome) => intialIncome.id === income.id
+          );
+
+          const initialIncomeValue = initialIncome!.value / scenario[0].value;
+
+          const newIncomeValue =
+            income.value_mode === "fixed"
+              ? income.value
+              : initialIncomeValue * asset.value;
+
+          const yoyIncrease =
+            income.yoy_mode === "simple"
+              ? income.yoy_type === "fixed"
+                ? income.yoy || 0
+                : ((income.yoy || 0) / 100) * newIncomeValue
+              : income.yoy_type === "fixed"
+              ? income.yoy_advanced[targetYear] || 0
+              : ((income.yoy_advanced[targetYear] || 0) / 100) * newIncomeValue;
+
+          return {
+            ...income,
+            value: newIncomeValue + yoyIncrease,
+            yoy_increase: yoyIncrease,
+          };
+        });
+
+        // Calculate new costs for the "currency" asset
+        const newCosts = asset.costs.map((cost) => {
+          const newCostValue =
+            cost.value_mode === "fixed"
+              ? cost.value
+              : (cost.value / 100) * asset.value;
+
+          const yoyIncrease =
+            cost.yoy_mode === "simple"
+              ? cost.yoy_type === "fixed"
+                ? cost.yoy || 0
+                : ((cost.yoy || 0) / 100) * newCostValue
+              : cost.yoy_type === "fixed"
+              ? cost.yoy_advanced[targetYear] || 0
+              : ((cost.yoy_advanced[targetYear] || 0) / 100) * newCostValue;
+
+          return {
+            ...cost,
+            value: newCostValue + yoyIncrease,
+            yoy_increase: yoyIncrease,
+          };
+        });
+
+        // Update the asset with new values for incomes and costs
+        const updatedAsset: Asset = {
+          ...asset,
+          additions: asset.additions + totalProfit,
+          incomes: newIncomes,
+          costs: newCosts,
+        };
+
+        // Update the next year asset value if applicable
         if (targetYear < scenario.length - 1) {
           const nextYearAsset = allAssets[targetAsset][targetYear + 1];
-
           nextYearAsset.value = asset.value + totalProfit;
         }
-        asset.additions += totalProfit;
+
+        return updatedAsset;
       }
+
       return asset;
     });
   });

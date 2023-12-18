@@ -2,24 +2,24 @@ import { convertToStackedChartData, formatValue } from "@/lib/helperFunctions";
 import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
 import { Card, Title, BarChart, Subtitle } from "@tremor/react";
 import { useEffect } from "react";
-import { useStackedChartDataStore } from "@/store/chartStore";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { StackedBarTooltip } from "./lib/StackedBarTooltip";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const { activePlans } = useCalculatedAssetStore();
-  const { stackedChartdata, setStackedChartData } = useStackedChartDataStore();
+  const {
+    activePlans,
+    singleYearCalculatedAsset,
+    setSingleYearCalculatedAsset,
+  } = useCalculatedAssetStore();
   const pureAssets = assets.filter((asset) => !asset.action_asset);
 
   useEffect(() => {
     if (selectedAssets.length == 0) {
-      setStackedChartData(
-        convertToStackedChartData(activePlans ? assets : pureAssets)
-      );
+      setSingleYearCalculatedAsset(activePlans ? assets : pureAssets);
     } else {
-      setStackedChartData(convertToStackedChartData(selectedAssets));
+      setSingleYearCalculatedAsset(selectedAssets);
     }
   }, [assets, selectedAssets, activePlans]);
 
@@ -29,7 +29,7 @@ export default function StackedBarChart() {
       <Subtitle>Some text to add</Subtitle>
       <BarChart
         className="mt-4 h-80"
-        data={stackedChartdata}
+        data={convertToStackedChartData(singleYearCalculatedAsset)}
         index="index"
         categories={[
           "Passive",

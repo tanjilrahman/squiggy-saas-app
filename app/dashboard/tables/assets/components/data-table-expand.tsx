@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Asset } from "../data/schema";
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import { ProfitAllocationCombobox } from "./profit-allocation-combobox";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -53,8 +54,11 @@ export function DataTableExpand<TData extends Asset, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const { assets } = useAssetStore();
+  const { activePlans } = useCalculatedAssetStore();
   const { expanded, isEditable, setIsEditable } = useAssetExpandedState();
   const [status, setStatus] = React.useState<string | null>(null);
+  const pureAssets = assets.filter((asset) => !asset.action_asset);
+  const assetsData = activePlans ? assets : pureAssets;
 
   React.useEffect(() => {
     if (isEditable === true) setStatus(null);
@@ -179,7 +183,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                             </Label>
                             <DataTable
                               // @ts-ignore
-                              data={assets[row.index].incomes}
+                              data={assetsData[row.index].incomes}
                               columns={ColumnDetailsIncomes}
                             />
                           </div>
@@ -192,7 +196,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                             </Label>
                             <DataTable
                               // @ts-ignore
-                              data={assets[row.index].costs}
+                              data={assetsData[row.index].costs}
                               columns={ColumnDetailsCosts}
                             />
                           </div>
@@ -201,7 +205,8 @@ export function DataTableExpand<TData extends Asset, TValue>({
                           <div className="space-x-4">
                             <ProfitAllocationCombobox
                               disabled={
-                                !isEditable || assets[row.index].action_asset
+                                !isEditable ||
+                                assetsData[row.index].action_asset
                               }
                               assetId={row.getValue("id")}
                             />

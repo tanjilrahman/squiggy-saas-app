@@ -1,7 +1,9 @@
 import { StackedChartData, formatValue } from "@/lib/helperFunctions";
 import { Separator } from "@/components/ui/separator";
-import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
+import { useSelectedAssetStore } from "@/store/assetStore";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { Asset } from "../../tables/assets/data/schema";
+import { useAreaChartDataStore } from "@/store/chartStore";
 
 type PayloadDataType = {
   value: number;
@@ -22,18 +24,22 @@ export const StackedBarTooltip = ({
   payload: PayloadDataType[];
   active: boolean;
 }) => {
-  const { assets } = useAssetStore();
-  const { activePlans } = useCalculatedAssetStore();
+  const { activePlans, singleYearCalculatedAsset } = useCalculatedAssetStore();
+  const { yearSelected } = useAreaChartDataStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const pureAssets = assets.filter((asset) => !asset.action_asset);
 
   if (!active || !payload) return null;
 
-  function getTypeValues(targetType: string): TypeValues[] {
+  function getTypeValues(
+    targetType: string,
+    assetsToConvert: Asset[]
+  ): TypeValues[] {
+    const pureAssets = assetsToConvert.filter((asset) => !asset.action_asset);
+
     const filteredAssets =
       selectedAssets.length == 0
         ? activePlans
-          ? assets
+          ? assetsToConvert
           : pureAssets
         : selectedAssets;
 
@@ -44,7 +50,9 @@ export const StackedBarTooltip = ({
         value_mode: "fixed" | "%",
         assetValue: number
       ): number => {
-        return value_mode === "%" ? (value / 100) * assetValue : value;
+        return value_mode === "%" && !yearSelected
+          ? (value / 100) * assetValue
+          : value;
       };
 
       const matchingIncomes = asset.incomes.filter(
@@ -110,19 +118,21 @@ export const StackedBarTooltip = ({
           {payload.length > 1 && <Separator />}
 
           <div className="pt-1 pb-2 space-y-1">
-            {getTypeValues(item.dataKey).map((asset, i) => (
-              <div key={i} className="grid grid-cols-4 px-3">
-                <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
-                  {asset.assetName}
-                </p>
-                <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
-                  {formatValue(asset.typeValue)}
-                </p>
-                <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-auto">
-                  ({Math.floor((asset.typeValue / item.value) * 100)}%)
-                </p>
-              </div>
-            ))}
+            {getTypeValues(item.dataKey, singleYearCalculatedAsset).map(
+              (asset, i) => (
+                <div key={i} className="grid grid-cols-4 px-3">
+                  <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
+                    {asset.assetName}
+                  </p>
+                  <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
+                    {formatValue(asset.typeValue)}
+                  </p>
+                  <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-auto">
+                    ({Math.floor((asset.typeValue / item.value) * 100)}%)
+                  </p>
+                </div>
+              )
+            )}
           </div>
         </div>
       ))}

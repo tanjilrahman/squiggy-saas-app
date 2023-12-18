@@ -15,17 +15,17 @@ export const useBarChartDataStore = create<BarChartDataStore>((set) => ({
   setBarChartData: (barChartdata) => set({ barChartdata }),
 }));
 
-type StackedChartDataStore = {
-  stackedChartdata: StackedChartData[];
-  setStackedChartData: (stackedChartdata: StackedChartData[]) => void;
-};
+// type StackedChartDataStore = {
+//   stackedChartdata: StackedChartData[];
+//   setStackedChartData: (stackedChartdata: StackedChartData[]) => void;
+// };
 
-export const useStackedChartDataStore = create<StackedChartDataStore>(
-  (set) => ({
-    stackedChartdata: [],
-    setStackedChartData: (stackedChartdata) => set({ stackedChartdata }),
-  })
-);
+// export const useStackedChartDataStore = create<StackedChartDataStore>(
+//   (set) => ({
+//     stackedChartdata: [],
+//     setStackedChartData: (stackedChartdata) => set({ stackedChartdata }),
+//   })
+// );
 
 type AreaChartDataStore = {
   areaChartdata: AreaChartData[];

@@ -12,7 +12,6 @@ import { useCalculatedAssetStore } from "@/store/calculationStore";
 import {
   useAreaChartDataStore,
   useBarChartDataStore,
-  useStackedChartDataStore,
 } from "@/store/chartStore";
 import { useHorizonState } from "@/store/store";
 import {
@@ -30,11 +29,16 @@ type EventPropsWithChartData = EventProps & BarChartData;
 export default function BarChart() {
   const { assets } = useAssetStore();
   const { year } = useHorizonState();
-  const { activePlans, setActivePlans, barChartActive, setBarChartActive } =
-    useCalculatedAssetStore();
+  const {
+    activePlans,
+    setActivePlans,
+    barChartActive,
+    singleYearCalculatedAsset,
+    setSingleYearCalculatedAsset,
+    setBarChartActive,
+  } = useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
-  const { setStackedChartData } = useStackedChartDataStore();
   const { setAreaChartData } = useAreaChartDataStore();
 
   useEffect(() => {
@@ -72,10 +76,8 @@ export default function BarChart() {
       calculatedAssets()
     );
 
-    setStackedChartData(
-      convertToStackedChartData(
-        category ? filteredAssetsWithCategory : normalAssets
-      )
+    setSingleYearCalculatedAsset(
+      category ? filteredAssetsWithCategory : normalAssets
     );
     setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
   };

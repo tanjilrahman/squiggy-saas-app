@@ -1,4 +1,5 @@
 import { Asset } from "@/app/dashboard/tables/assets/data/schema";
+import { useAreaChartDataStore } from "@/store/chartStore";
 
 export interface BarChartData {
   category: string;
@@ -40,6 +41,7 @@ interface Totals {
 export const convertToStackedChartData = (
   inputData: Asset[]
 ): StackedChartData[] => {
+  const { yearSelected } = useAreaChartDataStore();
   // Initialize objects to store income, cost, and margin totals by category type
   const incomeTotals: Totals = {};
   const costTotals: Totals = {};
@@ -56,7 +58,9 @@ export const convertToStackedChartData = (
       value_mode: "fixed" | "%",
       assetValue: number
     ): number => {
-      return value_mode === "%" ? (value / 100) * assetValue : value;
+      return value_mode === "%" && !yearSelected
+        ? (value / 100) * assetValue
+        : value;
     };
 
     // Sum Incomes
@@ -147,7 +151,9 @@ export const formatValue = (value: number): string => {
   if (absValue >= 1e6) {
     return (value / 1e6).toFixed(1) + "M";
   } else if (absValue >= 1e3) {
-    return Math.floor(+(value / 1e3).toFixed(1)) + "K";
+    return (value / 1e3) % 1 == 0
+      ? value / 1e3 + "K"
+      : (value / 1e3).toFixed(1) + "K";
   } else {
     return Math.floor(value).toString();
   }
