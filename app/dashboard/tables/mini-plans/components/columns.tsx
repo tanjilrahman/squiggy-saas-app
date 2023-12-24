@@ -6,21 +6,21 @@ import { useState } from "react";
 import { usePlanStore } from "@/store/planStore";
 import { Action } from "../../plans/data/schema";
 import ColumnName from "./column/column-name";
-import ColumnTimeframe from "./column/column-timeframe";
+import ColumnTime from "./column/column-time";
 import { formatValue } from "@/lib/helperFunctions";
 
 function ActionNameCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnName row={row} />;
 }
 
-function ActionTimeframeCell<TData>({
+function ActionTimeCell<TData>({
   table,
   row,
 }: {
   table: Table<TData>;
   row: Row<TData>;
 }) {
-  return <ColumnTimeframe row={row} table={table} />;
+  return <ColumnTime row={row} table={table} />;
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
@@ -67,11 +67,11 @@ export const columns: ColumnDef<Action>[] = [
     cell: ActionNameCell,
   },
   {
-    accessorKey: "timeframe",
+    accessorKey: "time",
     header: ({ column }) => (
-      <DataTableColumnHeader sort={false} column={column} title="Timeframe" />
+      <DataTableColumnHeader sort={false} column={column} title="Time" />
     ),
-    cell: ActionTimeframeCell,
+    cell: ActionTimeCell,
   },
   {
     accessorKey: "value",

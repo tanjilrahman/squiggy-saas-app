@@ -1,40 +1,80 @@
 "use client";
 
+import { MenuBarTooltip } from "@/components/tooltips/MenuBarTooltip";
+import { useCarousel } from "@/components/ui/carousel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavState } from "@/store/store";
 import { CandlestickChart, KanbanSquare, Route } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-function MenuBar() {
-  const { nav, setNav } = useNavState();
+type navType = "review" | "assets" | "plans";
+
+function MenuBar({ nav }: { nav: navType }) {
+  const { scrollNext, scrollPrev, canScrollNext, canScrollPrev } =
+    useCarousel();
+  const [active, setActive] = useState<navType>("review");
   const pathname = usePathname();
+
+  useEffect(() => {
+    setActive(nav);
+  }, [nav]);
 
   if (pathname !== "/dashboard") return null;
   return (
-    <Tabs defaultValue="assets" className="">
-      <TabsList>
-        <TabsTrigger value="review" onClick={() => setNav("review")}>
-          <KanbanSquare
-            className={`mr-2 h-4 w-4 ${nav === "review" && "text-indigo-500"}`}
-          />
-          Review
-        </TabsTrigger>
-        <TabsTrigger value="assets" onClick={() => setNav("assets")}>
-          <CandlestickChart
-            className={`mr-2 h-4 w-4 ${nav === "assets" && "text-indigo-500"}`}
-          />
-          Assets
-        </TabsTrigger>
-        <TabsTrigger value="plans" onClick={() => setNav("plans")}>
-          <Route
-            className={`mr-2 h-4 w-4 ${nav === "plans" && "text-indigo-500"}`}
-          />
-          Plans
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <div className="flex items-center">
+      <Tabs defaultValue="review" value={nav} className="">
+        <TabsList>
+          <TabsTrigger
+            value="review"
+            onClick={() => {
+              scrollPrev();
+              scrollPrev();
+              setActive("review");
+            }}
+          >
+            <KanbanSquare
+              className={`mr-2 h-4 w-4 ${
+                active === "review" && "text-indigo-500"
+              }`}
+            />
+            Review
+          </TabsTrigger>
+          <TabsTrigger
+            value="assets"
+            onClick={() => {
+              canScrollNext && scrollNext();
+              canScrollPrev && scrollPrev();
+              setActive("assets");
+            }}
+          >
+            <CandlestickChart
+              className={`mr-2 h-4 w-4 ${
+                active === "assets" && "text-indigo-500"
+              }`}
+            />
+            Assets
+          </TabsTrigger>
+          <TabsTrigger
+            value="plans"
+            className="hover:bg-muted"
+            onClick={() => {
+              scrollNext();
+              scrollNext();
+              setActive("plans");
+            }}
+          >
+            <Route
+              className={`mr-2 h-4 w-4 ${
+                active === "plans" && "text-indigo-500"
+              }`}
+            />
+            Plans
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+      <MenuBarTooltip />
+    </div>
   );
 }
 

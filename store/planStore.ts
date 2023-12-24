@@ -1,8 +1,4 @@
-import {
-  Plan,
-  Action,
-  AssetIn,
-} from "@/app/dashboard/tables/plans/data/schema";
+import { Plan, Action } from "@/app/dashboard/tables/plans/data/schema";
 import { create } from "zustand";
 
 type PlanExpandedState = {
@@ -65,15 +61,11 @@ type PlanStore = {
   updatePlanStatus: (planId: string, newStatus: string) => void;
 
   updateActionName: (planId: string, actionId: string, newName: string) => void;
-  updateActionTimeframe: (
-    planId: string,
-    actionId: string,
-    newTimeframe: number[]
-  ) => void;
+  updateActionTime: (planId: string, actionId: string, newTime: number) => void;
   updateActionAssetIn: (
     planId: string,
     actionId: string,
-    newAssetIn: AssetIn
+    newAssetIn: string
   ) => void;
   updateActionAssetOut: (
     planId: string,
@@ -213,16 +205,14 @@ export const usePlanStore = create<PlanStore>((set) => ({
     }));
   },
 
-  updateActionTimeframe: (planId, actionId, newTimeframe) => {
+  updateActionTime: (planId, actionId, newTime) => {
     set((state) => ({
       plans: state.plans.map((plan) =>
         plan.id === planId
           ? {
               ...plan,
               actions: plan.actions.map((action) =>
-                action.id === actionId
-                  ? { ...action, timeframe: newTimeframe }
-                  : action
+                action.id === actionId ? { ...action, time: newTime } : action
               ),
             }
           : plan
@@ -238,7 +228,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
               ...plan,
               actions: plan.actions.map((action) =>
                 action.id === actionId
-                  ? { ...action, assetIns: [...action.assetIns, newAssetIn] }
+                  ? { ...action, assetsIn: [...action.assetsIn, newAssetIn] }
                   : action
               ),
             }
@@ -273,8 +263,8 @@ export const usePlanStore = create<PlanStore>((set) => ({
                 action.id === actionId
                   ? {
                       ...action,
-                      assetIns: action.assetIns.filter(
-                        (asset) => asset.assetId !== assetInId
+                      assetsIn: action.assetsIn.filter(
+                        (asset) => asset !== assetInId
                       ),
                     }
                   : action

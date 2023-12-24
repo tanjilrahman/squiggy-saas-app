@@ -33,7 +33,7 @@ import { ColumnDetailsCosts } from "./column-details/column-details-costs";
 import DataTableTextArea from "./data-table-textarea";
 import { Button } from "@/components/ui/button";
 import { Asset } from "../data/schema";
-import { AlertCircle, Check, Loader2 } from "lucide-react";
+import { AlertCircle, Check, Loader2, Route } from "lucide-react";
 import { ProfitAllocationCombobox } from "./profit-allocation-combobox";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 
@@ -202,14 +202,20 @@ export function DataTableExpand<TData extends Asset, TValue>({
                           </div>
                         </div>
                         <div className="w-full flex justify-between my-4">
-                          <div className="space-x-4">
+                          <div className="flex items-center space-x-4">
                             <ProfitAllocationCombobox
                               disabled={
                                 !isEditable ||
-                                assetsData[row.index].action_asset
+                                !!assetsData[row.index].action_asset
                               }
                               assetId={row.getValue("id")}
                             />
+                            {assetsData[row.index].action_asset && (
+                              <div className="flex items-center space-x-2">
+                                <Route className="w-4 h-4 text-indigo-500" />
+                                <span>Plan Asset</span>
+                              </div>
+                            )}
                           </div>
                           <Button
                             type="submit"

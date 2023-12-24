@@ -161,3 +161,42 @@ export const formatValue = (value: number): string => {
 export const formatNumericValue = (numericValue: number | null) => {
   return new Intl.NumberFormat("en-US").format(numericValue || 0);
 };
+
+export function calculateProfit(asset: Asset): number {
+  const adjustValue = (
+    value: number,
+    value_mode: "fixed" | "%",
+    assetValue: number
+  ): number => {
+    return value_mode === "%" ? (value / 100) * assetValue : value;
+  };
+
+  const totalIncome = asset.incomes.reduce(
+    (sum, income) =>
+      sum + adjustValue(income.value, income.value_mode, asset.value),
+    0
+  );
+
+  const totalCost = asset.costs.reduce(
+    (sum, cost) => sum + adjustValue(cost.value, cost.value_mode, asset.value),
+    0
+  );
+
+  const netIncome = totalIncome - totalCost;
+  return netIncome;
+}
+
+export function calculateROI(asset: Asset): number {
+  const calculatedAssetYoy =
+    asset.yoy_mode === "simple"
+      ? asset.yoy_type === "fixed"
+        ? asset.yoy || 0
+        : ((asset.yoy || 0) / 100) * asset.value
+      : asset.yoy_type === "fixed"
+      ? asset.yoy_advanced[0] || 0
+      : ((asset.yoy_advanced[0] || 0) / 100) * asset.value;
+
+  const calculatedAssetROI =
+    (((calculatedAssetYoy || 0) + calculateProfit(asset)) / asset.value) * 100;
+  return calculatedAssetROI;
+}

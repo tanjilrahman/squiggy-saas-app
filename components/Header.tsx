@@ -14,25 +14,25 @@ async function Header() {
   const user = await currentUser();
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-slate-950">
-      <nav className="flex flex-col sm:flex-row justify-between items-center p-5 pl-2 max-w-7xl mx-auto">
+    <header className="sticky top-0 z-10 bg-white dark:bg-slate-950">
+      <nav className="flex flex-col items-center justify-between p-5 pl-2 mx-auto sm:flex-row max-w-7xl">
         <Link href={userId ? "/dashboard" : "/"} prefetch={false}>
           <Logo />
         </Link>
 
-        {userId && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {/* {userId && (
+          <div className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
             <MenuBar />
           </div>
-        )}
+        )} */}
 
         <div className="flex items-center justify-end space-x-4 ">
           {userId ? (
             <>
-              <p className="hover:underline cursor-pointer text-muted-foreground/60">
+              <p className="cursor-pointer hover:underline text-muted-foreground/60">
                 Leave feedback
               </p>
-              <p className="hover:underline cursor-pointer text-muted-foreground/60">
+              <p className="cursor-pointer hover:underline text-muted-foreground/60">
                 Guide
               </p>
               <SettingsButton />

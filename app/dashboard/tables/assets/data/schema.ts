@@ -13,7 +13,7 @@ export type IncomeCost = {
 
 export type Asset = {
   id: string;
-  action_asset: boolean;
+  action_asset: string | null;
   name: string;
   value: number;
   category: string;

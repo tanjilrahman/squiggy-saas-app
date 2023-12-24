@@ -53,11 +53,7 @@ async function Dashboard() {
       userId: dbUser.id,
     },
     include: {
-      actions: {
-        include: {
-          assetIns: true,
-        },
-      },
+      actions: true,
     },
     orderBy: {
       createdAt: "asc",

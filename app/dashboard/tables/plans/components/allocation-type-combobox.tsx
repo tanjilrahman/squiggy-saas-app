@@ -11,25 +11,34 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const frameworks = [
-  {
-    value: "absolute",
-    label: "Absolute",
-  },
-  {
-    value: "cumulative",
-    label: "Cumulative",
-  },
-];
+import { useUserState } from "@/store/store";
 
 type PropsType = {
+  className?: string;
+  disabled?: boolean;
   value: string;
-  setValue: (value: "absolute" | "cumulative") => void;
+  setValue: (value: "%" | "fixed") => void;
 };
 
-export function AllocationTypeCombobox({ value, setValue }: PropsType) {
+export function AllocationTypeCombobox({
+  className,
+  disabled,
+  value,
+  setValue,
+}: PropsType) {
   const [open, setOpen] = React.useState(false);
+  const { user } = useUserState();
+
+  const frameworks = [
+    {
+      value: "fixed",
+      label: user?.currency.toUpperCase(),
+    },
+    {
+      value: "%",
+      label: "%",
+    },
+  ];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -38,14 +47,16 @@ export function AllocationTypeCombobox({ value, setValue }: PropsType) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between disabled:opacity-100 disabled:bg-transparent disabled:border-transparent px-3"
+          className={cn("justify-between px-3", className)}
+          disabled={disabled}
         >
           {value &&
             frameworks.find((framework) => framework.value === value)?.label}
+
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[full] p-0 ">
+      <PopoverContent className="w-[80px] p-0 ">
         <Command>
           <CommandGroup>
             {frameworks.map((framework) => (
@@ -53,10 +64,14 @@ export function AllocationTypeCombobox({ value, setValue }: PropsType) {
                 key={framework.value}
                 value={framework.value}
                 onSelect={(currentValue) => {
-                  setValue(currentValue as "absolute" | "cumulative");
-                  setOpen(false);
+                  if (currentValue === "fixed" || currentValue === "%") {
+                    setValue(currentValue as "fixed" | "%");
+                    setOpen(false);
+                  } else {
+                    setValue("fixed");
+                    setOpen(false);
+                  }
                 }}
-                className="pr-4"
               >
                 <Check
                   className={cn(

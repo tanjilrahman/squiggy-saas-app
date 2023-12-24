@@ -3,7 +3,6 @@ import {
   BarChartData,
   convertToAreaChartData,
   convertToChartData,
-  convertToStackedChartData,
   formatValue,
 } from "@/lib/helperFunctions";
 import { useAssetStore } from "@/store/assetStore";
@@ -23,23 +22,26 @@ import {
 } from "@tremor/react";
 import { useEffect } from "react";
 import { BarTooltip } from "./lib/BarTooltip";
+import { usePlanStore, useSelectedMiniPlanStore } from "@/store/planStore";
+import DashboardAlert from "../components/DashboardAlert";
 
 type EventPropsWithChartData = EventProps & BarChartData;
 
 export default function BarChart() {
   const { assets } = useAssetStore();
+  const { plans } = usePlanStore();
   const { year } = useHorizonState();
-  const {
-    activePlans,
-    setActivePlans,
-    barChartActive,
-    singleYearCalculatedAsset,
-    setSingleYearCalculatedAsset,
-    setBarChartActive,
-  } = useCalculatedAssetStore();
+  const { activePlans, setSingleYearCalculatedAsset, setBarChartActive } =
+    useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
-  const { setAreaChartData } = useAreaChartDataStore();
+  const {
+    yearSelected,
+    areaChartKey,
+    setYearSelected,
+    setAreaChartData,
+    setAreaChartKey,
+  } = useAreaChartDataStore();
 
   useEffect(() => {
     const pureAssets = assets.filter((asset) => !asset.action_asset);
@@ -51,6 +53,7 @@ export default function BarChart() {
   }, [assets, selectedAssets, activePlans]);
 
   const onValueChange = (value: EventPropsWithChartData) => {
+    if (yearSelected) return;
     const normalAssets = assets.filter((asset) => !asset.action_asset);
     const category = value?.category?.toLowerCase();
     if (category) {
@@ -58,18 +61,26 @@ export default function BarChart() {
     } else {
       setBarChartActive(false);
     }
-    setActivePlans(false);
+    // setActivePlans(false);
 
     const filteredAssetsWithCategory = assets.filter(
       (asset) => asset.category === category
     );
 
     const calculatedAssets = () => {
-      const filteredPureAsset = assets.filter(
-        (asset) =>
-          !asset.action_asset && (category ? asset.category === category : true)
-      );
-      return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+      if (activePlans) {
+        const filteredAsset = assets.filter((asset) =>
+          category ? asset.category === category : true
+        );
+        return filteredAsset.map((asset) =>
+          calculateAsset(asset, year, plans, assets)
+        );
+      } else {
+        const filteredPureAsset = assets.filter((asset) =>
+          !asset.action_asset && category ? asset.category === category : true
+        );
+        return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+      }
     };
 
     const calculateAssetsWithAllocation = addProfitsToCurrency(
@@ -84,8 +95,12 @@ export default function BarChart() {
 
   return (
     <Card className="z-10">
-      <Title>Assets</Title>
+      <Title className="flex justify-between items-center">
+        <span>Assets</span>
+        <DashboardAlert />
+      </Title>
       <Subtitle>Some text to add</Subtitle>
+
       <BC
         className="mt-6"
         data={barChartdata}

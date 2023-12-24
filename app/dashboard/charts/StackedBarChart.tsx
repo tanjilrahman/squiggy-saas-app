@@ -1,13 +1,21 @@
-import { convertToStackedChartData, formatValue } from "@/lib/helperFunctions";
+import {
+  StackedChartData,
+  convertToStackedChartData,
+  formatValue,
+} from "@/lib/helperFunctions";
 import { useAssetStore, useSelectedAssetStore } from "@/store/assetStore";
 import { Card, Title, BarChart, Subtitle } from "@tremor/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { StackedBarTooltip } from "./lib/StackedBarTooltip";
 import { useAreaChartDataStore } from "@/store/chartStore";
+import DashboardAlert from "../components/DashboardAlert";
 
 export default function StackedBarChart() {
   const { assets } = useAssetStore();
+  const [stackedChartdata, setStackedChartData] = useState<StackedChartData[]>(
+    []
+  );
   const { selectedAssets } = useSelectedAssetStore();
   const { yearSelected } = useAreaChartDataStore();
   const {
@@ -25,16 +33,22 @@ export default function StackedBarChart() {
     }
   }, [assets, selectedAssets, activePlans]);
 
+  useEffect(() => {
+    setStackedChartData(
+      convertToStackedChartData(singleYearCalculatedAsset, yearSelected)
+    );
+  }, [singleYearCalculatedAsset]);
+
   return (
     <Card className="z-10">
-      <Title>Margin</Title>
+      <Title className="flex justify-between items-center">
+        <span>Margin</span>
+        <DashboardAlert />
+      </Title>
       <Subtitle>Some text to add</Subtitle>
       <BarChart
         className="mt-4 h-80"
-        data={convertToStackedChartData(
-          singleYearCalculatedAsset,
-          yearSelected
-        )}
+        data={stackedChartdata}
         index="index"
         categories={[
           "Passive",

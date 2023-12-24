@@ -35,49 +35,26 @@ export async function POST(request: NextRequest) {
             where: { id: action.id },
             update: {
               name: action.name,
-              timeframe: action.timeframe,
+              time: action.time,
               value: action.value,
               status: action.status,
               assetOut: action.assetOut,
-              assetIns: {
-                upsert: action.assetIns.map((assetIn) => ({
-                  where: {
-                    id: assetIn.id,
-                  },
-                  update: {
-                    assetId: assetIn.assetId,
-                    type: assetIn.type,
-                    allocation: assetIn.allocation,
-                  },
-                  create: {
-                    assetId: assetIn.assetId,
-                    type: assetIn.type,
-                    allocation: assetIn.allocation,
-                  },
-                })),
-              },
+              assetsIn: action.assetsIn,
             },
             create: {
               name: action.name,
-              timeframe: action.timeframe,
+              time: action.time,
               value: action.value,
               status: action.status,
               assetOut: action.assetOut,
-              assetIns: {
-                create: action.assetIns.map((assetIn) => ({
-                  id: assetIn.id,
-                  assetId: assetIn.assetId,
-                  type: assetIn.type,
-                  allocation: assetIn.allocation,
-                })),
-              },
+              assetsIn: action.assetsIn,
             },
           })),
         },
       },
     });
   } else {
-    // Create new plan with associated actions, assetIns, and assetOuts
+    // Create new plan with associated actions, assetsIn, and assetOuts
     const createdPlan = await db.plan.create({
       data: {
         User: {
@@ -96,21 +73,12 @@ export async function POST(request: NextRequest) {
           create: updatedPlan.actions.map((action) => ({
             id: action.id,
             name: action.name,
-            timeframe: action.timeframe,
+            time: action.time,
             value: action.value,
             status: action.status,
             assetOut: action.assetOut,
-            assetIns: {
-              create: action.assetIns,
-            },
+            assetsIn: action.assetsIn,
           })),
-        },
-      },
-      include: {
-        actions: {
-          include: {
-            assetIns: true,
-          },
         },
       },
     });

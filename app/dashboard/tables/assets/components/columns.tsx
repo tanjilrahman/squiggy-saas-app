@@ -11,7 +11,6 @@ import {
   ChevronUp,
   Pencil,
   PlusCircle,
-  Route,
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -28,6 +27,7 @@ import ColumnValue from "./column/column-value";
 import ColumnYoy from "./column/column-yoy";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { FormatValueCurrency } from "@/components/FormatValueCurrency";
+import { calculateProfit, calculateROI } from "@/lib/helperFunctions";
 
 function NameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateAssetName } = useAssetStore();
@@ -37,15 +37,6 @@ function NameCell<TData>({ row }: { row: Row<TData> }) {
 
 function CategoryCell<TData>({ row }: { row: Row<TData> }) {
   const { expanded, isEditable } = useAssetExpandedState();
-  const { assets } = useAssetStore();
-  const asset = assets.find((asset) => asset.id === row.getValue("id"));
-
-  if (asset?.action_asset)
-    return (
-      <div className="flex items-center px-4 py-2 space-x-2">
-        <Route className="w-4 h-4 text-indigo-500" /> <span>Plan Asset</span>
-      </div>
-    );
 
   if (row.getValue("id") === expanded)
     return (
@@ -72,18 +63,36 @@ function SelectHeader<TValue extends Asset>({
 }: {
   table: Table<TValue>;
 }) {
-  const { setSelectedAssets } = useSelectedAssetStore();
+  const { selectedAssets, setSelectedAssets } = useSelectedAssetStore();
   useEffect(() => {
     const selectedAssets = table
       .getFilteredSelectedRowModel()
       .rows.map((row) => row.original);
     setSelectedAssets(selectedAssets);
   }, [table.getFilteredSelectedRowModel().rows.length]);
+
+  useEffect(() => {
+    if (selectedAssets.length === 0) {
+      table.resetRowSelection();
+    }
+  }, [selectedAssets.length]);
+
   return (
     <Checkbox
       checked={table.getIsAllPageRowsSelected()}
       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
       aria-label="Select all"
+      className="translate-y-[2px]"
+    />
+  );
+}
+
+function SelectCell<TData>({ row }: { row: Row<TData> }) {
+  return (
+    <Checkbox
+      checked={row.getIsSelected()}
+      onCheckedChange={(value) => row.toggleSelected(!!value)}
+      aria-label="Select row"
       className="translate-y-[2px]"
     />
   );
@@ -100,34 +109,37 @@ function YoyCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
-  const { calculatedAssets } = useCalculatedAssetStore();
-
-  const calcAssetAll = calculatedAssets.find(
-    (year) => year[0].id === row.getValue("id")
-  );
+  const [profit, setProfit] = useState(0);
+  const { assets } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === row.getValue("id"));
+  row.original.profit = profit;
+  useEffect(() => {
+    setProfit(calculateProfit(asset!));
+    row.original.profit = profit;
+  }, [assets]);
   return (
     <div className="flex w-[100px] space-x-2 justify-end">
       <p className="font-medium truncate">
-        <FormatValueCurrency number={calcAssetAll && calcAssetAll[0].profit} />
+        <FormatValueCurrency number={profit} />
       </p>
     </div>
   );
 }
 
 function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
-  const { calculatedAssets } = useCalculatedAssetStore();
-
-  const calcAssetAll = calculatedAssets.find(
-    (year) => year[0].id === row.getValue("id")
-  );
+  const [roi, setRoi] = useState(0);
+  const { assets } = useAssetStore();
+  const asset = assets.find((asset) => asset.id === row.getValue("id"));
+  row.original.roi = roi;
+  useEffect(() => {
+    setRoi(calculateROI(asset!));
+    row.original.roi = roi;
+  }, [assets]);
   return (
     <div className="w-[60px] flex items-center justify-end">
       <p>
-        {(calcAssetAll &&
-          calcAssetAll[0].value > 0 &&
-          calcAssetAll[0].roi?.toFixed(2)) ||
-          "N/A"}
-        {calcAssetAll && calcAssetAll[0].value > 0 && "%"}
+        {(asset && asset.value > 0 && roi?.toFixed(2)) || "N/A"}
+        {asset && asset.value > 0 && "%"}
       </p>
     </div>
   );
@@ -142,7 +154,7 @@ function DetailsHeader() {
 
     const newAsset: Asset = {
       id: newAssetId,
-      action_asset: false,
+      action_asset: null,
       name: "",
       value: 0,
       category: "",
@@ -262,14 +274,7 @@ export const columns: ColumnDef<Asset>[] = [
   {
     id: "select",
     header: SelectHeader,
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
+    cell: SelectCell,
     enableSorting: false,
     enableHiding: false,
   },

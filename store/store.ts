@@ -11,7 +11,7 @@ interface navState {
 }
 
 export const useNavState = create<navState>()((set) => ({
-  nav: "assets",
+  nav: "review",
   setNav: (nav) => set({ nav }),
 }));
 

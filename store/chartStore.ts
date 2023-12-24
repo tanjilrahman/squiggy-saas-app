@@ -30,6 +30,8 @@ export const useBarChartDataStore = create<BarChartDataStore>((set) => ({
 type AreaChartDataStore = {
   areaChartdata: AreaChartData[];
   yearSelected: number | null;
+  areaChartKey: number;
+  setAreaChartKey: (key: number) => void;
   setYearSelected: (yearSelected: number | null) => void;
   setAreaChartData: (areaChartdata: AreaChartData[]) => void;
 };
@@ -37,6 +39,8 @@ type AreaChartDataStore = {
 export const useAreaChartDataStore = create<AreaChartDataStore>((set) => ({
   areaChartdata: [],
   yearSelected: null,
+  areaChartKey: 0,
+  setAreaChartKey: (areaChartKey) => set({ areaChartKey }),
   setYearSelected: (yearSelected) => set({ yearSelected }),
   setAreaChartData: (areaChartdata) => set({ areaChartdata }),
 }));

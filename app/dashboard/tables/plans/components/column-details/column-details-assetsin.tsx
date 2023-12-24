@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Row } from "@tanstack/react-table";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/assetStore";
-import { AssetIn } from "../../data/schema";
-import { DetailsAssetinsDialog } from "./details-assetins-dialog";
+import { DetailsAssetsInDialog } from "./details-assetsin-dialog";
 import { formatValue } from "@/lib/helperFunctions";
 
 interface ColumnDetailsAssetsInProps<TData> {
@@ -15,34 +14,62 @@ interface ColumnDetailsAssetsInProps<TData> {
 function ColumnDetailsAssetsIn<TData>({
   row,
 }: ColumnDetailsAssetsInProps<TData>) {
-  const [value, setValue] = useState<AssetIn[]>(row.getValue("assetIns"));
+  const [value, setValue] = useState<string[]>(row.getValue("assetsIn"));
+  const [status, setStatus] = useState<string | null>(null);
+  const { removeAsset } = useAssetStore();
   const [estValue, setEstValue] = useState(0);
   const { plans, removeActionAssetInId, updateActionAssetIn } = usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
 
   useEffect(() => {
-    setValue(row.getValue("assetIns"));
+    setValue(row.getValue("assetsIn"));
   }, [plans]);
+
+  const handleRemoveWithAsset = async (assetId: string) => {
+    setStatus("LOADING");
+    try {
+      const response = await fetch("/api/delete-asset", {
+        method: "POST",
+        body: JSON.stringify({ assetId }),
+      });
+
+      const { success, code } = await response.json();
+      if (success) {
+        console.log("success");
+        setStatus("SUCCESS");
+        removeAsset(assetId);
+        removeActionAssetInId(expanded!, row.getValue("id"), assetId);
+      }
+      if (code === "NOT FOUND") {
+        setStatus("ERROR");
+        removeAsset(assetId);
+        removeActionAssetInId(expanded!, row.getValue("id"), assetId);
+      }
+    } catch (err: any) {
+      if (err.data?.code === "UNAUTHORIZED") {
+        console.log("You don't have the access.");
+        setStatus("ERROR");
+      }
+    }
+  };
 
   useEffect(() => {
     const totalValue = value.reduce((sum, assetin) => {
-      const assetValue = assets.find(
-        (asset) => asset.id === assetin.assetId
-      )?.value;
-      const est = (assetValue || 0) * (assetin.allocation / 100);
-      return est + sum;
+      const assetValue = assets.find((asset) => asset.id === assetin)?.value;
+
+      return assetValue! + sum;
     }, 0);
 
     setEstValue(totalValue);
   }, [value]);
 
   return (
-    <div className="w-[200px]">
-      {value?.map((item) => {
-        const asset = assets.find((asset) => asset.id === item.assetId);
+    <div className="w-[240px]">
+      {value?.map((assetId) => {
+        const asset = assets.find((asset) => asset.id === assetId);
         return (
-          <div key={item.assetId} className="flex items-center space-x-2 mb-2">
+          <div key={assetId} className="flex items-center space-x-2 mb-2">
             <div
               className={`${
                 !isEditable && "border-transparent bg-transparent"
@@ -50,23 +77,21 @@ function ColumnDetailsAssetsIn<TData>({
             >
               {asset?.name}
               <span className="text-muted-foreground ml-1">
-                ({item.allocation}%)
+                ({formatValue(asset?.value!)})
               </span>
             </div>
             {isEditable && (
               <Button
-                disabled={!isEditable}
+                disabled={!isEditable || status === "LOADING"}
                 variant="outline"
                 className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
-                onClick={() =>
-                  removeActionAssetInId(
-                    expanded!,
-                    row.getValue("id"),
-                    item.assetId
-                  )
-                }
+                onClick={() => handleRemoveWithAsset(assetId)}
               >
-                <Trash2 className="h-4 w-4" />
+                {status === "LOADING" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </Button>
             )}
           </div>
@@ -75,7 +100,7 @@ function ColumnDetailsAssetsIn<TData>({
 
       {isEditable && (
         <div>
-          <DetailsAssetinsDialog
+          <DetailsAssetsInDialog
             planId={expanded!}
             columnId={row.getValue("id")}
             updateFunc={updateActionAssetIn}
@@ -83,7 +108,7 @@ function ColumnDetailsAssetsIn<TData>({
             <Button variant="outline" className="w-full">
               <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
             </Button>
-          </DetailsAssetinsDialog>
+          </DetailsAssetsInDialog>
           {value.length > 0 && (
             <p className="mt-4 text-muted-foreground">
               Est. value: {formatValue(estValue)}

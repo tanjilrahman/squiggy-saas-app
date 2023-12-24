@@ -2,7 +2,6 @@ import {
   AreaChartData,
   convertToAreaChartData,
   convertToChartData,
-  convertToStackedChartData,
   formatValue,
 } from "@/lib/helperFunctions";
 import {
@@ -20,6 +19,7 @@ import {
 } from "@/store/chartStore";
 import { useAssetStore } from "@/store/assetStore";
 import { useSelectedMiniPlanStore } from "@/store/planStore";
+import DashboardAlert from "../components/DashboardAlert";
 
 type EventPropsWithChartData = EventProps & AreaChartData;
 
@@ -33,8 +33,13 @@ export default function AreaChart() {
     barChartActive,
     setSingleYearCalculatedAsset,
   } = useCalculatedAssetStore();
-  const { areaChartdata, setAreaChartData, yearSelected, setYearSelected } =
-    useAreaChartDataStore();
+  const {
+    areaChartKey,
+    areaChartdata,
+    setAreaChartData,
+    yearSelected,
+    setYearSelected,
+  } = useAreaChartDataStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
 
   useEffect(() => {
@@ -44,14 +49,14 @@ export default function AreaChart() {
 
   const onValueChange = (value: EventPropsWithChartData) => {
     const year = value?.year - 2023;
-    console.log(year, value);
+    // console.log(year, value);
     setYearSelected(year ? year : null);
     const selectedYearAssets = calculatedAssets.map((assetYears) => {
       return assetYears.filter((_, i) => i === year);
     });
     // console.log(selectedYearAssets);
 
-    const normalAssets = assets.filter((asset) => !asset.action_asset);
+    const pureAssets = assets.filter((asset) => !asset.action_asset);
     const selectedWithoutPlanAssets = selectedYearAssets
       .flat()
       .filter((asset) => !asset.action_asset);
@@ -81,7 +86,7 @@ export default function AreaChart() {
         if (activePlans) {
           assetsToConvert = assets;
         } else {
-          assetsToConvert = normalAssets;
+          assetsToConvert = pureAssets;
         }
       }
       // console.log(selectedWithCategory);
@@ -100,12 +105,16 @@ export default function AreaChart() {
       // @ts-ignore
       onValueChange({ year: 2023 + 0 });
     }
-  }, [startTime]);
+  }, [startTime, areaChartKey]);
   return (
     <Card>
-      <Title>Prognosis</Title>
+      <Title className="flex justify-between items-center">
+        <span>Prognosis</span>
+        <DashboardAlert />
+      </Title>
       <Subtitle>Some text to add</Subtitle>
       <AC
+        key={areaChartKey}
         className="mt-4"
         yAxisWidth={40}
         showAnimation={true}

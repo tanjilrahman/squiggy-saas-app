@@ -18,8 +18,8 @@ function ColumnDetailsAdd({ className, updateFunc }: ColumnDetailsAddProps) {
     const newItem: Action = {
       id: uuid(),
       name: "",
-      timeframe: [0, 0],
-      assetIns: [],
+      time: 0,
+      assetsIn: [],
       assetOut: "",
       value: 0,
       status: "",

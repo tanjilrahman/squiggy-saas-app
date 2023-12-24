@@ -1,23 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Row } from "@tanstack/react-table";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/assetStore";
 import { DetailsAssetoutDialog } from "./details-assetout-dialog";
-import { formatValue } from "@/lib/helperFunctions";
-import { AssetIn } from "../../data/schema";
 
-interface ColumnDetailsAssetsOutProps<TData> {
+interface ColumnDetailsAssetOutProps<TData> {
   row: Row<TData>;
 }
 
-function ColumnDetailsAssetsOut<TData>({
+function ColumnDetailsAssetOut<TData>({
   row,
-}: ColumnDetailsAssetsOutProps<TData>) {
+}: ColumnDetailsAssetOutProps<TData>) {
   const [value, setValue] = useState<string>(row.getValue("assetOut"));
-  const [assetInValue, setAssetInValue] = useState<AssetIn[]>(
-    row.getValue("assetIns")
+  const { removeAsset } = useAssetStore();
+  const [status, setStatus] = useState<string | null>(null);
+  const [assetInValue, setAssetInValue] = useState<string[]>(
+    row.getValue("assetsIn")
   );
   const [tradeOff, setTradeOff] = useState(0);
 
@@ -30,22 +30,49 @@ function ColumnDetailsAssetsOut<TData>({
 
   useEffect(() => {
     setValue(row.getValue("assetOut"));
-    setAssetInValue(row.getValue("assetIns"));
+    setAssetInValue(row.getValue("assetsIn"));
+    console.log(asset);
   }, [plans]);
+
+  const handleRemoveWithAsset = async (assetId: string) => {
+    setStatus("LOADING");
+    try {
+      const response = await fetch("/api/delete-asset", {
+        method: "POST",
+        body: JSON.stringify({ assetId }),
+      });
+
+      const { success, code } = await response.json();
+      if (success) {
+        console.log("success");
+        setStatus("SUCCESS");
+        removeAsset(assetId);
+        removeActionAssetOutId(expanded!, row.getValue("id"), value);
+      }
+      if (code === "NOT FOUND") {
+        setStatus("ERROR");
+        removeAsset(assetId);
+        removeActionAssetOutId(expanded!, row.getValue("id"), value);
+      }
+    } catch (err: any) {
+      if (err.data?.code === "UNAUTHORIZED") {
+        console.log("You don't have the access.");
+        setStatus("ERROR");
+      }
+    }
+  };
 
   useEffect(() => {
     const totalValue = assetInValue.reduce((sum, assetin) => {
-      const assetValue = assets.find(
-        (asset) => asset.id === assetin.assetId
-      )?.value;
-      const est = (assetValue || 0) * (assetin.allocation / 100);
-      return est + sum;
+      const assetValue = assets.find((asset) => asset.id === assetin)?.value;
+
+      return assetValue! + sum;
     }, 0);
     setTradeOff(((asset?.value || 0) / totalValue) * 100);
   }, [value, assetInValue]);
 
   return (
-    <div className="w-[200px]">
+    <div className="w-[220px]">
       {value && (
         <div>
           <div className="flex items-center space-x-2 mb-2">
@@ -58,14 +85,16 @@ function ColumnDetailsAssetsOut<TData>({
             </div>
             {isEditable && (
               <Button
-                disabled={!isEditable}
+                disabled={!isEditable || status === "LOADING"}
                 variant="outline"
                 className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
-                onClick={() =>
-                  removeActionAssetOutId(expanded!, row.getValue("id"), value)
-                }
+                onClick={() => handleRemoveWithAsset(value)}
               >
-                <Trash2 className="h-4 w-4" />
+                {status === "LOADING" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </Button>
             )}
           </div>
@@ -92,4 +121,4 @@ function ColumnDetailsAssetsOut<TData>({
   );
 }
 
-export default ColumnDetailsAssetsOut;
+export default ColumnDetailsAssetOut;

@@ -15,12 +15,12 @@ export function DataRow({
   activePlans,
   table,
 }: DataRowProps) {
-  const tf: number[] = row.getValue("timeframe");
+  const tf: number = row.getValue("time");
   const [highlight, setHighlight] = useState(false);
 
   useEffect(() => {
     if (yearSelected && activePlans) {
-      const selected = yearSelected >= tf[0] && yearSelected <= tf[1];
+      const selected = yearSelected >= tf;
       setHighlight(selected);
     } else {
       setHighlight(false);

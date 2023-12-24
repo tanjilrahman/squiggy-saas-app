@@ -15,18 +15,18 @@
 
 // export type Task = z.infer<typeof taskSchema>
 
-export type AssetIn = {
-  id: string;
-  assetId: string;
-  allocation: number;
-  type: "absolute" | "cumulative";
-};
+// export type ActionAsset = {
+//   id: string;
+//   assetId: string;
+//   allocation: number;
+//   type: "%" | "fixed";
+// };
 
 export type Action = {
   id: string;
   name: string;
-  timeframe: number[];
-  assetIns: AssetIn[];
+  time: number;
+  assetsIn: string[];
   assetOut: string;
   value: number;
   status: string;

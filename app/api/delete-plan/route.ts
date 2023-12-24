@@ -29,13 +29,6 @@ export async function POST(request: NextRequest) {
         where: {
           id: planId,
         },
-        include: {
-          actions: {
-            include: {
-              assetIns: true,
-            },
-          },
-        },
       })
       .catch((e) => {
         return Response.json({ code: "NOT FOUND" }, { status: 404 });
@@ -46,9 +39,6 @@ export async function POST(request: NextRequest) {
       .delete({
         where: {
           id: itemId,
-        },
-        include: {
-          assetIns: true,
         },
       })
       .catch((e) => {

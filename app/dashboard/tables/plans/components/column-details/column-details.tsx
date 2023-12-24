@@ -9,10 +9,10 @@ import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
 import { Plan } from "../../data/schema";
 import { useEffect, useState } from "react";
 import { formatValue } from "@/lib/helperFunctions";
-import ColumnDetailsTimeframe from "./column-details-timeframe";
-import ColumnDetailsAssetsIn from "./column-details-assetin";
-import ColumnDetailsAssetsOut from "./column-details-assetout";
+import ColumnDetailsAssetsIn from "./column-details-assetsin";
+import ColumnDetailsAssetOut from "./column-details-assetout";
 import { useAssetStore } from "@/store/assetStore";
+import ColumnDetailsTime from "./column-details-time";
 
 function ActionNameCell<TData>({ row }: { row: Row<TData> }) {
   const { updateActionName } = usePlanStore();
@@ -20,20 +20,18 @@ function ActionNameCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnDetailsName row={row} updateFunc={updateActionName} />;
 }
 
-function ActionTimeframeCell<TData>({ row }: { row: Row<TData> }) {
-  const { updateActionTimeframe } = usePlanStore();
+function ActionTimeCell<TData>({ row }: { row: Row<TData> }) {
+  const { updateActionTime } = usePlanStore();
 
-  return (
-    <ColumnDetailsTimeframe row={row} updateFunc={updateActionTimeframe} />
-  );
+  return <ColumnDetailsTime row={row} updateFunc={updateActionTime} />;
 }
 
 function ActionAssetsInCell<TData>({ row }: { row: Row<TData> }) {
   return <ColumnDetailsAssetsIn row={row} />;
 }
 
-function ActionAssetsOutCell<TData>({ row }: { row: Row<TData> }) {
-  return <ColumnDetailsAssetsOut row={row} />;
+function ActionAssetOutCell<TData>({ row }: { row: Row<TData> }) {
+  return <ColumnDetailsAssetOut row={row} />;
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
@@ -99,19 +97,19 @@ export const ColumnDetails: ColumnDef<Plan>[] = [
     cell: ActionNameCell,
   },
   {
-    accessorKey: "timeframe",
+    accessorKey: "time",
     header: ({ column }) => (
       <DataTableColumnHeader
         sort={false}
         column={column}
-        title="Timeframe"
+        title="Time"
         className="translate-x-3"
       />
     ),
-    cell: ActionTimeframeCell,
+    cell: ActionTimeCell,
   },
   {
-    accessorKey: "assetIns",
+    accessorKey: "assetsIn",
     header: ({ column }) => (
       <DataTableColumnHeader
         sort={false}
@@ -128,11 +126,11 @@ export const ColumnDetails: ColumnDef<Plan>[] = [
       <DataTableColumnHeader
         sort={false}
         column={column}
-        title="Assets out"
+        title="Asset out"
         className="translate-x-3"
       />
     ),
-    cell: ActionAssetsOutCell,
+    cell: ActionAssetOutCell,
   },
   {
     accessorKey: "value",
