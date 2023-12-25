@@ -27,6 +27,7 @@ export const StackedBarTooltip = ({
   const { activePlans, singleYearCalculatedAsset } = useCalculatedAssetStore();
   const { yearSelected } = useAreaChartDataStore();
   const { selectedAssets } = useSelectedAssetStore();
+  const totalPayloadValue = payload.reduce((sum, item) => item.value + sum, 0);
 
   if (!active || !payload) return null;
 
@@ -94,8 +95,8 @@ export const StackedBarTooltip = ({
     <div className="w-56 rounded-tremor-default text-tremor-default bg-tremor-background dark:bg-dark-tremor-background-muted shadow-tremor-dropdown border border-tremor-border dark:border dark:border-dark-tremor-border">
       {payload.map((item, idx) => (
         <div key={idx}>
-          <div className="grid grid-cols-4 py-2 px-3">
-            <div className="flex items-center space-x-1 col-span-3">
+          <div className="flex items-center py-2 px-3">
+            <div className="flex flex-grow items-center space-x-1">
               <svg
                 width="8"
                 height="8"
@@ -110,25 +111,29 @@ export const StackedBarTooltip = ({
               </p>
             </div>
 
-            <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
+            <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
               {formatValue(item.value)}
+            </p>
+            <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
+              ({((item.value / totalPayloadValue) * 100).toFixed(0)}%)
             </p>
           </div>
 
-          {payload.length > 1 && <Separator />}
+          {payload.length > 0 && <Separator />}
 
           <div className="pt-1 pb-2 space-y-1">
             {getTypeValues(item.dataKey, singleYearCalculatedAsset).map(
               (asset, i) => (
-                <div key={i} className="grid grid-cols-4 px-3">
-                  <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
+                <div key={i} className="flex items-center px-3">
+                  <p className="flex-grow text-tremor-content dark:text-dark-tremor-content col-span-2">
                     {asset.assetName}
                   </p>
-                  <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
+                  <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
                     {formatValue(asset.typeValue)}
                   </p>
-                  <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-auto">
-                    ({Math.floor((asset.typeValue / item.value) * 100)}%)
+                  <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
+                    ({((asset.typeValue / totalPayloadValue) * 100).toFixed(0)}
+                    %)
                   </p>
                 </div>
               )

@@ -38,8 +38,8 @@ export const BarTooltip = ({
 
   return (
     <div className="w-56 rounded-tremor-default text-tremor-default bg-tremor-background dark:bg-dark-tremor-background-muted shadow-tremor-dropdown border border-tremor-border dark:border dark:border-dark-tremor-border">
-      <div className="grid grid-cols-4 py-2 px-3">
-        <div className="flex items-center space-x-1 col-span-3">
+      <div className="flex items-center py-2 px-3">
+        <div className="flex items-center space-x-1">
           <span className="w-2 h-2 rounded-full bg-indigo-500" />
           <p className=" text-tremor-content dark:text-dark-tremor-background-emphasis font-semibold">
             {payload[0]?.payload.category}
@@ -53,15 +53,15 @@ export const BarTooltip = ({
       <Separator />
       <div className="py-2 space-y-1">
         {getTypeValues(singleYearCalculatedAsset).map((item, idx) => (
-          <div key={idx} className="grid grid-cols-4 px-3">
-            <p className="text-tremor-content dark:text-dark-tremor-content col-span-2">
+          <div key={idx} className="flex items-center px-3">
+            <p className="flex-grow text-tremor-content dark:text-dark-tremor-content col-span-2">
               {item.name}
             </p>
             <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis ml-auto">
               {formatValue(item.value)}
             </p>
-            <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-2">
-              ({Math.floor((item.value / totalValue) * 100)}%)
+            <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
+              ({((item.value / totalValue) * 100).toFixed(0)}%)
             </p>
           </div>
         ))}

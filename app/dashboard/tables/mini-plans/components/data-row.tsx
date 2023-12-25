@@ -1,20 +1,21 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { flexRender } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { Row } from "@tanstack/react-table";
 
-interface DataRowProps {
-  row: any;
+interface DataRowProps<TData> {
+  row: Row<TData>;
   yearSelected: any;
   activePlans: any;
   table: any;
 }
 
-export function DataRow({
+export function DataRow<TData>({
   row,
   yearSelected,
   activePlans,
   table,
-}: DataRowProps) {
+}: DataRowProps<TData>) {
   const tf: number = row.getValue("time");
   const [highlight, setHighlight] = useState(false);
 
@@ -35,7 +36,7 @@ export function DataRow({
         activePlans && "cursor-pointer"
       }`}
       onClick={() => {
-        if (activePlans) {
+        if (activePlans && (!yearSelected || row.getIsSelected())) {
           table.resetRowSelection(false);
           row.toggleSelected(!row.getIsSelected());
         }

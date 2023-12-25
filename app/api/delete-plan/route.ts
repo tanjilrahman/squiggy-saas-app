@@ -2,13 +2,20 @@ import { db } from "@/db";
 import { auth } from "@clerk/nextjs";
 import { NextRequest } from "next/server";
 
+type RequestType = {
+  planId: string;
+  type: string;
+  itemId: string;
+  assetIds: string[];
+};
+
 export async function POST(request: NextRequest) {
   const { userId } = auth();
-  const { planId, type, itemId } = await request.json();
+  const { planId, type, itemId, assetIds }: RequestType = await request.json();
 
   if (!userId) return Response.json({ code: "UNAUTHORIZED" }, { status: 401 });
 
-  // Check if the user have this asset
+  // Check if the user has this plan
 
   const hasPlan = await db.user.findFirst({
     where: {
@@ -33,8 +40,22 @@ export async function POST(request: NextRequest) {
       .catch((e) => {
         return Response.json({ code: "NOT FOUND" }, { status: 404 });
       });
+
+    // Delete associated assets
+    if (assetIds) {
+      await db.asset
+        .deleteMany({
+          where: {
+            id: { in: assetIds },
+          },
+        })
+        .catch((e) => {
+          return Response.json({ code: "NOT FOUND" }, { status: 404 });
+        });
+    }
   }
-  if (type === "action" && itemId) {
+
+  if (type === "action") {
     await db.action
       .delete({
         where: {
@@ -44,6 +65,19 @@ export async function POST(request: NextRequest) {
       .catch((e) => {
         return Response.json({ code: "NOT FOUND" }, { status: 404 });
       });
+
+    // Delete associated assets
+    if (assetIds) {
+      await db.asset
+        .deleteMany({
+          where: {
+            id: { in: assetIds },
+          },
+        })
+        .catch((e) => {
+          return Response.json({ code: "NOT FOUND" }, { status: 404 });
+        });
+    }
   }
 
   return Response.json({ success: true });

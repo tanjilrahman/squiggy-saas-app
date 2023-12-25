@@ -41,10 +41,11 @@ export default function StackedBarChart() {
 
   return (
     <Card className="z-10">
-      <Title className="flex justify-between items-center">
-        <span>Margin</span>
+      <div className="flex justify-between items-center">
+        <Title>Margin</Title>
         <DashboardAlert />
-      </Title>
+      </div>
+
       <Subtitle>Some text to add</Subtitle>
       <BarChart
         className="mt-4 h-80"

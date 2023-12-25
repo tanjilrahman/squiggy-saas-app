@@ -108,10 +108,10 @@ export default function AreaChart() {
   }, [startTime, areaChartKey]);
   return (
     <Card>
-      <Title className="flex justify-between items-center">
-        <span>Prognosis</span>
+      <div className="flex justify-between items-center">
+        <Title>Prognosis</Title>
         <DashboardAlert />
-      </Title>
+      </div>
       <Subtitle>Some text to add</Subtitle>
       <AC
         key={areaChartKey}

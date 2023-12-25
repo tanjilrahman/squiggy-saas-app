@@ -14,7 +14,9 @@ interface ColumnDetailsAssetsInProps<TData> {
 function ColumnDetailsAssetsIn<TData>({
   row,
 }: ColumnDetailsAssetsInProps<TData>) {
-  const [value, setValue] = useState<string[]>(row.getValue("assetsIn"));
+  const [assetsInIds, setAssetsInIds] = useState<string[]>(
+    row.getValue("assetsIn")
+  );
   const [status, setStatus] = useState<string | null>(null);
   const { removeAsset } = useAssetStore();
   const [estValue, setEstValue] = useState(0);
@@ -23,7 +25,7 @@ function ColumnDetailsAssetsIn<TData>({
   const { expanded, isEditable } = usePlanExpandedState();
 
   useEffect(() => {
-    setValue(row.getValue("assetsIn"));
+    setAssetsInIds(row.getValue("assetsIn"));
   }, [plans]);
 
   const handleRemoveWithAsset = async (assetId: string) => {
@@ -55,19 +57,28 @@ function ColumnDetailsAssetsIn<TData>({
   };
 
   useEffect(() => {
-    const totalValue = value.reduce((sum, assetin) => {
-      const assetValue = assets.find((asset) => asset.id === assetin)?.value;
+    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
+      const asset = assets.find((a) => a.id === assetId);
+      const actionAssetId = asset?.action_asset;
+      const targetAsset = assets.find((a) => a.id === actionAssetId);
+      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
 
-      return assetValue! + sum;
+      return sum + assetInValue;
     }, 0);
 
-    setEstValue(totalValue);
-  }, [value]);
+    setEstValue(assetsInTotalValue);
+  }, [assetsInIds]);
 
   return (
     <div className="w-[240px]">
-      {value?.map((assetId) => {
+      {assetsInIds?.map((assetId) => {
         const asset = assets.find((asset) => asset.id === assetId);
+        const targetAsset = assets.find(
+          (asset) =>
+            asset.id ===
+            assets.find((asset) => asset.id === assetId)?.action_asset
+        );
+        const assetInValue = (targetAsset?.value || 0) - asset?.value!;
         return (
           <div key={assetId} className="flex items-center space-x-2 mb-2">
             <div
@@ -77,7 +88,7 @@ function ColumnDetailsAssetsIn<TData>({
             >
               {asset?.name}
               <span className="text-muted-foreground ml-1">
-                ({formatValue(asset?.value!)})
+                ({formatValue(assetInValue)})
               </span>
             </div>
             {isEditable && (
@@ -109,7 +120,7 @@ function ColumnDetailsAssetsIn<TData>({
               <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
             </Button>
           </DetailsAssetsInDialog>
-          {value.length > 0 && (
+          {assetsInIds.length > 0 && (
             <p className="mt-4 text-muted-foreground">
               Est. value: {formatValue(estValue)}
             </p>

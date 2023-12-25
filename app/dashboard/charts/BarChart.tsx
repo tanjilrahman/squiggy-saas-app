@@ -22,7 +22,7 @@ import {
 } from "@tremor/react";
 import { useEffect } from "react";
 import { BarTooltip } from "./lib/BarTooltip";
-import { usePlanStore, useSelectedMiniPlanStore } from "@/store/planStore";
+import { usePlanStore } from "@/store/planStore";
 import DashboardAlert from "../components/DashboardAlert";
 
 type EventPropsWithChartData = EventProps & BarChartData;
@@ -35,13 +35,7 @@ export default function BarChart() {
     useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
-  const {
-    yearSelected,
-    areaChartKey,
-    setYearSelected,
-    setAreaChartData,
-    setAreaChartKey,
-  } = useAreaChartDataStore();
+  const { yearSelected, setAreaChartData } = useAreaChartDataStore();
 
   useEffect(() => {
     const pureAssets = assets.filter((asset) => !asset.action_asset);
@@ -95,10 +89,11 @@ export default function BarChart() {
 
   return (
     <Card className="z-10">
-      <Title className="flex justify-between items-center">
-        <span>Assets</span>
+      <div className="flex justify-between items-center">
+        <Title>Assets</Title>
         <DashboardAlert />
-      </Title>
+      </div>
+
       <Subtitle>Some text to add</Subtitle>
 
       <BC

@@ -16,7 +16,7 @@ function ColumnDetailsAssetOut<TData>({
   const [value, setValue] = useState<string>(row.getValue("assetOut"));
   const { removeAsset } = useAssetStore();
   const [status, setStatus] = useState<string | null>(null);
-  const [assetInValue, setAssetInValue] = useState<string[]>(
+  const [assetsInIds, setAssetsInIds] = useState<string[]>(
     row.getValue("assetsIn")
   );
   const [tradeOff, setTradeOff] = useState(0);
@@ -26,12 +26,11 @@ function ColumnDetailsAssetOut<TData>({
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
 
-  const asset = assets.find((asset) => asset.id === value);
+  const assetOut = assets.find((asset) => asset.id === value);
 
   useEffect(() => {
     setValue(row.getValue("assetOut"));
-    setAssetInValue(row.getValue("assetsIn"));
-    console.log(asset);
+    setAssetsInIds(row.getValue("assetsIn"));
   }, [plans]);
 
   const handleRemoveWithAsset = async (assetId: string) => {
@@ -63,13 +62,25 @@ function ColumnDetailsAssetOut<TData>({
   };
 
   useEffect(() => {
-    const totalValue = assetInValue.reduce((sum, assetin) => {
-      const assetValue = assets.find((asset) => asset.id === assetin)?.value;
+    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
+      const asset = assets.find((a) => a.id === assetId);
+      const actionAssetId = asset?.action_asset;
+      const targetAsset = assets.find((a) => a.id === actionAssetId);
+      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
 
-      return assetValue! + sum;
+      return sum + assetInValue;
     }, 0);
-    setTradeOff(((asset?.value || 0) / totalValue) * 100);
-  }, [value, assetInValue]);
+
+    const targetOutAsset = assets.find(
+      (asset) => asset.id === assetOut?.action_asset
+    );
+
+    setTradeOff(
+      (((assetOut?.value || 0) - (targetOutAsset?.value || 0)) /
+        assetsInTotalValue) *
+        100
+    );
+  }, [value, assetsInIds]);
 
   return (
     <div className="w-[220px]">
@@ -81,7 +92,7 @@ function ColumnDetailsAssetOut<TData>({
                 !isEditable && "border-transparent bg-transparent"
               } flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background`}
             >
-              {asset?.name}
+              {assetOut?.name}
             </div>
             {isEditable && (
               <Button

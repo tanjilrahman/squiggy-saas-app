@@ -41,7 +41,6 @@ export const convertToStackedChartData = (
   inputData: Asset[],
   yearSelected: number | null
 ): StackedChartData[] => {
-  // Initialize objects to store income, cost, and margin totals by category type
   const incomeTotals: Totals = {};
   const costTotals: Totals = {};
 
@@ -49,9 +48,7 @@ export const convertToStackedChartData = (
     return input.charAt(0).toUpperCase() + input.slice(1);
   };
 
-  // Iterate through the input data and sum values by category type
   inputData.forEach((asset) => {
-    // Function to adjust values based on the percentage mode
     const adjustValue = (
       value: number,
       value_mode: "fixed" | "%",

@@ -35,19 +35,31 @@ function ActionAssetOutCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<number>(row.getValue("value"));
   const { assets } = useAssetStore();
-  const { plans } = usePlanStore();
+  const { plans, updateActionValue } = usePlanStore();
   const { expanded } = usePlanExpandedState();
 
   const plan = plans.find((plan) => plan.id === expanded);
   const action = plan?.actions.find(
     (action) => action.id === row.getValue("id")
   );
+
   const asset = assets.find((asset) => asset.id === action?.assetOut);
+  const targetAsset = assets.find(
+    (asset) =>
+      asset.id ===
+      assets.find((asset) => asset.id === action?.assetOut)?.action_asset
+  );
+
   useEffect(() => {
-    setValue(asset?.value || 0);
+    const newValue = (asset?.value || 0) - (targetAsset?.value || 0);
+    setValue(newValue);
   }, [plans]);
+
+  useEffect(() => {
+    updateActionValue(expanded!, row.getValue("id"), value);
+  }, [value]);
 
   return (
     <div className="flex w-[80px] px-3 py-2 border border-transparent">
@@ -57,17 +69,50 @@ function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function StatusCell<TData>({ row }: { row: Row<TData> }) {
-  const [status, setStatus] = useState("");
-  const { plans } = usePlanStore();
-  const plan = plans.find((plan) => plan.id === row.getValue("id"));
-  // row.original.profit = profit;
-  // useEffect(() => {
-  //   setProfit(calculateProfit(asset!));
-  //   row.original.profit = profit;
-  // }, [assets]);
+  const [status, setStatus] = useState<string>(row.getValue("status"));
+  const [assetOutId, setAssetOutId] = useState<string>(
+    row.getValue("assetOut")
+  );
+  const [assetsInIds, setAssetsInIds] = useState<string[]>(
+    row.getValue("assetsIn")
+  );
+  const { assets } = useAssetStore();
+  const { plans, updateActionStatus } = usePlanStore();
+  const { expanded } = usePlanExpandedState();
+
+  useEffect(() => {
+    setAssetOutId(row.getValue("assetOut"));
+    setAssetsInIds(row.getValue("assetsIn"));
+  }, [plans]);
+
+  useEffect(() => {
+    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
+      const asset = assets.find((a) => a.id === assetId);
+      const actionAssetId = asset?.action_asset;
+      const targetAsset = assets.find((a) => a.id === actionAssetId);
+      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
+
+      return sum + assetInValue;
+    }, 0);
+
+    const assetOut = assets.find((asset) => asset.id === assetOutId);
+
+    const targetOutAsset = assets.find(
+      (asset) => asset.id === assetOut?.action_asset
+    );
+
+    const assetOutValue = (assetOut?.value || 0) - (targetOutAsset?.value || 0);
+    const newStatus = assetsInTotalValue > assetOutValue ? "OK" : "At risk";
+    setStatus(newStatus);
+  }, [assetOutId, assetsInIds]);
+
+  useEffect(() => {
+    updateActionStatus(expanded!, row.getValue("id"), status);
+  }, [status]);
+
   return (
-    <div className="flex w-[60px] px-3 py-2 border border-transparent">
-      <span className="truncate font-medium">Ok</span>
+    <div className="flex w-[70px] px-3 py-2 border border-transparent">
+      <span className="truncate font-medium">{status}</span>
     </div>
   );
 }

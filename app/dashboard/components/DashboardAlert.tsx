@@ -17,26 +17,26 @@ function DashboardAlert() {
   return (
     <div className="flex justify-center">
       {yearSelected && (
-        <p className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
-          Assets from year - {yearSelected + 2023}{" "}
+        <div className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
+          <span>Assets from year - {yearSelected + 2023}</span>
           {!startTime && (
             <X
               onClick={handleResetAreaChart}
               className="h-4 w-4 ml-1 cursor-pointer hover:text-primary"
             />
           )}
-        </p>
+        </div>
       )}
       {selectedAssets.length > 0 && (
-        <p className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
-          Partial asset(s) selected
+        <div className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
+          <span>Partial asset(s) selected</span>
           {!startTime && (
             <X
               onClick={handleResetAreaChart}
               className="h-4 w-4 ml-1 cursor-pointer hover:text-primary"
             />
           )}
-        </p>
+        </div>
       )}
     </div>
   );

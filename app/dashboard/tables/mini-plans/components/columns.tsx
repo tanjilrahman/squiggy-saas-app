@@ -2,7 +2,7 @@
 
 import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePlanStore } from "@/store/planStore";
 import { Action } from "../../plans/data/schema";
 import ColumnName from "./column/column-name";
@@ -24,27 +24,21 @@ function ActionTimeCell<TData>({
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<number>(row.getValue("value"));
   const { plans } = usePlanStore();
-  const plan = plans.find((plan) => plan.id === row.getValue("id"));
-  // row.original.profit = profit;
-  // useEffect(() => {
-  //   setProfit(calculateProfit(asset!));
-  //   row.original.profit = profit;
-  // }, [assets]);
+  useEffect(() => {
+    setValue(row.getValue("value"));
+  }, [plans]);
   return <p className="truncate font-medium">{formatValue(value)}</p>;
 }
 
 function StatusCell<TData>({ row }: { row: Row<TData> }) {
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<string>(row.getValue("status"));
   const { plans } = usePlanStore();
-  const plan = plans.find((plan) => plan.id === row.getValue("id"));
-  // row.original.profit = profit;
-  // useEffect(() => {
-  //   setProfit(calculateProfit(asset!));
-  //   row.original.profit = profit;
-  // }, [assets]);
-  return <p className="truncate font-medium">Ok</p>;
+  useEffect(() => {
+    setStatus(row.getValue("status"));
+  }, [plans]);
+  return <p className="truncate font-medium">{status}</p>;
 }
 
 export const columns: ColumnDef<Action>[] = [
