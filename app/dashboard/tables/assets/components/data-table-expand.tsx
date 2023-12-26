@@ -33,9 +33,10 @@ import { ColumnDetailsCosts } from "./column-details/column-details-costs";
 import DataTableTextArea from "./data-table-textarea";
 import { Button } from "@/components/ui/button";
 import { Asset } from "../data/schema";
-import { AlertCircle, Check, Loader2, Route } from "lucide-react";
+import { AlertCircle, Check, Loader2, MoveRight, Route } from "lucide-react";
 import { ProfitAllocationCombobox } from "./profit-allocation-combobox";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { usePlanStore } from "@/store/planStore";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -53,12 +54,32 @@ export function DataTableExpand<TData extends Asset, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const { plans } = usePlanStore();
   const { assets } = useAssetStore();
   const { activePlans } = useCalculatedAssetStore();
   const { expanded, isEditable, setIsEditable } = useAssetExpandedState();
   const [status, setStatus] = React.useState<string | null>(null);
   const pureAssets = assets.filter((asset) => !asset.action_asset);
   const assetsData = activePlans ? assets : pureAssets;
+
+  const planOrigin = (assetId: string) => {
+    const allActions = plans.map((plan) => plan.actions).flat();
+    const action = allActions.find(
+      (action) =>
+        action.assetsIn.includes(assetId) || action.assetOut === assetId
+    );
+    const plan = plans.find((plan) =>
+      plan.actions.find((a) => a.id === action?.id)
+    );
+
+    return (
+      <div className="flex items-center space-x-2 text-muted-foreground">
+        <p>{plan?.name}</p>
+        <MoveRight className="w-4 h-4" />
+        <p>{action?.name}</p>
+      </div>
+    );
+  };
 
   React.useEffect(() => {
     if (isEditable === true) setStatus(null);
@@ -179,7 +200,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                               htmlFor="income"
                               className="text-gray-800 dark:text-gray-200"
                             >
-                              Incomes
+                              Revenues
                             </Label>
                             <DataTable
                               // @ts-ignore
@@ -192,7 +213,7 @@ export function DataTableExpand<TData extends Asset, TValue>({
                               htmlFor="income"
                               className="text-gray-800 dark:text-gray-200"
                             >
-                              Costs
+                              Expenses
                             </Label>
                             <DataTable
                               // @ts-ignore
@@ -211,9 +232,13 @@ export function DataTableExpand<TData extends Asset, TValue>({
                               assetId={row.getValue("id")}
                             />
                             {assetsData[row.index].action_asset && (
-                              <div className="flex items-center space-x-2">
-                                <Route className="w-4 h-4 text-indigo-500" />
-                                <span>Plan Asset</span>
+                              <div className="flex items-center space-x-3 h-10 px-4 py-2 ring-offset-background rounded-md bg-indigo-500/10">
+                                <div className="flex items-center space-x-2">
+                                  <Route className="w-4 h-4 text-indigo-500" />
+                                  <span>Scenario</span>
+                                </div>
+
+                                {planOrigin(assetsData[row.index].id)}
                               </div>
                             )}
                           </div>

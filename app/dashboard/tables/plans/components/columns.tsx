@@ -117,7 +117,7 @@ function DetailsHeader() {
       onClick={handleAddPlan}
     >
       <PlusCircle className="h-4 w-4" />
-      <span>Add Plan</span>
+      <span>Add Scenario</span>
     </Button>
   );
 }

@@ -117,7 +117,7 @@ function DashboardBody({
   return (
     <div>
       <Carousel className="w-full px-6 mx-auto" setApi={setApi}>
-        <div className="fixed z-10 transform -translate-x-1/2 top-6 left-1/2 ml-[10px]">
+        <div className="fixed z-10 transform -translate-x-1/2 top-6 left-1/2 ml-[18px]">
           <MenuBar nav={nav} />
         </div>
         <CarouselContent>

@@ -27,7 +27,7 @@ export default function StackedBarChart() {
 
   useEffect(() => {
     if (selectedAssets.length == 0) {
-      setSingleYearCalculatedAsset(activePlans ? assets : pureAssets);
+      setSingleYearCalculatedAsset(pureAssets);
     } else {
       setSingleYearCalculatedAsset(selectedAssets);
     }
@@ -42,7 +42,7 @@ export default function StackedBarChart() {
   return (
     <Card className="z-10">
       <div className="flex justify-between items-center">
-        <Title>Margin</Title>
+        <Title>Cashflow</Title>
         <DashboardAlert />
       </div>
 

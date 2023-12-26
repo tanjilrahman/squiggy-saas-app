@@ -239,14 +239,12 @@ export function addProfitsToCurrency(allAssets: Asset[][]): Asset[][] {
   return allAssets.map((scenario, targetAsset) => {
     return scenario.map((asset, targetYear) => {
       if (asset.category === "currency" && !asset.action_asset) {
-        const allocatedAssets = allAssets
-          .flat()
-          .filter(
-            (otherAsset, index) =>
-              index % scenario.length === targetYear &&
-              otherAsset.id !== asset.id &&
-              otherAsset.allocation === asset.id
-          );
+        const allocatedAssets = allAssets.flat().filter(
+          (otherAsset, index) =>
+            index % scenario.length === targetYear &&
+            // otherAsset.id !== asset.id &&
+            otherAsset.allocation === asset.id
+        );
 
         const totalProfit = allocatedAssets.reduce(
           (sum, otherAsset) => (sum += otherAsset.profit || 0),

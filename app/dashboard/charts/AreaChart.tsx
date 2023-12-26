@@ -11,7 +11,7 @@ import {
   Subtitle,
   Title,
 } from "@tremor/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import {
   useAreaChartDataStore,
@@ -40,21 +40,27 @@ export default function AreaChart() {
     yearSelected,
     setYearSelected,
   } = useAreaChartDataStore();
-  const { barChartdata, setBarChartData } = useBarChartDataStore();
+  const { setBarChartData } = useBarChartDataStore();
+  const [areaChartdataState, setAreaChartDataState] = useState<AreaChartData[]>(
+    []
+  );
 
   useEffect(() => {
     setAreaChartData(convertToAreaChartData(calculatedAssets));
     // console.log(areaChartData);
   }, [calculatedAssets]);
 
+  useEffect(() => {
+    setAreaChartDataState(areaChartdata);
+  }, [areaChartdata]);
+
   const onValueChange = (value: EventPropsWithChartData) => {
     const year = value?.year - 2023;
-    // console.log(year, value);
+
     setYearSelected(year ? year : null);
     const selectedYearAssets = calculatedAssets.map((assetYears) => {
       return assetYears.filter((_, i) => i === year);
     });
-    // console.log(selectedYearAssets);
 
     const pureAssets = assets.filter((asset) => !asset.action_asset);
     const selectedWithoutPlanAssets = selectedYearAssets
@@ -83,13 +89,8 @@ export default function AreaChart() {
       if (barChartActive) {
         assetsToConvert = selectedWithCategory;
       } else {
-        if (activePlans) {
-          assetsToConvert = assets;
-        } else {
-          assetsToConvert = pureAssets;
-        }
+        assetsToConvert = pureAssets;
       }
-      // console.log(selectedWithCategory);
     }
 
     setSingleYearCalculatedAsset(assetsToConvert);
@@ -118,13 +119,13 @@ export default function AreaChart() {
         className="mt-4"
         yAxisWidth={40}
         showAnimation={true}
-        data={areaChartdata}
+        data={areaChartdataState}
         index="year"
         categories={[
           "Total Asset Value",
-          "Total Income",
-          "Total Cost",
-          "Asset YOY Increase",
+          "Total Revenue",
+          "Total Expense",
+          "YOY Increase",
         ]}
         colors={["indigo", "cyan", "amber", "blue"]}
         valueFormatter={formatValue}

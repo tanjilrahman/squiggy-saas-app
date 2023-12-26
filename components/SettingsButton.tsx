@@ -12,11 +12,9 @@ import { Settings } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { useHorizonState } from "@/store/store";
 import { Switch } from "@tremor/react";
-import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function SettingsButton() {
   const { setYear, year } = useHorizonState();
-  const { setActivePlans, activePlans } = useCalculatedAssetStore();
 
   useEffect(() => {
     const storedYear = localStorage.getItem("selectedYear");
@@ -28,18 +26,6 @@ function SettingsButton() {
   const handleSetYear = (newYear: number) => {
     localStorage.setItem("selectedYear", String(newYear));
     setYear(newYear);
-  };
-
-  useEffect(() => {
-    const storedShow = localStorage.getItem("showActionAssets");
-    if (storedShow) {
-      setActivePlans(JSON.parse(storedShow));
-    }
-  }, [setActivePlans]);
-
-  const handleSetShow = (show: boolean) => {
-    localStorage.setItem("showActionAssets", String(show));
-    setActivePlans(show);
   };
 
   return (
@@ -74,11 +60,11 @@ function SettingsButton() {
 
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center justify-between text-sm">
-            <p>Plan Assets</p>
+            <p>Inflation</p>
             <Switch
-              checked={activePlans}
+              // checked={activePlans}
               color="indigo"
-              onChange={() => handleSetShow(!activePlans)}
+              // onChange={() => handleSetShow(!activePlans)}
             />
           </div>
         </DropdownMenuLabel>

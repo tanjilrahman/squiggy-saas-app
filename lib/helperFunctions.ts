@@ -104,9 +104,9 @@ export const convertToStackedChartData = (
 export interface AreaChartData {
   year: number;
   "Total Asset Value": number;
-  "Total Income": number;
-  "Total Cost": number;
-  "Asset YOY Increase": number;
+  "Total Revenue": number;
+  "Total Expense": number;
+  "YOY Increase": number;
 }
 
 export function convertToAreaChartData(
@@ -134,9 +134,9 @@ export function convertToAreaChartData(
     return {
       year,
       "Total Asset Value": totalAssetValue,
-      "Total Income": totalIncome,
-      "Total Cost": totalCost,
-      "Asset YOY Increase": assetYOYIncrease,
+      "Total Revenue": totalIncome,
+      "Total Expense": totalCost,
+      "YOY Increase": assetYOYIncrease,
     };
   });
 }

@@ -46,7 +46,7 @@ function ColumnDetailsAdd({
       onClick={handleAdd}
     >
       <PlusCircle className="h-4 w-4" />
-      <span>Add {type === "income" ? "Income" : "Cost"}</span>
+      <span>Add {type === "income" ? "Revenue" : "Expense"}</span>
     </Button>
   );
 }

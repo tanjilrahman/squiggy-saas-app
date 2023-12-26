@@ -20,7 +20,7 @@ import {
   Subtitle,
   Title,
 } from "@tremor/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BarTooltip } from "./lib/BarTooltip";
 import { usePlanStore } from "@/store/planStore";
 import DashboardAlert from "../components/DashboardAlert";
@@ -36,44 +36,75 @@ export default function BarChart() {
   const { selectedAssets } = useSelectedAssetStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
   const { yearSelected, setAreaChartData } = useAreaChartDataStore();
+  const [barChartdataState, setBarChartDataState] = useState<BarChartData[]>(
+    []
+  );
 
   useEffect(() => {
     const pureAssets = assets.filter((asset) => !asset.action_asset);
     if (selectedAssets.length == 0) {
-      setBarChartData(convertToChartData(activePlans ? assets : pureAssets));
+      setBarChartData(convertToChartData(pureAssets));
     } else {
       setBarChartData(convertToChartData(selectedAssets));
     }
   }, [assets, selectedAssets, activePlans]);
 
+  useEffect(() => {
+    setBarChartDataState(barChartdata);
+  }, [barChartdata]);
+
   const onValueChange = (value: EventPropsWithChartData) => {
     if (yearSelected) return;
-    const normalAssets = assets.filter((asset) => !asset.action_asset);
     const category = value?.category?.toLowerCase();
     if (category) {
       setBarChartActive(true);
     } else {
       setBarChartActive(false);
     }
-    // setActivePlans(false);
 
-    const filteredAssetsWithCategory = assets.filter(
+    const pureAssets = assets.filter((asset) => !asset.action_asset);
+    const pureAssetsWithCategory = assets.filter(
+      (asset) => !asset.action_asset && asset.category === category
+    );
+    const AssetsWithCategory = assets.filter(
       (asset) => asset.category === category
     );
 
+    const singleYearCalc = () => {
+      if (activePlans) {
+        if (category) {
+          return AssetsWithCategory;
+        } else {
+          return assets;
+        }
+      } else {
+        if (category) {
+          return pureAssetsWithCategory;
+        } else {
+          return pureAssets;
+        }
+      }
+    };
+
     const calculatedAssets = () => {
       if (activePlans) {
-        const filteredAsset = assets.filter((asset) =>
-          category ? asset.category === category : true
-        );
-        return filteredAsset.map((asset) =>
-          calculateAsset(asset, year, plans, assets)
-        );
+        if (category) {
+          return AssetsWithCategory.map((asset) =>
+            calculateAsset(asset, year, plans, assets)
+          );
+        } else {
+          return assets.map((asset) =>
+            calculateAsset(asset, year, plans, assets)
+          );
+        }
       } else {
-        const filteredPureAsset = assets.filter((asset) =>
-          !asset.action_asset && category ? asset.category === category : true
-        );
-        return filteredPureAsset.map((asset) => calculateAsset(asset, year));
+        if (category) {
+          return pureAssetsWithCategory.map((asset) =>
+            calculateAsset(asset, year)
+          );
+        } else {
+          return pureAssets.map((asset) => calculateAsset(asset, year));
+        }
       }
     };
 
@@ -81,9 +112,7 @@ export default function BarChart() {
       calculatedAssets()
     );
 
-    setSingleYearCalculatedAsset(
-      category ? filteredAssetsWithCategory : normalAssets
-    );
+    setSingleYearCalculatedAsset(singleYearCalc());
     setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
   };
 
@@ -98,7 +127,7 @@ export default function BarChart() {
 
       <BC
         className="mt-6"
-        data={barChartdata}
+        data={barChartdataState}
         index="category"
         categories={["Total value"]}
         colors={["indigo"]}

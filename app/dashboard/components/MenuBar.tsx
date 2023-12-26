@@ -69,7 +69,7 @@ function MenuBar({ nav }: { nav: navType }) {
                 active === "plans" && "text-indigo-500"
               }`}
             />
-            Plans
+            Scenarios
           </TabsTrigger>
         </TabsList>
       </Tabs>
