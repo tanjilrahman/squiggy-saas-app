@@ -59,7 +59,7 @@ export default function AreaChart() {
 
     setYearSelected(year ? year : null);
     const selectedYearAssets = calculatedAssets.map((assetYears) => {
-      return assetYears.filter((_, i) => i === year);
+      return assetYears.filter((_, i) => i === (year || 0));
     });
 
     const pureAssets = assets.filter((asset) => !asset.action_asset);
@@ -94,7 +94,9 @@ export default function AreaChart() {
     }
 
     setSingleYearCalculatedAsset(assetsToConvert);
-    setBarChartData(convertToChartData(assetsToConvert));
+    if (!barChartActive) {
+      setBarChartData(convertToChartData(assetsToConvert));
+    }
   };
 
   useEffect(() => {

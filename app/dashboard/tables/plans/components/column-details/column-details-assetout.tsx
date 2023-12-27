@@ -75,8 +75,10 @@ function ColumnDetailsAssetOut<TData>({
       (asset) => asset.id === assetOut?.action_asset
     );
 
+    const sameAsset = assetOut?.id === targetOutAsset?.id;
+
     setTradeOff(
-      (((assetOut?.value || 0) - (targetOutAsset?.value || 0)) /
+      (((assetOut?.value || 0) - (sameAsset ? 0 : targetOutAsset?.value || 0)) /
         assetsInTotalValue) *
         100
     );

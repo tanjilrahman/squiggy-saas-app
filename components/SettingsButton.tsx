@@ -12,9 +12,11 @@ import { Settings } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { useHorizonState } from "@/store/store";
 import { Switch } from "@tremor/react";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
 
 function SettingsButton() {
   const { setYear, year } = useHorizonState();
+  const { setActiveInflation, activeInflation } = useCalculatedAssetStore();
 
   useEffect(() => {
     const storedYear = localStorage.getItem("selectedYear");
@@ -26,6 +28,18 @@ function SettingsButton() {
   const handleSetYear = (newYear: number) => {
     localStorage.setItem("selectedYear", String(newYear));
     setYear(newYear);
+  };
+
+  useEffect(() => {
+    const storedShow = localStorage.getItem("inflation");
+    if (storedShow) {
+      setActiveInflation(JSON.parse(storedShow));
+    }
+  }, [setActiveInflation]);
+
+  const handleSetInflation = (show: boolean) => {
+    localStorage.setItem("inflation", String(show));
+    setActiveInflation(show);
   };
 
   return (
@@ -62,9 +76,9 @@ function SettingsButton() {
           <div className="flex items-center justify-between text-sm">
             <p>Inflation</p>
             <Switch
-              // checked={activePlans}
+              checked={activeInflation}
               color="indigo"
-              // onChange={() => handleSetShow(!activePlans)}
+              onChange={() => handleSetInflation(!activeInflation)}
             />
           </div>
         </DropdownMenuLabel>

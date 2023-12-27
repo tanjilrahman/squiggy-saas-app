@@ -32,10 +32,7 @@ function ColumnInflation<TData>({
 
   useEffect(() => {
     if (mode === "advanced") {
-      updateFunc(
-        row.getValue("id"),
-        inflationAdvanced![1] - inflationAdvanced![0]
-      );
+      updateFunc(row.getValue("id"), inflationAdvanced![0]);
     }
   }, [mode]);
 
@@ -44,11 +41,8 @@ function ColumnInflation<TData>({
       <div className="flex items-center w-[120px]">
         <Input
           id="yoy"
-          value={
-            mode === "advanced"
-              ? inflationAdvanced![1] - inflationAdvanced![0]
-              : value
-          }
+          type="number"
+          value={mode === "advanced" ? inflationAdvanced![0] : value}
           disabled={!isEditable || mode === "advanced"}
           onChange={(e) => {
             if (mode === "simple") {
@@ -59,8 +53,13 @@ function ColumnInflation<TData>({
           className={`${
             !inflationAdvanced &&
             "disabled:bg-transparent disabled:border-transparent"
-          } ${!isEditable ? "w-full" : "w-[80px]"} disabled:opacity-100`}
+          } ${
+            !isEditable ? "w-full" : "w-[60px]"
+          } disabled:opacity-100 border-r-0 rounded-r-none pr-0 text-right flex-grow`}
         />
+        <div className="h-10 py-2 pl-2 pr-3 text-sm leading-relaxed border border-l-0 rounded-md rounded-l-none border-input bg-background ring-offset-background">
+          %
+        </div>
         <InflationDialog planId={expanded!}>
           <TrendingUp
             className={`${
@@ -71,14 +70,12 @@ function ColumnInflation<TData>({
       </div>
     );
   return (
-    <div className="flex items-center w-[120px] px-3 py-2 border border-transparent">
+    <div className="flex items-center w-[120px] px-3 py-2 border border-transparent justify-end ml-auto">
+      {mode === "advanced" ? <p>{inflationAdvanced![0]}%</p> : <p>{value}%</p>}
       {mode === "advanced" ? (
-        <p>{inflationAdvanced![1] - inflationAdvanced![0]}%</p>
+        <TrendingUp className="w-5 h-5 ml-2 opacity-100" />
       ) : (
-        <p>{value}%</p>
-      )}
-      {mode === "advanced" && (
-        <TrendingUp className="opacity-100 h-5 w-5 ml-2" />
+        <TrendingUp className="w-5 h-5 ml-2 opacity-0" />
       )}
     </div>
   );

@@ -31,8 +31,12 @@ export default function BarChart() {
   const { assets } = useAssetStore();
   const { plans } = usePlanStore();
   const { year } = useHorizonState();
-  const { activePlans, setSingleYearCalculatedAsset, setBarChartActive } =
-    useCalculatedAssetStore();
+  const {
+    activePlans,
+    activeInflation,
+    setSingleYearCalculatedAsset,
+    setBarChartActive,
+  } = useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
   const { barChartdata, setBarChartData } = useBarChartDataStore();
   const { yearSelected, setAreaChartData } = useAreaChartDataStore();
@@ -90,11 +94,11 @@ export default function BarChart() {
       if (activePlans) {
         if (category) {
           return AssetsWithCategory.map((asset) =>
-            calculateAsset(asset, year, plans, assets)
+            calculateAsset(asset, year, plans, assets, activeInflation)
           );
         } else {
           return assets.map((asset) =>
-            calculateAsset(asset, year, plans, assets)
+            calculateAsset(asset, year, plans, assets, activeInflation)
           );
         }
       } else {

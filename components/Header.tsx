@@ -29,12 +29,16 @@ async function Header() {
         <div className="flex items-center justify-end space-x-4 ">
           {userId ? (
             <>
-              <p className="cursor-pointer hover:underline text-muted-foreground/60">
-                Leave feedback
-              </p>
-              <p className="cursor-pointer hover:underline text-muted-foreground/60">
-                Guide
-              </p>
+              <Link href="/hc">
+                <Button variant="link" className="px-0 text-muted-foreground">
+                  Leave feedback
+                </Button>
+              </Link>
+              <Link href="/guide">
+                <Button variant="link" className="px-0">
+                  Guide
+                </Button>
+              </Link>
               <SettingsButton />
             </>
           ) : (

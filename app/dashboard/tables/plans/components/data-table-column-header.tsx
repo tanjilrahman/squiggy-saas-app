@@ -19,12 +19,14 @@ interface DataTableColumnHeaderProps<TData, TValue>
   column: Column<TData, TValue>;
   title: string;
   sort?: boolean;
+  classNameButton?: string;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
   className,
+  classNameButton,
   sort = true,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
@@ -39,7 +41,10 @@ export function DataTableColumnHeader<TData, TValue>({
             <Button
               variant="ghost"
               size="sm"
-              className="-ml-3 h-8 data-[state=open]:bg-accent"
+              className={cn(
+                "-ml-3 h-8 data-[state=open]:bg-accent",
+                classNameButton
+              )}
             >
               <span>{title}</span>
               {column.getIsSorted() === "desc" ? (
@@ -64,7 +69,7 @@ export function DataTableColumnHeader<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <span>{title}</span>
+        <span className={cn("", classNameButton)}>{title}</span>
       )}
     </div>
   );

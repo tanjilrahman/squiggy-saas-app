@@ -43,7 +43,7 @@ export function DetailsAssetoutDialog({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<"%" | "fixed">("%");
   const [status, setStatus] = useState<string | null>(null);
-  const [allocation, setAllocation] = useState(0);
+  const [allocation, setAllocation] = useState(100);
   const plan = plans.find((plan) => plan.id === planId);
   const action = plan?.actions.find((action) => action.id === columnId);
 
@@ -141,6 +141,7 @@ export function DetailsAssetoutDialog({
 
   const handleCreate = () => {
     setActivePlans(true);
+    setOpen(false);
     scrollPrev();
 
     const newAssetId = uuid();

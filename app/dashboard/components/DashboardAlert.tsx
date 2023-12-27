@@ -15,7 +15,7 @@ function DashboardAlert() {
     setSelectedAssets([]);
   };
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center space-x-2">
       {yearSelected && (
         <div className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
           <span>Assets from year - {yearSelected + 2023}</span>

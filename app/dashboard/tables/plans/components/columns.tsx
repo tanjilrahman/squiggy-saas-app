@@ -75,14 +75,21 @@ function StatusCell<TData>({ row }: { row: Row<TData> }) {
   const [status, setStatus] = useState("");
   const { plans } = usePlanStore();
   const plan = plans.find((plan) => plan.id === row.getValue("id"));
-  // row.original.profit = profit;
-  // useEffect(() => {
-  //   setProfit(calculateProfit(asset!));
-  //   row.original.profit = profit;
-  // }, [assets]);
+
+  useEffect(() => {
+    const okStatus = plan?.actions.filter((action) => action.status === "OK");
+    const riskStatus = plan?.actions.filter(
+      (action) => action.status === "At risk"
+    );
+
+    const totalStatus =
+      (okStatus?.length || 0) >= (riskStatus?.length || 0) ? "OK" : "At risk";
+
+    setStatus(totalStatus);
+  }, [plans]);
   return (
-    <div className="flex w-[60px] space-x-2">
-      <span className="truncate font-medium">Ok</span>
+    <div className="flex w-[50px] space-x-2 justify-end ml-auto">
+      <span className="truncate font-medium">{status}</span>
     </div>
   );
 }
@@ -263,7 +270,8 @@ export const columns: ColumnDef<Plan>[] = [
       <DataTableColumnHeader
         column={column}
         title="Inflation"
-        className="translate-x-3"
+        className="-translate-x-6"
+        classNameButton="ml-auto"
       />
     ),
     cell: InflationCell,
@@ -274,7 +282,12 @@ export const columns: ColumnDef<Plan>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader
+        column={column}
+        title="Status"
+        className="translate-x-4"
+        classNameButton="ml-auto"
+      />
     ),
     cell: StatusCell,
     filterFn: (row, id, value) => {

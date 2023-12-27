@@ -39,6 +39,8 @@ export default function StackedBarChart() {
     );
   }, [singleYearCalculatedAsset]);
 
+  const onValueChange = () => {};
+
   return (
     <Card className="z-10">
       <div className="flex justify-between items-center">
@@ -58,13 +60,14 @@ export default function StackedBarChart() {
           "Sustain",
           "Invest",
           "Seed",
-          "Margin",
+          "Cashflow",
         ]}
         colors={["sky", "violet", "yellow", "slate", "pink", "lime", "orange"]}
         stack={true}
         valueFormatter={formatValue}
         yAxisWidth={40}
         showAnimation={true}
+        onValueChange={onValueChange}
         // @ts-ignore
         customTooltip={StackedBarTooltip}
       />

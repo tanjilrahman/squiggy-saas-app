@@ -19,7 +19,7 @@ function ColumnDetailsAssetsIn<TData>({
   );
   const [status, setStatus] = useState<string | null>(null);
   const { removeAsset } = useAssetStore();
-  const [estValue, setEstValue] = useState(0);
+  const [estValue, setEstValue] = useState(100);
   const { plans, removeActionAssetInId, updateActionAssetIn } = usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();

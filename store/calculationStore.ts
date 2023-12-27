@@ -6,7 +6,9 @@ type CalculatedAssetStore = {
   singleYearCalculatedAsset: Asset[];
   activePlans: boolean;
   barChartActive: boolean;
+  activeInflation: boolean;
   setBarChartActive: (barChartActive: boolean) => void;
+  setActiveInflation: (activeInflation: boolean) => void;
   setActivePlans: (activePlans: boolean) => void;
   setCalculatedAssets: (calculatedAssets: Asset[][]) => void;
   setSingleYearCalculatedAsset: (calculatedAsset: Asset[]) => void;
@@ -17,7 +19,9 @@ export const useCalculatedAssetStore = create<CalculatedAssetStore>((set) => ({
   singleYearCalculatedAsset: [],
   activePlans: true,
   barChartActive: false,
+  activeInflation: false,
   setBarChartActive: (barChartActive) => set({ barChartActive }),
+  setActiveInflation: (activeInflation) => set({ activeInflation }),
   setActivePlans: (activePlans) => set({ activePlans }),
   setCalculatedAssets: (calculatedAssets) => set({ calculatedAssets }),
   setSingleYearCalculatedAsset: (singleYearCalculatedAsset) =>

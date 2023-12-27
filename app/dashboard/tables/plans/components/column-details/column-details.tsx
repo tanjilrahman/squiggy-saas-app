@@ -46,14 +46,12 @@ function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
   );
 
   const asset = assets.find((asset) => asset.id === action?.assetOut);
-  const targetAsset = assets.find(
-    (asset) =>
-      asset.id ===
-      assets.find((asset) => asset.id === action?.assetOut)?.action_asset
-  );
+  const targetAsset = assets.find((a) => a.id === asset?.action_asset);
 
   useEffect(() => {
-    const newValue = (asset?.value || 0) - (targetAsset?.value || 0);
+    const sameAsset = asset?.id === targetAsset?.id;
+    const newValue =
+      (asset?.value || 0) - (sameAsset ? 0 : targetAsset?.value || 0);
     setValue(newValue);
   }, [plans]);
 

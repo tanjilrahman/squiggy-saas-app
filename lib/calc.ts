@@ -5,7 +5,8 @@ export function calculateAsset(
   initialAsset: Asset,
   years: number,
   plans?: Plan[],
-  assets?: Asset[]
+  assets?: Asset[],
+  activeInflation?: boolean
 ): Asset[] {
   // 1st year Asset Calculation
   const calculatedIncomes = initialAsset.incomes.map((income) => {
@@ -95,6 +96,25 @@ export function calculateAsset(
   for (let year = 1; year < years; year++) {
     const prevAsset = result[year - 1];
 
+    let inflation = 0;
+
+    if (activeInflation && plans && initialAsset.action_asset) {
+      const planForAssetsIn = plans?.find((plan) =>
+        plan.actions.find((action) => action.assetsIn.includes(initialAsset.id))
+      );
+      const planForAssetOut = plans?.find((plan) =>
+        plan.actions.find((action) => action.assetOut === initialAsset.id)
+      );
+      const plan = planForAssetsIn || planForAssetOut;
+
+      if (plan) {
+        inflation =
+          plan.inflation_mode === "simple"
+            ? (plan.inflation || 0) / 100
+            : (plan.inflation_advanced[year] || 0) / 100;
+      }
+    }
+
     const newIncomes = prevAsset.incomes.map((income) => {
       const initialIncome = initialAsset.incomes.find(
         (intialIncome) => intialIncome.id === income.id
@@ -118,8 +138,8 @@ export function calculateAsset(
 
       return {
         ...income,
-        value: newIncomeValue,
-        yoy_increase: yoyIncrease,
+        value: newIncomeValue - newIncomeValue * inflation,
+        yoy_increase: yoyIncrease - yoyIncrease * inflation,
       };
     });
 
@@ -145,8 +165,8 @@ export function calculateAsset(
 
       return {
         ...cost,
-        value: newCostValue,
-        yoy_increase: yoyIncrease,
+        value: newCostValue - newCostValue * inflation,
+        yoy_increase: yoyIncrease - yoyIncrease * inflation,
       };
     });
 
@@ -159,10 +179,12 @@ export function calculateAsset(
         ? prevAsset.yoy_advanced[year] || 0
         : ((prevAsset.yoy_advanced[year] || 0) / 100) * prevAsset.value;
 
+    const newAssetValue = prevAsset.value + prevAsset.yoy_increase!;
+
     const newAsset: Asset = {
       ...prevAsset,
-      value: prevAsset.value + prevAsset.yoy_increase!,
-      yoy_increase: newAssetYoy,
+      value: newAssetValue - newAssetValue * inflation,
+      yoy_increase: newAssetYoy - newAssetYoy * inflation,
       profit:
         newIncomes.reduce((sum, income) => sum + income.value, 0) -
         newCosts.reduce((sum, cost) => sum + cost.value, 0),

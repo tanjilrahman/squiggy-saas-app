@@ -42,7 +42,7 @@ function DashboardBody({
   const { selectedAssets } = useSelectedAssetStore();
   const { plans } = usePlanStore();
   const { selectedPlan } = useSelectedPlanStore();
-  const { activePlans, setCalculatedAssets, barChartActive } =
+  const { activePlans, activeInflation, setCalculatedAssets, barChartActive } =
     useCalculatedAssetStore();
   const { setPlans } = usePlanStore();
 
@@ -83,11 +83,11 @@ function DashboardBody({
               assetInIds.includes(asset.id)
             );
             return assetsIn.map((asset) =>
-              calculateAsset(asset, year, plans, assets)
+              calculateAsset(asset, year, plans, assets, activeInflation)
             );
           }
           return activeAssets.map((asset) =>
-            calculateAsset(asset, year, plans, assets)
+            calculateAsset(asset, year, plans, assets, activeInflation)
           );
         } else {
           return filteredPureAsset.map((asset) => calculateAsset(asset, year));
@@ -100,7 +100,15 @@ function DashboardBody({
 
       setCalculatedAssets(calculateAssetsWithAllocation);
     }
-  }, [assets, plans, year, activePlans, selectedPlan, selectedAssets]);
+  }, [
+    assets,
+    plans,
+    year,
+    activePlans,
+    activeInflation,
+    selectedPlan,
+    selectedAssets,
+  ]);
 
   useEffect(() => {
     if (!api) {
