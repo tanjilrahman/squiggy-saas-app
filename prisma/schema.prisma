@@ -35,8 +35,6 @@ model Asset {
   yoy_advanced Float[]
   yoy_type     String
   yoy_mode     String
-  profit       Int
-  roi          Int
   note         String
   allocation   String?
   createdAt    DateTime @default(now())
