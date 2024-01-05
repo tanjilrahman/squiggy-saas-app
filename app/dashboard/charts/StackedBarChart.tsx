@@ -41,7 +41,9 @@ export default function StackedBarChart() {
     );
   }, [singleYearCalculatedAsset]);
 
-  const onValueChange = () => {};
+  const onValueChange = () => {
+    console.log(stackedChartdata);
+  };
 
   return (
     <Card className="z-10">
@@ -51,6 +53,36 @@ export default function StackedBarChart() {
       </div>
 
       <Subtitle>Value in {user?.currency.toUpperCase()}</Subtitle>
+      <div className="flex items-center space-x-4 justify-end pt-4 px-4">
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#0ea5e9] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Passive</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#8b5cf6] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Mixed</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#eab308] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Active</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#64748b] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Sustain</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#ec4899] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Invest</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#84cc16] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Seed</p>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-[8px] h-[8px] bg-[#f97316] rounded-full" />
+          <p className="text-sm text-dark-tremor-content">Margin</p>
+        </div>
+      </div>
       <BarChart
         className="mt-4 h-80"
         data={stackedChartdata}
@@ -59,12 +91,23 @@ export default function StackedBarChart() {
           "Passive",
           "Mixed",
           "Active",
+          "",
           "Sustain",
           "Invest",
           "Seed",
           "Margin",
         ]}
-        colors={["sky", "violet", "yellow", "slate", "pink", "lime", "orange"]}
+        colors={[
+          "sky",
+          "violet",
+          "yellow",
+          "rgba(0,0,0,0)",
+          "slate",
+          "pink",
+          "lime",
+          "orange",
+        ]}
+        showLegend={false}
         stack={true}
         valueFormatter={formatValue}
         yAxisWidth={40}

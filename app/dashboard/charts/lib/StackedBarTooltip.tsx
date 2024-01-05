@@ -93,54 +93,58 @@ export const StackedBarTooltip = ({
 
   return (
     <div className="w-56 rounded-tremor-default text-tremor-default bg-tremor-background dark:bg-dark-tremor-background-muted shadow-tremor-dropdown border border-tremor-border dark:border dark:border-dark-tremor-border">
-      {payload.map((item, idx) => (
-        <div key={idx}>
-          <div className="flex items-center py-2 px-3">
-            <div className="flex flex-grow items-center space-x-1">
-              <svg
-                width="8"
-                height="8"
-                viewBox="0 0 8 8"
-                className={item.className}
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="4" cy="4" r="4" />
-              </svg>
-              <p className=" text-tremor-content dark:text-dark-tremor-background-emphasis font-semibold">
-                {item.dataKey}
+      {payload.map((item, idx) => {
+        if (item.dataKey === "") return;
+        return (
+          <div key={idx}>
+            <div className="flex items-center py-2 px-3">
+              <div className="flex flex-grow items-center space-x-1">
+                <svg
+                  width="8"
+                  height="8"
+                  viewBox="0 0 8 8"
+                  className={item.className}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="4" cy="4" r="4" />
+                </svg>
+                <p className=" text-tremor-content dark:text-dark-tremor-background-emphasis font-semibold">
+                  {item.dataKey}
+                </p>
+              </div>
+
+              <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                {formatValue(item.value)}
+              </p>
+              <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
+                ({((item.value / totalPayloadValue) * 100).toFixed(0)}%)
               </p>
             </div>
 
-            <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
-              {formatValue(item.value)}
-            </p>
-            <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
-              ({((item.value / totalPayloadValue) * 100).toFixed(0)}%)
-            </p>
-          </div>
+            {payload.length > 0 && <Separator />}
 
-          {payload.length > 0 && <Separator />}
-
-          <div className="pt-1 pb-2 space-y-1">
-            {getTypeValues(item.dataKey, singleYearCalculatedAsset).map(
-              (asset, i) => (
-                <div key={i} className="flex items-center px-3">
-                  <p className="flex-grow text-tremor-content dark:text-dark-tremor-content col-span-2">
-                    {asset.assetName}
-                  </p>
-                  <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
-                    {formatValue(asset.typeValue)}
-                  </p>
-                  <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
-                    ({((asset.typeValue / totalPayloadValue) * 100).toFixed(0)}
-                    %)
-                  </p>
-                </div>
-              )
-            )}
+            <div className="pt-1 pb-2 space-y-1">
+              {getTypeValues(item.dataKey, singleYearCalculatedAsset).map(
+                (asset, i) => (
+                  <div key={i} className="flex items-center px-3">
+                    <p className="flex-grow text-tremor-content dark:text-dark-tremor-content col-span-2">
+                      {asset.assetName}
+                    </p>
+                    <p className="font-medium text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis">
+                      {formatValue(asset.typeValue)}
+                    </p>
+                    <p className="font-medium text-tremor-content dark:text-dark-tremor-content ml-1">
+                      (
+                      {((asset.typeValue / totalPayloadValue) * 100).toFixed(0)}
+                      %)
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

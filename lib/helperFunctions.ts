@@ -94,7 +94,7 @@ export const convertToStackedChartData = (
   // Organize the data into the desired format
   const result: StackedChartData[] = [
     { index: "Revenues", ...incomeTotals },
-    { index: "Expenses", ...costTotals },
+    { index: "Expenses", "": margin, ...costTotals },
     { index: "Margin", Margin: margin },
   ];
 
