@@ -47,25 +47,41 @@ function SettingsButton() {
       <DropdownMenuTrigger className="rounded-full">
         <Settings className="text-muted-foreground hover:opacity-70 transition-opacity duration-150 cursor-pointer" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="" align="end" forceMount>
+      <DropdownMenuContent className=" w-52" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           Time Horizon
         </DropdownMenuLabel>
         <Tabs
           defaultValue={String(year)}
-          className="flex items-center space-x-2 mt-1"
+          className="items-center space-x-2 mt-1"
         >
-          <TabsList>
-            <TabsTrigger value="5" onClick={() => handleSetYear(5)}>
+          <TabsList className="w-full">
+            <TabsTrigger
+              className="w-full"
+              value="5"
+              onClick={() => handleSetYear(5)}
+            >
               5
             </TabsTrigger>
-            <TabsTrigger value="10" onClick={() => handleSetYear(10)}>
+            <TabsTrigger
+              className="w-full"
+              value="10"
+              onClick={() => handleSetYear(10)}
+            >
               10
             </TabsTrigger>
-            <TabsTrigger value="25" onClick={() => handleSetYear(25)}>
+            <TabsTrigger
+              className="w-full"
+              value="25"
+              onClick={() => handleSetYear(25)}
+            >
               25
             </TabsTrigger>
-            <TabsTrigger value="50" onClick={() => handleSetYear(50)}>
+            <TabsTrigger
+              className="w-full"
+              value="50"
+              onClick={() => handleSetYear(50)}
+            >
               50
             </TabsTrigger>
           </TabsList>
@@ -74,7 +90,7 @@ function SettingsButton() {
 
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center justify-between text-sm">
-            <p>Inflation</p>
+            <p>Inflation Adjustment</p>
             <Switch
               checked={activeInflation}
               color="indigo"
