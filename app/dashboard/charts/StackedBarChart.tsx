@@ -10,8 +10,10 @@ import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { StackedBarTooltip } from "./lib/StackedBarTooltip";
 import { useAreaChartDataStore } from "@/store/chartStore";
 import DashboardAlert from "../components/DashboardAlert";
+import { useUserState } from "@/store/store";
 
 export default function StackedBarChart() {
+  const { user } = useUserState();
   const { assets } = useAssetStore();
   const [stackedChartdata, setStackedChartData] = useState<StackedChartData[]>(
     []
@@ -48,7 +50,7 @@ export default function StackedBarChart() {
         <DashboardAlert />
       </div>
 
-      <Subtitle>Some text to add</Subtitle>
+      <Subtitle>Value in {user?.currency.toUpperCase()}</Subtitle>
       <BarChart
         className="mt-4 h-80"
         data={stackedChartdata}
@@ -60,7 +62,7 @@ export default function StackedBarChart() {
           "Sustain",
           "Invest",
           "Seed",
-          "Cashflow",
+          "Margin",
         ]}
         colors={["sky", "violet", "yellow", "slate", "pink", "lime", "orange"]}
         stack={true}

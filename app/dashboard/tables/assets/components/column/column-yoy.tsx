@@ -44,6 +44,7 @@ function ColumnYoy<TData>({ row, updateFunc }: ColumnYoyProps<TData>) {
         <Input
           id="yoy"
           type="number"
+          placeholder="0"
           value={mode === "advanced" ? yoyAdvanced![0] || "" : value || ""}
           disabled={!isEditable || mode === "advanced"}
           onChange={(e) => {

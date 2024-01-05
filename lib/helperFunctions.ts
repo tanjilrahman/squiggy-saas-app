@@ -95,7 +95,7 @@ export const convertToStackedChartData = (
   const result: StackedChartData[] = [
     { index: "Revenues", ...incomeTotals },
     { index: "Expenses", ...costTotals },
-    { index: "Cashflow", Cashflow: margin },
+    { index: "Margin", Margin: margin },
   ];
 
   return result;
@@ -113,22 +113,30 @@ export function convertToAreaChartData(
   calculatedAssets: Asset[][]
 ): AreaChartData[] {
   return calculatedAssets[0]?.map((_, index) => {
-    const year = 2023 + index; // Assuming the calculation starts from 2023
+    const currentYear = new Date().getFullYear();
+    const year = currentYear + index;
 
     const totalAssetValue = calculatedAssets
       .map((scenario) => scenario[index].value)
       .reduce((sum, value) => sum + value, 0);
 
     const totalIncome = calculatedAssets
-      .map((scenario) => scenario[index].incomes[0]?.value)
-      .reduce((sum, value) => sum + (value || 0), 0);
+      .map((scenario) =>
+        scenario[index].incomes.reduce(
+          (sum, income) => sum + (income?.value || 0),
+          0
+        )
+      )
+      .reduce((sum, value) => sum + value, 0);
 
     const totalCost = calculatedAssets
-      .map((scenario) => scenario[index].costs[0]?.value)
-      .reduce((sum, value) => sum + (value || 0), 0);
+      .map((scenario) =>
+        scenario[index].costs.reduce((sum, cost) => sum + (cost?.value || 0), 0)
+      )
+      .reduce((sum, value) => sum + value, 0);
 
     const assetYOYIncrease = calculatedAssets
-      .map((scenario) => scenario[index].yoy_increase!)
+      .map((scenario) => scenario[index].yoy_increase || 0)
       .reduce((sum, value) => sum + value, 0);
 
     return {

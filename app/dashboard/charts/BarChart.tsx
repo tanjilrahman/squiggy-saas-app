@@ -12,7 +12,7 @@ import {
   useAreaChartDataStore,
   useBarChartDataStore,
 } from "@/store/chartStore";
-import { useHorizonState } from "@/store/store";
+import { useHorizonState, useUserState } from "@/store/store";
 import {
   BarChart as BC,
   Card,
@@ -22,15 +22,17 @@ import {
 } from "@tremor/react";
 import { useEffect, useState } from "react";
 import { BarTooltip } from "./lib/BarTooltip";
-import { usePlanStore } from "@/store/planStore";
+import { usePlanStore, useSelectedPlanStore } from "@/store/planStore";
 import DashboardAlert from "../components/DashboardAlert";
 
 type EventPropsWithChartData = EventProps & BarChartData;
 
 export default function BarChart() {
+  const { user } = useUserState();
   const { assets } = useAssetStore();
   const { plans } = usePlanStore();
   const { year } = useHorizonState();
+  const { selectedPlan } = useSelectedPlanStore();
   const {
     activePlans,
     activeInflation,
@@ -38,7 +40,7 @@ export default function BarChart() {
     setBarChartActive,
   } = useCalculatedAssetStore();
   const { selectedAssets } = useSelectedAssetStore();
-  const { barChartdata, setBarChartData } = useBarChartDataStore();
+  const { barChartdata, barChartKey, setBarChartData } = useBarChartDataStore();
   const { yearSelected, setAreaChartData } = useAreaChartDataStore();
   const [barChartdataState, setBarChartDataState] = useState<BarChartData[]>(
     []
@@ -60,6 +62,7 @@ export default function BarChart() {
   const onValueChange = (value: EventPropsWithChartData) => {
     if (yearSelected) return;
     const category = value?.category?.toLowerCase();
+    console.log(category);
     if (category) {
       setBarChartActive(true);
     } else {
@@ -93,13 +96,35 @@ export default function BarChart() {
     const calculatedAssets = () => {
       if (activePlans) {
         if (category) {
-          return AssetsWithCategory.map((asset) =>
-            calculateAsset(asset, year, plans, assets, activeInflation)
-          );
+          if (selectedPlan) {
+            return AssetsWithCategory.map((asset) =>
+              calculateAsset(
+                asset,
+                year,
+                [selectedPlan],
+                selectedPlan,
+                activeInflation
+              )
+            );
+          } else {
+            return AssetsWithCategory.map((asset) =>
+              calculateAsset(asset, year, plans)
+            );
+          }
         } else {
-          return assets.map((asset) =>
-            calculateAsset(asset, year, plans, assets, activeInflation)
-          );
+          if (selectedPlan) {
+            return assets.map((asset) =>
+              calculateAsset(
+                asset,
+                year,
+                [selectedPlan],
+                selectedPlan,
+                activeInflation
+              )
+            );
+          } else {
+            return assets.map((asset) => calculateAsset(asset, year, plans));
+          }
         }
       } else {
         if (category) {
@@ -112,13 +137,37 @@ export default function BarChart() {
       }
     };
 
+    const calculateAltAssets = assets.map((asset) =>
+      calculateAsset(
+        asset,
+        year,
+        activePlans ? plans : null,
+        selectedPlan ? selectedPlan : null,
+        activeInflation ? activeInflation : null
+      )
+    );
+
     const calculateAssetsWithAllocation = addProfitsToCurrency(
-      calculatedAssets()
+      calculatedAssets(),
+      category === "currency" ? calculateAltAssets : null,
+      activePlans ? plans : null,
+      selectedPlan ? selectedPlan : null,
+      activeInflation ? activeInflation : null
     );
 
     setSingleYearCalculatedAsset(singleYearCalc());
     setAreaChartData(convertToAreaChartData(calculateAssetsWithAllocation));
+    console.log(calculateAssetsWithAllocation);
   };
+
+  useEffect(() => {
+    onValueChange({
+      "Total value": 0,
+      category: "",
+      categoryClicked: "",
+      eventType: "category",
+    });
+  }, [barChartKey]);
 
   return (
     <Card className="z-10">
@@ -127,9 +176,10 @@ export default function BarChart() {
         <DashboardAlert />
       </div>
 
-      <Subtitle>Some text to add</Subtitle>
+      <Subtitle>Value in {user?.currency.toUpperCase()}</Subtitle>
 
       <BC
+        key={barChartKey}
         className="mt-6"
         data={barChartdataState}
         index="category"

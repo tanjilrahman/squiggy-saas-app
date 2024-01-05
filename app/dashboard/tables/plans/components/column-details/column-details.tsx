@@ -6,7 +6,7 @@ import ColumnDetailsName from "./column-details-name";
 import ColumnDetailsAdd from "./column-details-add";
 import ColumnDetailsDelete from "./column-details-delete";
 import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
-import { Plan } from "../../data/schema";
+import { ActionAsset, Plan } from "../../data/schema";
 import { useEffect, useState } from "react";
 import { formatValue } from "@/lib/helperFunctions";
 import ColumnDetailsAssetsIn from "./column-details-assetsin";
@@ -35,7 +35,7 @@ function ActionAssetOutCell<TData>({ row }: { row: Row<TData> }) {
 }
 
 function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
-  const [value, setValue] = useState<number>(row.getValue("value"));
+  const [value, setValue] = useState(0);
   const { assets } = useAssetStore();
   const { plans, updateActionValue } = usePlanStore();
   const { expanded } = usePlanExpandedState();
@@ -44,20 +44,26 @@ function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
   const action = plan?.actions.find(
     (action) => action.id === row.getValue("id")
   );
-
-  const asset = assets.find((asset) => asset.id === action?.assetOut);
-  const targetAsset = assets.find((a) => a.id === asset?.action_asset);
-
-  useEffect(() => {
-    const sameAsset = asset?.id === targetAsset?.id;
-    const newValue =
-      (asset?.value || 0) - (sameAsset ? 0 : targetAsset?.value || 0);
-    setValue(newValue);
-  }, [plans]);
+  const asset = assets.find((asset) => asset.id === action?.assetOut?.assetId);
 
   useEffect(() => {
     updateActionValue(expanded!, row.getValue("id"), value);
   }, [value]);
+
+  useEffect(() => {
+    if (asset) {
+      const allocation = asset?.action_asset
+        ? 100
+        : action?.assetOut?.allocation || 0;
+      const increaseValue =
+        action?.assetOut?.type === "%"
+          ? asset?.value * (allocation / 100)
+          : allocation;
+      setValue(increaseValue || 0);
+    } else {
+      setValue(0);
+    }
+  }, [plans, assets]);
 
   return (
     <div className="flex w-[80px] px-3 py-2 border border-transparent">
@@ -68,10 +74,10 @@ function ActionValueCell<TData>({ row }: { row: Row<TData> }) {
 
 function StatusCell<TData>({ row }: { row: Row<TData> }) {
   const [status, setStatus] = useState<string>(row.getValue("status"));
-  const [assetOutId, setAssetOutId] = useState<string>(
+  const [assetOut, setAssetOut] = useState<ActionAsset>(
     row.getValue("assetOut")
   );
-  const [assetsInIds, setAssetsInIds] = useState<string[]>(
+  const [assetsIn, setAssetsIn] = useState<ActionAsset[]>(
     row.getValue("assetsIn")
   );
   const { assets } = useAssetStore();
@@ -79,30 +85,34 @@ function StatusCell<TData>({ row }: { row: Row<TData> }) {
   const { expanded } = usePlanExpandedState();
 
   useEffect(() => {
-    setAssetOutId(row.getValue("assetOut"));
-    setAssetsInIds(row.getValue("assetsIn"));
+    setAssetOut(row.getValue("assetOut"));
+    setAssetsIn(row.getValue("assetsIn"));
   }, [plans]);
 
   useEffect(() => {
-    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
-      const asset = assets.find((a) => a.id === assetId);
-      const actionAssetId = asset?.action_asset;
-      const targetAsset = assets.find((a) => a.id === actionAssetId);
-      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
-
-      return sum + assetInValue;
+    const totalAssetInValue = assetsIn?.reduce((sum, assetin) => {
+      const assetValue = assets.find(
+        (asset) => asset.id === assetin.assetId
+      )?.value;
+      const est =
+        assetin?.type === "%"
+          ? (assetValue || 0) * (assetin.allocation / 100)
+          : assetin?.allocation;
+      return est + sum;
     }, 0);
 
-    const assetOut = assets.find((asset) => asset.id === assetOutId);
+    const asset = assets.find((asset) => asset.id === assetOut?.assetId);
 
-    const targetOutAsset = assets.find(
-      (asset) => asset.id === assetOut?.action_asset
-    );
+    const allocation = asset?.action_asset ? 100 : assetOut?.allocation;
 
-    const assetOutValue = (assetOut?.value || 0) - (targetOutAsset?.value || 0);
-    const newStatus = assetsInTotalValue > assetOutValue ? "OK" : "At risk";
+    const assetOutValue =
+      assetOut?.type === "%"
+        ? (asset?.value || 0) * (allocation / 100)
+        : allocation;
+
+    const newStatus = assetOutValue > totalAssetInValue ? "OK" : "At risk";
     setStatus(newStatus);
-  }, [assetOutId, assetsInIds]);
+  }, [assetOut, assetsIn]);
 
   useEffect(() => {
     updateActionStatus(expanded!, row.getValue("id"), status);

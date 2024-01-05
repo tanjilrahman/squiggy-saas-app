@@ -1,31 +1,19 @@
-import {
-  BarChartData,
-  StackedChartData,
-  AreaChartData,
-} from "@/lib/helperFunctions";
+import { BarChartData, AreaChartData } from "@/lib/helperFunctions";
 import { create } from "zustand";
 
 type BarChartDataStore = {
   barChartdata: BarChartData[];
+  barChartKey: number;
+  setBarChartKey: (key: number) => void;
   setBarChartData: (barChartdata: BarChartData[]) => void;
 };
 
 export const useBarChartDataStore = create<BarChartDataStore>((set) => ({
   barChartdata: [],
+  barChartKey: 0,
+  setBarChartKey: (barChartKey) => set({ barChartKey }),
   setBarChartData: (barChartdata) => set({ barChartdata }),
 }));
-
-// type StackedChartDataStore = {
-//   stackedChartdata: StackedChartData[];
-//   setStackedChartData: (stackedChartdata: StackedChartData[]) => void;
-// };
-
-// export const useStackedChartDataStore = create<StackedChartDataStore>(
-//   (set) => ({
-//     stackedChartdata: [],
-//     setStackedChartData: (stackedChartdata) => set({ stackedChartdata }),
-//   })
-// );
 
 type AreaChartDataStore = {
   areaChartdata: AreaChartData[];

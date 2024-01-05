@@ -1,4 +1,8 @@
-import { Plan, Action } from "@/app/dashboard/tables/plans/data/schema";
+import {
+  Plan,
+  Action,
+  ActionAsset,
+} from "@/app/dashboard/tables/plans/data/schema";
 import { create } from "zustand";
 
 type PlanExpandedState = {
@@ -17,7 +21,7 @@ export const usePlanExpandedState = create<PlanExpandedState>((set) => ({
 
 type SelectedPlanStore = {
   selectedPlan: Plan | null;
-  setSelectedPlan: (plan: Plan) => void;
+  setSelectedPlan: (plan: Plan | null) => void;
 };
 
 export const useSelectedPlanStore = create<SelectedPlanStore>((set) => ({
@@ -65,23 +69,15 @@ type PlanStore = {
   updateActionAssetIn: (
     planId: string,
     actionId: string,
-    newAssetIn: string
+    newAssetIn: ActionAsset
   ) => void;
   updateActionAssetOut: (
     planId: string,
     actionId: string,
-    newAssetOut: string
+    newAssetOut: ActionAsset
   ) => void;
-  removeActionAssetInId: (
-    planId: string,
-    actionId: string,
-    assetInId: string
-  ) => void;
-  removeActionAssetOutId: (
-    planId: string,
-    actionId: string,
-    assetOutId: string
-  ) => void;
+  removeActionAssetInId: (planId: string, actionId: string, id: string) => void;
+  removeActionAssetOutId: (planId: string, actionId: string) => void;
   updateActionValue: (
     planId: string,
     actionId: string,
@@ -253,7 +249,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
     }));
   },
 
-  removeActionAssetInId: (planId, actionId, assetInId) => {
+  removeActionAssetInId: (planId, actionId, id) => {
     set((state) => ({
       plans: state.plans.map((plan) =>
         plan.id === planId
@@ -264,7 +260,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
                   ? {
                       ...action,
                       assetsIn: action.assetsIn.filter(
-                        (asset) => asset !== assetInId
+                        (asset) => asset.id !== id
                       ),
                     }
                   : action
@@ -275,7 +271,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
     }));
   },
 
-  removeActionAssetOutId: (planId, actionId, assetOutId) => {
+  removeActionAssetOutId: (planId, actionId) => {
     set((state) => ({
       plans: state.plans.map((plan) =>
         plan.id === planId
@@ -285,7 +281,7 @@ export const usePlanStore = create<PlanStore>((set) => ({
                 action.id === actionId
                   ? {
                       ...action,
-                      assetOut: "",
+                      assetOut: null,
                     }
                   : action
               ),

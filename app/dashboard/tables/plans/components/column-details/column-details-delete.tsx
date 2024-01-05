@@ -3,8 +3,7 @@ import React from "react";
 import { DataTableRemove } from "../data-table-remove";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { usePlanExpandedState, usePlanStore } from "@/store/planStore";
-import { useAssetStore } from "@/store/assetStore";
+import { usePlanExpandedState } from "@/store/planStore";
 
 interface ColumnDetailsDeleteProps<TData> {
   row: Row<TData>;
@@ -15,34 +14,22 @@ function ColumnDetailsDelete<TData>({
   row,
   updateFunc,
 }: ColumnDetailsDeleteProps<TData>) {
-  const { plans } = usePlanStore();
   const { expanded, isEditable } = usePlanExpandedState();
-  const { removeAsset } = useAssetStore();
 
   const handleRemove = async () => {
-    const actionId: string = row.getValue("id");
-    const plan = plans.find((plan) => expanded === plan.id);
-    const action = plan?.actions.find((action) => actionId === action.id);
-    const assetIds = action?.assetsIn;
-
-    if (action?.assetOut) {
-      assetIds?.push(action.assetOut);
-    }
-
     try {
       const response = await fetch("/api/delete-plan", {
         method: "POST",
-        body: JSON.stringify({ type: "action", itemId: actionId, assetIds }),
+        body: JSON.stringify({ type: "action", itemId: row.getValue("id") }),
       });
 
       const { success, code } = await response.json();
       if (success) {
         console.log("success");
-        assetIds?.forEach((assetId) => removeAsset(assetId));
-        updateFunc(expanded!, actionId);
+        updateFunc(expanded!, row.getValue("id"));
       }
       if (code === "NOT FOUND") {
-        updateFunc(expanded!, actionId);
+        updateFunc(expanded!, row.getValue("id"));
       }
     } catch (err: any) {
       if (err.data?.code === "UNAUTHORIZED") {

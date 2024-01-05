@@ -20,10 +20,12 @@ import {
 import { useAssetStore } from "@/store/assetStore";
 import { useSelectedMiniPlanStore } from "@/store/planStore";
 import DashboardAlert from "../components/DashboardAlert";
+import { useUserState } from "@/store/store";
 
 type EventPropsWithChartData = EventProps & AreaChartData;
 
 export default function AreaChart() {
+  const { user } = useUserState();
   const { assets } = useAssetStore();
   const { startTime } = useSelectedMiniPlanStore();
   const {
@@ -44,6 +46,7 @@ export default function AreaChart() {
   const [areaChartdataState, setAreaChartDataState] = useState<AreaChartData[]>(
     []
   );
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     setAreaChartData(convertToAreaChartData(calculatedAssets));
@@ -55,7 +58,7 @@ export default function AreaChart() {
   }, [areaChartdata]);
 
   const onValueChange = (value: EventPropsWithChartData) => {
-    const year = value?.year - 2023;
+    const year = value?.year - currentYear;
 
     setYearSelected(year ? year : null);
     const selectedYearAssets = calculatedAssets.map((assetYears) => {
@@ -102,11 +105,11 @@ export default function AreaChart() {
   useEffect(() => {
     if (startTime && !yearSelected) {
       // @ts-ignore
-      onValueChange({ year: 2023 + startTime });
+      onValueChange({ year: currentYear + startTime });
     }
     if (startTime === null) {
       // @ts-ignore
-      onValueChange({ year: 2023 + 0 });
+      onValueChange({ year: currentYear + 0 });
     }
   }, [startTime, areaChartKey]);
   return (
@@ -115,7 +118,7 @@ export default function AreaChart() {
         <Title>Prognosis</Title>
         <DashboardAlert />
       </div>
-      <Subtitle>Some text to add</Subtitle>
+      <Subtitle>Value in {user?.currency.toUpperCase()}</Subtitle>
       <AC
         key={areaChartKey}
         className="mt-4"

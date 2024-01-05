@@ -21,12 +21,13 @@ import { formatNumericValue } from "@/lib/helperFunctions";
 import { AllocationTypeCombobox } from "../allocation-type-combobox";
 import { useCalculatedAssetStore } from "@/store/calculationStore";
 import { useCarousel } from "@/components/ui/carousel";
+import { ActionAsset } from "../../data/schema";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
   planId: string;
   columnId: string;
-  updateFunc: (planId: string, actionId: string, asset: string) => void;
+  updateFunc: (planId: string, actionId: string, asset: ActionAsset) => void;
 };
 
 export function DetailsAssetoutDialog({
@@ -41,102 +42,21 @@ export function DetailsAssetoutDialog({
   const { setActivePlans } = useCalculatedAssetStore();
   const { setIsEditable, setExpanded } = useAssetExpandedState();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<"%" | "fixed">("%");
-  const [status, setStatus] = useState<string | null>(null);
-  const [allocation, setAllocation] = useState(100);
+  const [value, setValue] = useState<"%" | "fixed">("fixed");
+  const [status] = useState<string | null>(null);
+  const [allocation, setAllocation] = useState(0);
   const plan = plans.find((plan) => plan.id === planId);
   const action = plan?.actions.find((action) => action.id === columnId);
 
-  const handleAddd = (assetId: string) => {
-    updateFunc(planId, columnId, assetId);
+  const handleAdd = (assetId: string, isActionAsset?: boolean) => {
+    const actionAsset: ActionAsset = {
+      id: uuid(),
+      allocation: isActionAsset ? 0 : allocation,
+      assetId: assetId,
+      type: isActionAsset ? "%" : value,
+    };
+    updateFunc(planId, columnId, actionAsset);
     setOpen(false);
-  };
-
-  const handleAdd = async (assetId: string) => {
-    const targetAsset = assets.find((asset) => assetId === asset.id);
-
-    let targetAllocation = 0;
-
-    if (value === "%") {
-      targetAllocation = allocation / 100 + 1;
-    } else {
-      targetAllocation = allocation / targetAsset!.value + 1;
-    }
-
-    const newAssetId = uuid();
-
-    if (targetAsset && targetAsset.id !== targetAsset.action_asset) {
-      const newIncomes = targetAsset.incomes.map((income) => ({
-        ...income,
-        id: uuid(),
-        value:
-          income.value_mode === "fixed"
-            ? income.value * targetAllocation
-            : income.value,
-        yoy:
-          income.yoy_type === "fixed"
-            ? income.yoy || 0 * targetAllocation
-            : income.yoy,
-      }));
-
-      const newCosts = targetAsset.costs.map((cost) => ({
-        ...cost,
-        id: uuid(),
-        value:
-          cost.value_mode === "fixed"
-            ? cost.value * targetAllocation
-            : cost.value,
-        yoy:
-          cost.yoy_type === "fixed"
-            ? cost.yoy || 0 * targetAllocation
-            : cost.yoy,
-      }));
-
-      const newAsset: Asset = {
-        ...targetAsset,
-        id: newAssetId,
-        action_asset: targetAsset.id,
-        name: targetAsset.name + " copy",
-        value: targetAsset.value * targetAllocation,
-        yoy:
-          targetAsset.yoy_type === "fixed"
-            ? targetAsset.yoy || 0 * targetAllocation
-            : targetAsset.yoy,
-        incomes: newIncomes,
-        costs: newCosts,
-      };
-
-      setStatus("LOADING");
-
-      try {
-        const response = await fetch("/api/update-asset", {
-          method: "POST",
-          body: JSON.stringify(newAsset),
-        });
-
-        const { success } = await response.json();
-        if (success) {
-          console.log("SUCCESS - Asset created");
-          setStatus("SUCCESS");
-          addAsset(newAsset);
-          updateFunc(planId, columnId, newAssetId);
-          setOpen(false);
-        } else {
-          setStatus("ERROR");
-        }
-      } catch (err: any) {
-        if (err.data?.code === "UNAUTHORIZED") {
-          console.log("You don't have the access.");
-        } else {
-          console.log(err);
-        }
-        setStatus("ERROR");
-      }
-    } else if (targetAsset && targetAsset.id === targetAsset.action_asset) {
-      updateFunc(planId, columnId, assetId);
-      console.log(assetId);
-      setOpen(false);
-    }
   };
 
   const handleCreate = () => {
@@ -146,12 +66,14 @@ export function DetailsAssetoutDialog({
 
     const newAssetId = uuid();
 
+    handleAdd(newAssetId, true);
+
     const newAsset: Asset = {
       id: newAssetId,
-      action_asset: newAssetId,
+      action_asset: action?.time || 0,
       name: "",
       value: 0,
-      category: "plan asset",
+      category: "",
       note: "",
       additions: 0,
       allocation: "",
@@ -189,20 +111,14 @@ export function DetailsAssetoutDialog({
 
         {assets.map((asset) => {
           const isAssetInColumn = action?.assetsIn?.some(
-            (item) => item === asset.id
+            (item) => item.assetId === asset.id
           );
 
-          const actionAssets = assets.map((asset) => asset.action_asset);
-          const isActionAsset = actionAssets.includes(asset.id);
-
-          if (
-            !isAssetInColumn &&
-            (asset.id === asset.action_asset || !isActionAsset)
-          ) {
+          if (!isAssetInColumn) {
             return (
               <div key={asset.id} className="flex items-center space-x-2">
                 <div className="flex items-center space-x-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 w-[200px] rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
-                  {asset.action_asset === asset.id && (
+                  {asset.action_asset && (
                     <Route className="w-4 h-4 mr-2 text-indigo-500" />
                   )}
                   {asset.name}
@@ -214,7 +130,6 @@ export function DetailsAssetoutDialog({
                   <Input
                     id="value"
                     type="text"
-                    disabled={asset.id === asset.action_asset}
                     value={formatNumericValue(allocation)}
                     onChange={(e) => {
                       const numericValue = +e.target.value.replace(/\D/g, "");
@@ -226,7 +141,6 @@ export function DetailsAssetoutDialog({
                     className="px-2 border-l-0 rounded-l-none"
                     value={value}
                     setValue={setValue}
-                    disabled={asset.id === asset.action_asset}
                   />
                 </div>
                 <Button

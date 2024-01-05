@@ -45,13 +45,19 @@ function SelectCell<TValue extends Plan>({
   table: Table<TValue>;
   row: Row<TValue>;
 }) {
-  const { setSelectedPlan } = useSelectedPlanStore();
+  const { selectedPlan, setSelectedPlan } = useSelectedPlanStore();
   useEffect(() => {
     const selectedAssets = table
       .getFilteredSelectedRowModel()
       .rows.map((row) => row.original);
     setSelectedPlan(selectedAssets[0]);
   }, [table.getFilteredSelectedRowModel()]);
+
+  useEffect(() => {
+    if (!selectedPlan) {
+      table.resetRowSelection();
+    }
+  }, [selectedPlan]);
 
   return (
     <CustomRadio
@@ -132,31 +138,19 @@ function DetailsHeader() {
 function DetailsCell<TData>({ row }: { row: Row<TData> }) {
   const { expanded, isEditable, setIsEditable, setExpanded } =
     usePlanExpandedState();
-  const { plans, removePlan } = usePlanStore();
-  const { removeAsset } = useAssetStore();
-
-  const plan = plans.find((plan) => expanded === plan.id);
-
-  const assetsInIds = plan?.actions.map((action) => action.assetsIn).flat();
-  const assetsOutIds = plan?.actions.map((action) => action.assetOut);
-  const combinedAssetIds =
-    assetsInIds && assetsOutIds && assetsInIds.concat(assetsOutIds);
+  const { removePlan } = usePlanStore();
 
   const handleRemove = async () => {
     try {
       const response = await fetch("/api/delete-plan", {
         method: "POST",
-        body: JSON.stringify({
-          planId: row.getValue("id"),
-          assetIds: combinedAssetIds,
-        }),
+        body: JSON.stringify({ planId: row.getValue("id") }),
       });
 
       const { success, code } = await response.json();
       if (success) {
         console.log("success");
         removePlan(row.getValue("id"));
-        combinedAssetIds?.forEach((assetId) => removeAsset(assetId));
         setExpanded(null);
         setIsEditable(false);
       }
@@ -171,7 +165,6 @@ function DetailsCell<TData>({ row }: { row: Row<TData> }) {
       }
     }
   };
-
   return (
     <div className="flex space-x-2 justify-end ml-auto items-center">
       <div

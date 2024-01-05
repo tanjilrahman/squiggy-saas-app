@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { YoyCombobox } from "./yoy-combobox";
 import { useAssetStore } from "@/store/assetStore";
@@ -23,9 +22,9 @@ type YoyDialogProps = {
 export function YoyDialog({ children, assetId }: YoyDialogProps) {
   const [open, setOpen] = useState(false);
   const [enable, setEnable] = useState(false);
-  const [numYears, setNumYears] = useState(5);
+  const numYears = 50;
   const [yoyValues, setYoyValues] = useState<(number | null)[]>(
-    Array(numYears).fill("")
+    Array(numYears).fill(0)
   );
   const { assets, updateAssetYoyMode, updateAssetYoyAdvanced } =
     useAssetStore();
@@ -63,6 +62,10 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
 
   const generateYearInputs = () => {
     return Array.from({ length: numYears }, (_, index) => {
+      const lastNumber = yoyValues
+        .filter((element) => typeof element === "number")
+        .pop();
+
       const yearValue = yoyValues[index] !== undefined ? yoyValues[index] : "";
 
       return (
@@ -71,6 +74,7 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
           <Input
             type="number"
             disabled={!enable}
+            placeholder={lastNumber?.toString()}
             className="w-[70px] h-[35px] p-2 mt-2 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
             value={yearValue || ""}
             onChange={(e) => {
@@ -101,23 +105,7 @@ export function YoyDialog({ children, assetId }: YoyDialogProps) {
         </DialogHeader>
 
         <div className="flex items-center justify-between">
-          <Tabs defaultValue="5" className="flex items-center space-x-2">
-            <TabsList>
-              <TabsTrigger value="5" onClick={() => setNumYears(5)}>
-                5
-              </TabsTrigger>
-              <TabsTrigger value="10" onClick={() => setNumYears(10)}>
-                10
-              </TabsTrigger>
-              <TabsTrigger value="25" onClick={() => setNumYears(25)}>
-                25
-              </TabsTrigger>
-              <TabsTrigger value="50" onClick={() => setNumYears(50)}>
-                50
-              </TabsTrigger>
-            </TabsList>
-            <YoyCombobox assetId={assetId} />
-          </Tabs>
+          <YoyCombobox assetId={assetId} />
           <div className="flex items-center">
             <Label className="mr-2">{enable ? "Enabled" : "Disabled"}</Label>
             <Switch

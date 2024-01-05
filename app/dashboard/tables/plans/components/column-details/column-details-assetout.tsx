@@ -5,6 +5,7 @@ import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/assetStore";
 import { DetailsAssetoutDialog } from "./details-assetout-dialog";
+import { ActionAsset } from "../../data/schema";
 
 interface ColumnDetailsAssetOutProps<TData> {
   row: Row<TData>;
@@ -13,45 +14,47 @@ interface ColumnDetailsAssetOutProps<TData> {
 function ColumnDetailsAssetOut<TData>({
   row,
 }: ColumnDetailsAssetOutProps<TData>) {
-  const [value, setValue] = useState<string>(row.getValue("assetOut"));
-  const { removeAsset } = useAssetStore();
   const [status, setStatus] = useState<string | null>(null);
-  const [assetsInIds, setAssetsInIds] = useState<string[]>(
+  const [value, setValue] = useState<ActionAsset>(row.getValue("assetOut"));
+  const [assetsInIds, setAssetsInIds] = useState<ActionAsset[]>(
     row.getValue("assetsIn")
   );
   const [tradeOff, setTradeOff] = useState(0);
-
+  const { removeAsset } = useAssetStore();
   const { plans, removeActionAssetOutId, updateActionAssetOut } =
     usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
+  const actionTime: number = row.getValue("time");
 
-  const assetOut = assets.find((asset) => asset.id === value);
+  const assetOut = assets.find((asset) => asset.id === value?.assetId);
 
+  assetOut?.action_asset;
   useEffect(() => {
     setValue(row.getValue("assetOut"));
     setAssetsInIds(row.getValue("assetsIn"));
   }, [plans]);
 
-  const handleRemoveWithAsset = async (assetId: string) => {
+  const handleRemoveActionAsset = async (actionAssetId: string) => {
     setStatus("LOADING");
+    const assetId = assetOut?.action_asset ? assetOut.id : null;
     try {
-      const response = await fetch("/api/delete-asset", {
+      const response = await fetch("/api/delete-action-asset", {
         method: "POST",
-        body: JSON.stringify({ assetId }),
+        body: JSON.stringify({ actionAssetId, assetId }),
       });
 
       const { success, code } = await response.json();
       if (success) {
         console.log("success");
         setStatus("SUCCESS");
-        removeAsset(assetId);
-        removeActionAssetOutId(expanded!, row.getValue("id"), value);
+        assetId && removeAsset(assetId);
+        removeActionAssetOutId(expanded!, row.getValue("id"));
       }
       if (code === "NOT FOUND") {
         setStatus("ERROR");
-        removeAsset(assetId);
-        removeActionAssetOutId(expanded!, row.getValue("id"), value);
+        assetId && removeAsset(assetId);
+        removeActionAssetOutId(expanded!, row.getValue("id"));
       }
     } catch (err: any) {
       if (err.data?.code === "UNAUTHORIZED") {
@@ -62,27 +65,28 @@ function ColumnDetailsAssetOut<TData>({
   };
 
   useEffect(() => {
-    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
-      const asset = assets.find((a) => a.id === assetId);
-      const actionAssetId = asset?.action_asset;
-      const targetAsset = assets.find((a) => a.id === actionAssetId);
-      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
-
-      return sum + assetInValue;
+    const totalValue = assetsInIds?.reduce((sum, assetin) => {
+      const assetValue = assets.find(
+        (asset) => asset.id === assetin.assetId
+      )?.value;
+      const est =
+        assetin?.type === "%"
+          ? (assetValue || 0) * (assetin.allocation / 100)
+          : assetin?.allocation;
+      return est + sum;
     }, 0);
 
-    const targetOutAsset = assets.find(
-      (asset) => asset.id === assetOut?.action_asset
-    );
+    const assetOut = assets.find((asset) => asset.id === value?.assetId);
 
-    const sameAsset = assetOut?.id === targetOutAsset?.id;
+    const allocation = assetOut?.action_asset ? 100 : value?.allocation;
 
-    setTradeOff(
-      (((assetOut?.value || 0) - (sameAsset ? 0 : targetOutAsset?.value || 0)) /
-        assetsInTotalValue) *
-        100
-    );
-  }, [value, assetsInIds]);
+    const assetOutValue =
+      value?.type === "%"
+        ? (assetOut?.value || 0) * (allocation / 100)
+        : allocation;
+
+    setTradeOff((assetOutValue / totalValue) * 100);
+  }, [value, assetsInIds, assets]);
 
   return (
     <div className="w-[220px]">
@@ -98,10 +102,10 @@ function ColumnDetailsAssetOut<TData>({
             </div>
             {isEditable && (
               <Button
-                disabled={!isEditable || status === "LOADING"}
+                disabled={!isEditable}
                 variant="outline"
                 className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
-                onClick={() => handleRemoveWithAsset(value)}
+                onClick={() => handleRemoveActionAsset(value.id)}
               >
                 {status === "LOADING" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -125,7 +129,11 @@ function ColumnDetailsAssetOut<TData>({
           columnId={row.getValue("id")}
           updateFunc={updateActionAssetOut}
         >
-          <Button variant="outline" className="w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={!(actionTime > 0)}
+          >
             <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
           </Button>
         </DetailsAssetoutDialog>

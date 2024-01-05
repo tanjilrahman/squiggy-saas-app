@@ -75,19 +75,18 @@ function DashboardBody({
 
         if (activePlans) {
           if (selectedPlan) {
-            const assetInIds = selectedPlan.actions
-              .map((action) => action.assetsIn.map((assetin) => assetin))
-              .flat();
-
-            const assetsIn = activeAssets.filter((asset) =>
-              assetInIds.includes(asset.id)
-            );
-            return assetsIn.map((asset) =>
-              calculateAsset(asset, year, plans, assets, activeInflation)
+            return activeAssets.map((asset) =>
+              calculateAsset(
+                asset,
+                year,
+                [selectedPlan],
+                selectedPlan,
+                activeInflation
+              )
             );
           }
           return activeAssets.map((asset) =>
-            calculateAsset(asset, year, plans, assets, activeInflation)
+            calculateAsset(asset, year, plans)
           );
         } else {
           return filteredPureAsset.map((asset) => calculateAsset(asset, year));
@@ -95,7 +94,11 @@ function DashboardBody({
       };
 
       const calculateAssetsWithAllocation = addProfitsToCurrency(
-        calculatedAssets()
+        calculatedAssets(),
+        null,
+        activePlans ? plans : null,
+        selectedPlan ? selectedPlan : null,
+        activeInflation ? activeInflation : null
       );
 
       setCalculatedAssets(calculateAssetsWithAllocation);

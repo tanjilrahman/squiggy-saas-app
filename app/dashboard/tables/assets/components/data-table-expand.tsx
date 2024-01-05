@@ -66,7 +66,8 @@ export function DataTableExpand<TData extends Asset, TValue>({
     const allActions = plans.map((plan) => plan.actions).flat();
     const action = allActions.find(
       (action) =>
-        action.assetsIn.includes(assetId) || action.assetOut === assetId
+        action.assetsIn.some((a) => a.assetId === assetId) ||
+        action.assetOut?.assetId === assetId
     );
     const plan = plans.find((plan) =>
       plan.actions.find((a) => a.id === action?.id)
@@ -226,8 +227,10 @@ export function DataTableExpand<TData extends Asset, TValue>({
                           <div className="flex items-center space-x-4">
                             <ProfitAllocationCombobox
                               disabled={
-                                !isEditable ||
-                                !!assetsData[row.index].action_asset
+                                !isEditable
+                                // (!!assetsData[row.index].action_asset &&
+                                //   assetsData[row.index].action_asset !==
+                                //     assetsData[row.index].id)
                               }
                               assetId={row.getValue("id")}
                             />

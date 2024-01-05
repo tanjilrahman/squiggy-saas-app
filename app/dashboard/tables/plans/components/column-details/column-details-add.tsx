@@ -20,7 +20,7 @@ function ColumnDetailsAdd({ className, updateFunc }: ColumnDetailsAddProps) {
       name: "",
       time: 0,
       assetsIn: [],
-      assetOut: "",
+      assetOut: null,
       value: 0,
       status: "",
     };

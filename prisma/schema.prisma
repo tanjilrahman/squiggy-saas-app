@@ -27,7 +27,7 @@ model User {
 
 model Asset {
   id           String   @id @default(uuid())
-  action_asset String?
+  action_asset Int?
   name         String
   value        Int
   category     String
@@ -89,23 +89,25 @@ model Plan {
 }
 
 model Action {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   name      String
   time      Int
   value     Int
   status    String
-  assetsIn  String[]
-  assetOut  String
-  createdAt DateTime @default(now())
-  Plan      Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  assetsIn  ActionAsset[] @relation("ActionIn")
+  assetOut  ActionAsset?
+  createdAt DateTime      @default(now())
+  Plan      Plan          @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId    String
 }
 
-// model ActionAsset {
-//   id         String  @id @default(uuid())
-//   assetId    String
-//   type       String
-//   allocation Int
-//   ActionIn   Action? @relation(fields: [actionInId], references: [id], onDelete: Cascade)
-//   actionInId String?
-// }
+model ActionAsset {
+  id          String  @id @default(uuid())
+  assetId     String
+  type        String
+  allocation  Float
+  ActionIn    Action? @relation("ActionIn", fields: [actionInId], references: [id], onDelete: Cascade)
+  actionInId  String?
+  ActionOut   Action? @relation(fields: [actionOutId], references: [id], onDelete: Cascade)
+  actionOutId String? @unique
+}

@@ -9,20 +9,21 @@ import {
 } from "@/components/ui/dialog";
 import { useAssetStore } from "@/store/assetStore";
 import { usePlanStore } from "@/store/planStore";
-import { Loader2, PlusCircle, Route } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { AllocationTypeCombobox } from "../allocation-type-combobox";
 import { Input } from "@/components/ui/input";
-import { Asset } from "../../../assets/data/schema";
 import { FormatValueCurrency } from "@/components/FormatValueCurrency";
 import { formatNumericValue } from "@/lib/helperFunctions";
+import { useCalculatedAssetStore } from "@/store/calculationStore";
+import { ActionAsset } from "../../data/schema";
 
 type ColumnDetailsDialogProps = {
   children: JSX.Element;
   planId: string;
   columnId: string;
-  updateFunc: (planId: string, actionId: string, asset: string) => void;
+  updateFunc: (planId: string, actionId: string, asset: ActionAsset) => void;
 };
 
 export function DetailsAssetsInDialog({
@@ -31,96 +32,23 @@ export function DetailsAssetsInDialog({
   columnId,
   updateFunc,
 }: ColumnDetailsDialogProps) {
-  const { assets, addAsset } = useAssetStore();
+  const { assets } = useAssetStore();
   const { plans } = usePlanStore();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<"%" | "fixed">("%");
-  const [status, setStatus] = useState<string | null>(null);
+  const [value, setValue] = useState<"%" | "fixed">("fixed");
   const [allocation, setAllocation] = useState(0);
   const plan = plans.find((plan) => plan.id === planId);
   const action = plan?.actions.find((action) => action.id === columnId);
 
-  const handleAdd = async (assetId: string) => {
-    const targetAsset = assets.find((asset) => assetId === asset.id);
-
-    let targetAllocation = 0;
-
-    if (value === "%") {
-      targetAllocation = 1 - allocation / 100;
-    } else {
-      targetAllocation = 1 - allocation / targetAsset!.value;
-    }
-
-    const newAssetId = uuid();
-
-    if (targetAsset) {
-      const newIncomes = targetAsset.incomes.map((income) => ({
-        ...income,
-        id: uuid(),
-        value:
-          income.value_mode === "fixed"
-            ? income.value * targetAllocation
-            : income.value,
-        yoy:
-          income.yoy_type === "fixed"
-            ? income.yoy || 0 * targetAllocation
-            : income.yoy,
-      }));
-
-      const newCosts = targetAsset.costs.map((cost) => ({
-        ...cost,
-        id: uuid(),
-        value:
-          cost.value_mode === "fixed"
-            ? cost.value * targetAllocation
-            : cost.value,
-        yoy:
-          cost.yoy_type === "fixed"
-            ? cost.yoy || 0 * targetAllocation
-            : cost.yoy,
-      }));
-
-      const newAsset: Asset = {
-        ...targetAsset,
-        id: newAssetId,
-        action_asset: targetAsset.id,
-        name: targetAsset.name + " copy",
-        value: targetAsset.value * targetAllocation,
-        yoy:
-          targetAsset.yoy_type === "fixed"
-            ? targetAsset.yoy || 0 * targetAllocation
-            : targetAsset.yoy,
-        incomes: newIncomes,
-        costs: newCosts,
-      };
-
-      setStatus("LOADING");
-
-      try {
-        const response = await fetch("/api/update-asset", {
-          method: "POST",
-          body: JSON.stringify(newAsset),
-        });
-
-        const { success } = await response.json();
-        if (success) {
-          console.log("SUCCESS - Asset created");
-          setStatus("SUCCESS");
-          addAsset(newAsset);
-          updateFunc(planId, columnId, newAssetId);
-          setOpen(false);
-        } else {
-          setStatus("ERROR");
-        }
-      } catch (err: any) {
-        if (err.data?.code === "UNAUTHORIZED") {
-          console.log("You don't have the access.");
-        } else {
-          console.log(err);
-        }
-        setStatus("ERROR");
-      }
-    }
+  const handleAdd = (assetId: string) => {
+    const assetsIn: ActionAsset = {
+      id: uuid(),
+      assetId,
+      allocation: allocation,
+      type: value,
+    };
+    updateFunc(planId, columnId, assetsIn);
+    setOpen(false);
   };
 
   return (
@@ -142,13 +70,13 @@ export function DetailsAssetsInDialog({
 
         {assets.map((asset) => {
           const isAssetInColumn = action?.assetsIn?.some(
-            (item) => item === asset.id
+            (item) => item.assetId === asset.id
           );
-          const actionAssets = assets.map((asset) => asset.action_asset);
-          const isActionAsset = actionAssets.includes(asset.id);
-          const isAssetOutColumn = action?.assetOut === asset.id;
+          // const actionAssets = assets.map((asset) => asset.action_asset);
+          // const isActionAsset = actionAssets.includes(asset.id);
+          const isAssetOutColumn = action?.assetOut?.assetId === asset.id;
 
-          if (!isAssetInColumn && !isAssetOutColumn && !isActionAsset) {
+          if (!isAssetInColumn && !isAssetOutColumn) {
             return (
               <div key={asset.id} className="flex space-x-2 items-center">
                 <div className="flex items-center bg-secondary text-secondary-foreground h-10 w-[200px] rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
@@ -179,14 +107,8 @@ export function DetailsAssetsInDialog({
                   variant="outline"
                   className="p-3 space-x-2 data-[state=open]:bg-muted"
                   onClick={() => handleAdd(asset.id!)}
-                  disabled={status === "LOADING"}
                 >
-                  {status === "LOADING" ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <PlusCircle className="h-4 w-4 mr-1" />
-                  )}
-                  Add
+                  <PlusCircle className="h-4 w-4 mr-1" /> Add
                 </Button>
               </div>
             );

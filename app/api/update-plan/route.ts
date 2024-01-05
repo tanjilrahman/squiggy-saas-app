@@ -38,16 +38,66 @@ export async function POST(request: NextRequest) {
               time: action.time,
               value: action.value,
               status: action.status,
-              assetOut: action.assetOut,
-              assetsIn: action.assetsIn,
+              assetsIn: {
+                upsert: action.assetsIn.map((assetIn) => ({
+                  where: { id: assetIn.id },
+                  update: {
+                    assetId: assetIn.assetId,
+                    allocation: assetIn.allocation,
+                    type: assetIn.type,
+                  },
+                  create: {
+                    id: assetIn.id,
+                    assetId: assetIn.assetId,
+                    allocation: assetIn.allocation,
+                    type: assetIn.type,
+                  },
+                })),
+              },
+              assetOut: action.assetOut
+                ? {
+                    upsert: {
+                      where: { id: action.assetOut.id },
+                      update: {
+                        id: action.assetOut.id,
+                        assetId: action.assetOut.assetId,
+                        allocation: action.assetOut.allocation,
+                        type: action.assetOut.type,
+                      },
+                      create: {
+                        id: action.assetOut.id,
+                        assetId: action.assetOut.assetId,
+                        allocation: action.assetOut.allocation,
+                        type: action.assetOut.type,
+                      },
+                    },
+                  }
+                : undefined,
             },
             create: {
+              id: action.id,
               name: action.name,
               time: action.time,
               value: action.value,
               status: action.status,
-              assetOut: action.assetOut,
-              assetsIn: action.assetsIn,
+              assetsIn: {
+                create: action.assetsIn.map((assetIn) => ({
+                  id: assetIn.id,
+                  assetId: assetIn.assetId,
+                  allocation: assetIn.allocation,
+                  type: assetIn.type,
+                })),
+              },
+              assetOut: action.assetOut
+                ? {
+                    create: {
+                      id: action.assetOut.id,
+                      assetId: action.assetOut.assetId,
+                      allocation: action.assetOut.allocation,
+                      type: action.assetOut.type,
+                    },
+                  }
+                : undefined,
             },
           })),
         },
@@ -76,8 +126,24 @@ export async function POST(request: NextRequest) {
             time: action.time,
             value: action.value,
             status: action.status,
-            assetOut: action.assetOut,
-            assetsIn: action.assetsIn,
+            assetsIn: {
+              create: action.assetsIn.map((assetIn) => ({
+                id: assetIn.id,
+                assetId: assetIn.assetId,
+                allocation: assetIn.allocation,
+                type: assetIn.type,
+              })),
+            },
+            assetOut: action.assetOut
+              ? {
+                  create: {
+                    id: action.assetOut.id,
+                    assetId: action.assetOut.assetId,
+                    allocation: action.assetOut.allocation,
+                    type: action.assetOut.type,
+                  },
+                }
+              : undefined,
           })),
         },
       },

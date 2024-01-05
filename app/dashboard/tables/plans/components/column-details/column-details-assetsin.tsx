@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/assetStore";
 import { DetailsAssetsInDialog } from "./details-assetsin-dialog";
 import { formatValue } from "@/lib/helperFunctions";
+import { ActionAsset } from "../../data/schema";
 
 interface ColumnDetailsAssetsInProps<TData> {
   row: Row<TData>;
@@ -14,39 +15,50 @@ interface ColumnDetailsAssetsInProps<TData> {
 function ColumnDetailsAssetsIn<TData>({
   row,
 }: ColumnDetailsAssetsInProps<TData>) {
-  const [assetsInIds, setAssetsInIds] = useState<string[]>(
-    row.getValue("assetsIn")
-  );
   const [status, setStatus] = useState<string | null>(null);
-  const { removeAsset } = useAssetStore();
+  const [value, setValue] = useState<ActionAsset[]>(row.getValue("assetsIn"));
   const [estValue, setEstValue] = useState(100);
   const { plans, removeActionAssetInId, updateActionAssetIn } = usePlanStore();
   const { assets } = useAssetStore();
   const { expanded, isEditable } = usePlanExpandedState();
+  const actionTime: number = row.getValue("time");
 
   useEffect(() => {
-    setAssetsInIds(row.getValue("assetsIn"));
+    setValue(row.getValue("assetsIn"));
   }, [plans]);
 
-  const handleRemoveWithAsset = async (assetId: string) => {
+  useEffect(() => {
+    const totalValue = value?.reduce((sum, assetin) => {
+      const assetValue = assets.find(
+        (asset) => asset.id === assetin.assetId
+      )?.value;
+      const est =
+        assetin?.type === "%"
+          ? (assetValue || 0) * (assetin.allocation / 100)
+          : assetin?.allocation;
+      return est + sum;
+    }, 0);
+
+    setEstValue(totalValue);
+  }, [value, plans]);
+
+  const handleRemoveActionAsset = async (actionAssetId: string) => {
     setStatus("LOADING");
     try {
-      const response = await fetch("/api/delete-asset", {
+      const response = await fetch("/api/delete-action-asset", {
         method: "POST",
-        body: JSON.stringify({ assetId }),
+        body: JSON.stringify({ actionAssetId }),
       });
 
       const { success, code } = await response.json();
       if (success) {
         console.log("success");
         setStatus("SUCCESS");
-        removeAsset(assetId);
-        removeActionAssetInId(expanded!, row.getValue("id"), assetId);
+        removeActionAssetInId(expanded!, row.getValue("id"), actionAssetId);
       }
       if (code === "NOT FOUND") {
         setStatus("ERROR");
-        removeAsset(assetId);
-        removeActionAssetInId(expanded!, row.getValue("id"), assetId);
+        removeActionAssetInId(expanded!, row.getValue("id"), actionAssetId);
       }
     } catch (err: any) {
       if (err.data?.code === "UNAUTHORIZED") {
@@ -56,47 +68,36 @@ function ColumnDetailsAssetsIn<TData>({
     }
   };
 
-  useEffect(() => {
-    const assetsInTotalValue = assetsInIds.reduce((sum, assetId) => {
-      const asset = assets.find((a) => a.id === assetId);
-      const actionAssetId = asset?.action_asset;
-      const targetAsset = assets.find((a) => a.id === actionAssetId);
-      const assetInValue = (targetAsset?.value || 0) - (asset?.value || 0);
-
-      return sum + assetInValue;
-    }, 0);
-
-    setEstValue(assetsInTotalValue);
-  }, [assetsInIds]);
-
   return (
     <div className="w-[240px]">
-      {assetsInIds?.map((assetId) => {
-        const asset = assets.find((asset) => asset.id === assetId);
-        const targetAsset = assets.find(
-          (asset) =>
-            asset.id ===
-            assets.find((asset) => asset.id === assetId)?.action_asset
-        );
-        const assetInValue = (targetAsset?.value || 0) - asset?.value!;
+      {value?.map((item) => {
+        const asset = assets.find((asset) => asset.id === item.assetId);
         return (
-          <div key={assetId} className="flex items-center space-x-2 mb-2">
+          <div key={item.id} className="flex items-center space-x-2 mb-2">
             <div
               className={`${
                 !isEditable && "border-transparent bg-transparent"
               } flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background`}
             >
               {asset?.name}
-              <span className="text-muted-foreground ml-1">
-                ({formatValue(assetInValue)})
-              </span>
+
+              {item.type === "%" && (
+                <span className="text-muted-foreground ml-1">
+                  {formatValue(((asset?.value || 0) * item.allocation) / 100)}
+                </span>
+              )}
+              {item.type === "fixed" && (
+                <span className="text-muted-foreground ml-1">
+                  ({formatValue(item.allocation)})
+                </span>
+              )}
             </div>
             {isEditable && (
               <Button
-                disabled={!isEditable || status === "LOADING"}
+                disabled={!isEditable}
                 variant="outline"
                 className="flex p-3 space-x-2 data-[state=open]:bg-muted ml-auto"
-                onClick={() => handleRemoveWithAsset(assetId)}
+                onClick={() => handleRemoveActionAsset(item.id)}
               >
                 {status === "LOADING" ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -116,11 +117,15 @@ function ColumnDetailsAssetsIn<TData>({
             columnId={row.getValue("id")}
             updateFunc={updateActionAssetIn}
           >
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={!(actionTime > 0)}
+            >
               <PlusCircle className="h-4 w-4 mr-1" /> Add Asset
             </Button>
           </DetailsAssetsInDialog>
-          {assetsInIds.length > 0 && (
+          {value?.length > 0 && (
             <p className="mt-4 text-muted-foreground">
               Est. value: {formatValue(estValue)}
             </p>
