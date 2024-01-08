@@ -57,7 +57,8 @@ export function DataTableExpand<TData extends Asset, TValue>({
   const { plans } = usePlanStore();
   const { assets } = useAssetStore();
   const { activePlans } = useCalculatedAssetStore();
-  const { expanded, isEditable, setIsEditable } = useAssetExpandedState();
+  const { expanded, isEditable, assetTableKey, setIsEditable } =
+    useAssetExpandedState();
   const [status, setStatus] = React.useState<string | null>(null);
   const pureAssets = assets.filter((asset) => !asset.action_asset);
   const assetsData = activePlans ? assets : pureAssets;
@@ -167,11 +168,14 @@ export function DataTableExpand<TData extends Asset, TValue>({
               table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow
-                    key={row.id}
+                    key={assetTableKey}
                     data-state={row.getIsSelected() && "selected"}
                     className={`${
                       expanded === row.getValue("id") &&
                       "bg-muted/50 hover:bg-muted/50"
+                    } ${
+                      assetsData[row.index].action_asset &&
+                      "bg-indigo-500/10 hover:bg-indigo-500/10"
                     }`}
                   >
                     {row.getVisibleCells().map((cell) => (

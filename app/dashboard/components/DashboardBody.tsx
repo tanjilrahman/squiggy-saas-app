@@ -75,7 +75,22 @@ function DashboardBody({
 
         if (activePlans) {
           if (selectedPlan) {
-            return activeAssets.map((asset) =>
+            const plannedAssets = selectedPlan.actions.map((action) => {
+              const assetOutId = action.assetOut?.assetId;
+              const asset = assets.find((asset) => asset.id === assetOutId);
+              if (asset?.action_asset) {
+                return asset;
+              }
+            });
+
+            const filteredAssets = activeAssets.filter((asset) => {
+              const activePlannedAsset = plannedAssets.some(
+                (a) => a?.id === asset.id
+              );
+              return !asset.action_asset || activePlannedAsset;
+            });
+
+            return filteredAssets.map((asset) =>
               calculateAsset(
                 asset,
                 year,
@@ -84,10 +99,11 @@ function DashboardBody({
                 activeInflation
               )
             );
+          } else {
+            return activeAssets.map((asset) =>
+              calculateAsset(asset, year, plans)
+            );
           }
-          return activeAssets.map((asset) =>
-            calculateAsset(asset, year, plans)
-          );
         } else {
           return filteredPureAsset.map((asset) => calculateAsset(asset, year));
         }

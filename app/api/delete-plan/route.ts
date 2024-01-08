@@ -69,9 +69,9 @@ export async function POST(request: NextRequest) {
     // Delete associated assets
     if (assetIds) {
       await db.asset
-        .deleteMany({
+        .delete({
           where: {
-            id: { in: assetIds },
+            id: assetIds[0],
           },
         })
         .catch((e) => {

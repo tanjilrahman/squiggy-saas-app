@@ -1,9 +1,9 @@
 "use client";
 
-import { MenuBarTooltip } from "@/components/tooltips/MenuBarTooltip";
+import { DashboardTooltip } from "@/components/tooltips/DashboardTooltip";
 import { useCarousel } from "@/components/ui/carousel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CandlestickChart, KanbanSquare, Route } from "lucide-react";
+import { CandlestickChart, Info, KanbanSquare, Route } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
@@ -73,7 +73,13 @@ function MenuBar({ nav }: { nav: navType }) {
           </TabsTrigger>
         </TabsList>
       </Tabs>
-      <MenuBarTooltip />
+      <DashboardTooltip
+        className="w-40"
+        icon={
+          <Info className="h-[18px] w-[18px] ml-3 text-muted-foreground/80 hover:text-muted-foreground cursor-pointer" />
+        }
+        text="Swipe the screen to change tabs"
+      />
     </div>
   );
 }

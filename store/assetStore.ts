@@ -4,6 +4,8 @@ import { create } from "zustand";
 type AssetExpandedState = {
   expanded: string | null;
   isEditable: boolean;
+  assetTableKey: number;
+  setAssetTableKey: (key: number) => void;
   setExpanded: (id: string | null) => void;
   setIsEditable: (boolean: boolean) => void;
 };
@@ -11,6 +13,8 @@ type AssetExpandedState = {
 export const useAssetExpandedState = create<AssetExpandedState>((set) => ({
   expanded: null,
   isEditable: false,
+  assetTableKey: 0,
+  setAssetTableKey: (assetTableKey) => set({ assetTableKey }),
   setExpanded: (id) => set({ expanded: id }),
   setIsEditable: (boolean) => set({ isEditable: boolean }),
 }));

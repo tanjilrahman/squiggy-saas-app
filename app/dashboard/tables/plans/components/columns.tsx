@@ -138,23 +138,38 @@ function DetailsHeader() {
 function DetailsCell<TData>({ row }: { row: Row<TData> }) {
   const { expanded, isEditable, setIsEditable, setExpanded } =
     usePlanExpandedState();
-  const { removePlan } = usePlanStore();
+  const { plans, removePlan } = usePlanStore();
+  const { assets, removeAsset } = useAssetStore();
 
   const handleRemove = async () => {
+    const plan = plans.find((plan) => plan.id === expanded);
+
+    const assetOutIds = plan?.actions.map((action) => action.assetOut?.assetId);
+
+    const filteredAssetOut = assetOutIds?.filter((assetId) => {
+      const asset = assets.find((asset) => asset.id === assetId);
+      return asset?.action_asset;
+    });
+
     try {
       const response = await fetch("/api/delete-plan", {
         method: "POST",
-        body: JSON.stringify({ planId: row.getValue("id") }),
+        body: JSON.stringify({
+          planId: row.getValue("id"),
+          assetIds: filteredAssetOut,
+        }),
       });
 
       const { success, code } = await response.json();
       if (success) {
         console.log("success");
+        filteredAssetOut?.forEach((asset) => asset && removeAsset(asset));
         removePlan(row.getValue("id"));
         setExpanded(null);
         setIsEditable(false);
       }
       if (code === "NOT FOUND") {
+        filteredAssetOut?.forEach((asset) => asset && removeAsset(asset));
         removePlan(row.getValue("id"));
         setExpanded(null);
         setIsEditable(false);

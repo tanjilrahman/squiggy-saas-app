@@ -9,6 +9,7 @@ export const convertToChartData = (data: Asset[]): BarChartData[] => {
   const categoryTotals: { [key: string]: number } = {};
 
   data.forEach((asset) => {
+    if (asset.value === 0) return;
     const category = asset?.category?.toLowerCase();
 
     if (!categoryTotals[category]) {

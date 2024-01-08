@@ -59,7 +59,7 @@ function DashboardAlert() {
           )}
         </div>
       )}
-      {selectedPlan && (
+      {/* {selectedPlan && (
         <div className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
           <span>Scenario selected</span>
           {!startTime && (
@@ -69,7 +69,7 @@ function DashboardAlert() {
             />
           )}
         </div>
-      )}
+      )} */}
       {barChartActive && (
         <div className="flex items-center px-3 py-1 rounded-md text-sm bg-muted text-muted-foreground">
           <span>Category selected</span>

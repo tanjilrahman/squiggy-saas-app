@@ -141,7 +141,7 @@ export default function BarChart() {
       calculateAsset(
         asset,
         year,
-        activePlans ? plans : null,
+        activePlans ? (selectedPlan ? [selectedPlan] : plans) : null,
         selectedPlan ? selectedPlan : null,
         activeInflation ? activeInflation : null
       )

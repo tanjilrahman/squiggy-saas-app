@@ -109,33 +109,33 @@ export function calculateAsset(
     }
 
     if (activeInflation && activePlan) {
-      let count = 0;
+      // let count = 0;
 
-      activePlan.actions.forEach((action) => {
-        action.assetsIn.forEach((assetIn) => {
-          if (assetIn.assetId === initialAsset.id) {
-            count++;
-          }
-        });
-        if (action.assetOut?.assetId === initialAsset.id) {
-          count++;
-        }
-      });
+      // activePlan.actions.forEach((action) => {
+      //   action.assetsIn.forEach((assetIn) => {
+      //     if (assetIn.assetId === initialAsset.id) {
+      //       count++;
+      //     }
+      //   });
+      //   if (action.assetOut?.assetId === initialAsset.id) {
+      //     count++;
+      //   }
+      // });
 
       const inflationYear = year + (initialAsset.action_asset || 0);
 
       const lastInflation =
         activePlan.inflation_advanced[activePlan.inflation_advanced.length - 1];
 
-      if (count > 0) {
-        inflation =
-          activePlan.inflation_mode === "simple"
-            ? 1 + (activePlan.inflation || 0) / 100
-            : 1 +
-              (activePlan.inflation_advanced[inflationYear - 1] ||
-                lastInflation) /
-                100;
-      }
+      // if (count > 0) {
+      inflation =
+        activePlan.inflation_mode === "simple"
+          ? 1 + (activePlan.inflation || 0) / 100
+          : 1 +
+            (activePlan.inflation_advanced[inflationYear - 1] ||
+              lastInflation) /
+              100;
+      // }
     }
 
     const newIncomes = prevAsset.incomes.map((income) => {
@@ -298,33 +298,33 @@ export function addProfitsToCurrency(
         let rescaleFactor = 1;
 
         if (activeInflation && activePlan) {
-          let count = 0;
+          // let count = 0;
 
-          activePlan.actions.forEach((action) => {
-            action.assetsIn.forEach((assetIn) => {
-              if (assetIn.assetId === asset.id) {
-                count++;
-              }
-            });
-            if (action.assetOut?.assetId === asset.id) {
-              count++;
-            }
-          });
+          // activePlan.actions.forEach((action) => {
+          //   action.assetsIn.forEach((assetIn) => {
+          //     if (assetIn.assetId === asset.id) {
+          //       count++;
+          //     }
+          //   });
+          //   if (action.assetOut?.assetId === asset.id) {
+          //     count++;
+          //   }
+          // });
 
           const inflationYear = targetYear + (asset.action_asset || 0);
           const lastInflation =
             activePlan.inflation_advanced[
               activePlan.inflation_advanced.length - 1
             ];
-          if (count > 0) {
-            inflation =
-              activePlan.inflation_mode === "simple"
-                ? 1 + (activePlan.inflation || 0) / 100
-                : 1 +
-                  (activePlan.inflation_advanced[inflationYear] ||
-                    lastInflation) /
-                    100;
-          }
+          // if (count > 0) {
+          inflation =
+            activePlan.inflation_mode === "simple"
+              ? 1 + (activePlan.inflation || 0) / 100
+              : 1 +
+                (activePlan.inflation_advanced[inflationYear] ||
+                  lastInflation) /
+                  100;
+          // }
         }
 
         // Calculate new incomes for the "currency" asset
@@ -416,7 +416,7 @@ export function addProfitsToCurrency(
 
         if (plans) {
           rescaleFactor = getRescaleFactor(
-            plans,
+            activePlan ? [activePlan] : plans,
             initialAsset![assetIndex],
             targetYear + 1,
             nextYearAssetValue

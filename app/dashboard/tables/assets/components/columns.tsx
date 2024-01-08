@@ -13,7 +13,7 @@ import {
   PlusCircle,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import {
   useAssetExpandedState,
   useAssetStore,
@@ -113,7 +113,7 @@ function ProfitCell<TData extends Asset>({ row }: { row: Row<TData> }) {
   const { assets } = useAssetStore();
   const asset = assets.find((asset) => asset.id === row.getValue("id"));
   row.original.profit = profit;
-  useEffect(() => {
+  useLayoutEffect(() => {
     setProfit(calculateProfit(asset!));
     row.original.profit = profit;
   }, [assets]);
@@ -131,7 +131,7 @@ function RoiCell<TData extends Asset>({ row }: { row: Row<TData> }) {
   const { assets } = useAssetStore();
   const asset = assets.find((asset) => asset.id === row.getValue("id"));
   row.original.roi = roi;
-  useEffect(() => {
+  useLayoutEffect(() => {
     setRoi(calculateROI(asset!));
     row.original.roi = roi;
   }, [assets]);
