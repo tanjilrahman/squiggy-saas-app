@@ -1,3 +1,4 @@
+import LandingPage from "@/components/LandingPage";
 import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
@@ -8,8 +9,8 @@ export default function Home() {
   if (userId) return redirect("/dashboard");
   return (
     <main className="text-center ">
-      <h1>Landing page</h1>
-      <div className="flex items-center justify-center mt-4">
+      <LandingPage />
+      {/* <div className="flex items-center justify-center mt-4">
         <Link href="/hc">
           <Button variant="link">Help center</Button>
         </Link>
@@ -19,7 +20,7 @@ export default function Home() {
         <Link href="/privacy">
           <Button variant="link">Privacy policy</Button>
         </Link>
-      </div>
+      </div> */}
     </main>
   );
 }

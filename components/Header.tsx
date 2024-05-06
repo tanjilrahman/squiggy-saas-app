@@ -1,7 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { Settings } from "lucide-react";
-import MenuBar from "@/app/dashboard/components/MenuBar";
 import { auth, currentUser } from "@clerk/nextjs";
 import Logo from "@/components/Logo";
 import UserButton from "@/components/UserButton";
